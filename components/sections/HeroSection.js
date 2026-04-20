@@ -1,0 +1,74 @@
+import Image from "next/image";
+
+import ActionLink from "@/components/ui/ActionLink";
+import LucideIcon from "@/components/ui/LucideIcon";
+
+export default function HeroSection({
+  badge,
+  title,
+  description,
+  primaryAction,
+  secondaryAction,
+  heroImage,
+  tracker,
+}) {
+  return (
+    <section className="relative flex min-h-[870px] items-center overflow-hidden bg-[#f5f6f7]">
+      <div className="relative z-10 mx-auto grid w-full max-w-7xl grid-cols-1 items-center gap-12 px-8 lg:grid-cols-2">
+        <div className="space-y-8">
+          <div className="inline-flex items-center gap-2 rounded-full bg-[#7bfeb8]/30 px-4 py-2 text-sm font-semibold text-[#005c38]">
+            <LucideIcon className="h-5 w-5" name={badge.icon} strokeWidth={2.25} />
+            {badge.text}
+          </div>
+
+          <h1 className="text-6xl font-extrabold leading-[1.1] tracking-tighter md:text-7xl">
+            {title.lead} <span className="text-[#006941]">{title.highlight}</span>
+          </h1>
+
+          <p className="max-w-lg text-xl font-medium leading-relaxed text-[#595c5d]">
+            {description}
+          </p>
+
+          <div className="flex flex-wrap gap-4 pt-4">
+            <ActionLink href={primaryAction.href} variant="primary" size="md">
+              {primaryAction.label}
+            </ActionLink>
+
+            <ActionLink href={secondaryAction.href} variant="secondary" size="md">
+              {secondaryAction.label}
+            </ActionLink>
+          </div>
+        </div>
+
+        <div className="relative">
+          <div className="relative aspect-[4/5] rotate-2 overflow-hidden rounded-[2rem] shadow-2xl transition-transform duration-700 hover:rotate-0">
+            <Image
+              className="h-full w-full object-cover"
+              alt={heroImage.alt}
+              src={heroImage.src}
+              fill
+              priority
+              sizes="(min-width: 1024px) 40vw, 90vw"
+            />
+          </div>
+
+          <div className="absolute -bottom-6 -left-12 hidden max-w-[240px] rounded-2xl border border-[#abadae]/10 bg-white p-6 shadow-xl md:block">
+            <div className="mb-3 flex items-center gap-3">
+              <div className="flex h-10 w-10 items-center justify-center rounded-full bg-[#ffc69a]">
+                <LucideIcon
+                  className="h-5 w-5 text-[#6f3a00]"
+                  name={tracker.icon}
+                  strokeWidth={2.25}
+                />
+              </div>
+              <span className="text-sm font-bold">{tracker.title}</span>
+            </div>
+            <p className="text-xs text-[#595c5d]">{tracker.text}</p>
+          </div>
+        </div>
+      </div>
+
+      <div className="absolute top-0 right-0 -z-0 h-full w-1/3 bg-gradient-to-l from-[#7bfeb8]/20 to-transparent"></div>
+    </section>
+  );
+}

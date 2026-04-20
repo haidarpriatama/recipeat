@@ -1,0 +1,44 @@
+import Link from "next/link";
+
+import ActionLink from "@/components/ui/ActionLink";
+
+const navLinkClasses =
+  "text-sm font-semibold tracking-tight text-slate-600 transition-all duration-300 ease-out hover:scale-105 hover:text-[#006941]";
+
+export default function SiteHeader({
+  brand,
+  navLinks,
+  loginAction,
+  primaryAction,
+}) {
+  return (
+    <header className="fixed top-0 z-50 w-full bg-[#f5f6f7]/80 backdrop-blur-xl shadow-sm shadow-[#006941]/5">
+      <div className="mx-auto flex h-20 max-w-7xl items-center justify-between px-8">
+        <Link className="text-2xl font-black tracking-tighter text-[#006941]" href="/">
+          {brand}
+        </Link>
+
+        <nav className="hidden items-center gap-8 md:flex">
+          {navLinks.map((link) => (
+            <a key={link.label} className={navLinkClasses} href={link.href}>
+              {link.label}
+            </a>
+          ))}
+        </nav>
+
+        <div className="flex items-center gap-4">
+          <a
+            className="hidden text-sm font-semibold text-slate-600 transition-colors hover:text-[#006941] lg:block"
+            href={loginAction.href}
+          >
+            {loginAction.label}
+          </a>
+
+          <ActionLink href={primaryAction.href} size="sm" variant="header">
+            {primaryAction.label}
+          </ActionLink>
+        </div>
+      </div>
+    </header>
+  );
+}
