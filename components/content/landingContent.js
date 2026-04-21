@@ -3,7 +3,6 @@ export const headerContent = {
   navLinks: [
     { label: "Explore", href: "/explore" },
     { label: "Meal Plans", href: "/meal-plans" },
-    { label: "Recipes", href: "/recipes" },
     { label: "Favorites", href: "/favorites" },
   ],
   loginAction: {

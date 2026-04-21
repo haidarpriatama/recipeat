@@ -1,13 +1,13 @@
 import "./globals.css";
-import { Montserrat, Plus_Jakarta_Sans } from "next/font/google";
+import { Geist, Plus_Jakarta_Sans } from "next/font/google";
 
 // 1. Tambahkan Impor SiteHeader (dan SiteFooter jika ada) di sini
 import SiteHeader from "@/components/layout/SiteHeader";
 // import SiteFooter from "@/components/layout/SiteFooter"; // Buka komentar jika sudah punya file SiteFooter
 
-const montserrat = Montserrat({
+const geist = Geist({
   subsets: ["latin"],
-  variable: "--font-montserrat",
+  variable: "--font-geist",
   display: "swap",
 });
 
@@ -18,10 +18,10 @@ const plusJakartaSans = Plus_Jakarta_Sans({
 });
 
 // CHANGE THIS VALUE TO TEST A DIFFERENT DEFAULT FONT ACROSS THE APP.
-const DEFAULT_APP_FONT = "montserrat";
+const DEFAULT_APP_FONT = "geist";
 
 const fontFamilyMap = {
-  montserrat: "var(--font-montserrat)",
+  geist: "var(--font-geist)",
   plusJakarta: "var(--font-plus-jakarta)",
 };
 
@@ -34,7 +34,7 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <body
-        className={`${montserrat.variable} ${plusJakartaSans.variable} antialiased bg-[#f5f6f7]`}
+        className={`${geist.variable} ${plusJakartaSans.variable} antialiased bg-[#f5f6f7]`}
         style={{ fontFamily: fontFamilyMap[DEFAULT_APP_FONT] }}
       >
         {/* 2. Panggil SiteHeader di posisi paling atas dalam body */}

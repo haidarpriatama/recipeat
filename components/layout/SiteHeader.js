@@ -9,7 +9,6 @@ export default function SiteHeader({
   navLinks = [
     { label: "Explore", href: "/explore" },
     { label: "Meal Plans", href: "/meal-plans" },
-    { label: "Recipes", href: "/recipes" },
     { label: "Favorites", href: "/favorites" },
   ],
   loginAction = { label: "Login", href: "/login" },
@@ -27,7 +26,11 @@ export default function SiteHeader({
   return (
     <header className="fixed top-0 z-50 w-full bg-[#f5f6f7]/80 backdrop-blur-xl shadow-sm shadow-[#006941]/5">
       <div className="flex h-20 w-full items-center justify-between px-6 md:px-10">
-        <Link className="text-2xl font-black tracking-tighter text-[#006941]" href="/">
+        <Link
+          className="text-2xl font-bold tracking-tighter !text-[#006941]"
+          style={{ color: "#006941" }}
+          href="/"
+        >
           {brand}
         </Link>
 
@@ -54,14 +57,19 @@ export default function SiteHeader({
 
         <div className="flex items-center gap-4">
           <Link
-            className="hidden text-sm font-semibold text-slate-600 transition-colors hover:text-[#006941] lg:block"
+            className="hidden text-sm font-semibold text-[#006941] transition-colors hover:text-[#004b2d] lg:block"
             href={loginAction.href}
           >
             {loginAction.label}
           </Link>
 
           {primaryAction && (
-            <ActionLink href={primaryAction.href} size="sm" variant="header">
+            <ActionLink
+              href={primaryAction.href}
+              size="sm"
+              variant="header"
+              className="bg-[#dff5e8] text-[#006941] shadow-[#006941]/10 hover:bg-[#c8efd8]"
+            >
               {primaryAction.label}
             </ActionLink>
           )}

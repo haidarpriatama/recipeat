@@ -11,7 +11,8 @@ export default function SignUpPage() {
         {/* Logo Kiri - Berwarna Hijau #006941 */}
         <Link 
           href="/" 
-          className="text-2xl font-black tracking-tighter text-[#006941] pointer-events-auto"
+          className="text-2xl font-black tracking-tighter !text-[#006941] pointer-events-auto"
+          style={{ color: "#006941" }}
         >
           Recipeat
         </Link>
@@ -60,7 +61,9 @@ export default function SignUpPage() {
             
             {/* Mobile Logo (Hanya muncul di HP) */}
             <div className="md:hidden mb-8 text-center">
-              <span className="text-3xl font-black text-[#006941] font-headline">Recipeat</span>
+              <span className="text-3xl font-black !text-[#006941] font-headline" style={{ color: "#006941" }}>
+                Recipeat
+              </span>
             </div>
 
             {/* Judul Halaman */}

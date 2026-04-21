@@ -10,7 +10,8 @@ export default function LoginPage() {
         {/* Logo Kiri - Berwarna Hijau #006941 */}
         <Link 
           href="/" 
-          className="text-2xl font-black tracking-tighter text-[#006941] pointer-events-auto"
+          className="text-2xl font-black tracking-tighter !text-[#006941] pointer-events-auto"
+          style={{ color: "#006941" }}
         >
           Recipeat
         </Link>
@@ -51,7 +52,7 @@ export default function LoginPage() {
           <div className="w-full max-w-md space-y-10">
             
             {/* Logo untuk Mobile (Hanya muncul di layar kecil) */}
-            <div className="md:hidden text-2xl font-black tracking-tighter text-[#006941] mb-8">
+            <div className="md:hidden text-2xl font-black tracking-tighter !text-[#006941] mb-8" style={{ color: "#006941" }}>
               Recipeat
             </div>
 
