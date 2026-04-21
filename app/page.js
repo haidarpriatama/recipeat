@@ -2,12 +2,10 @@ import {
   ctaContent,
   featuresContent,
   footerContent,
-  headerContent,
   heroContent,
   recipesContent,
 } from "@/components/content/landingContent";
 import SiteFooter from "@/components/layout/SiteFooter";
-import SiteHeader from "@/components/layout/SiteHeader";
 import CtaSection from "@/components/sections/CtaSection";
 import FeaturesSection from "@/components/sections/FeaturesSection";
 import HeroSection from "@/components/sections/HeroSection";
@@ -16,14 +14,7 @@ import RecipesSection from "@/components/sections/RecipesSection";
 export default function HomePage() {
   return (
     <>
-      <SiteHeader
-        brand={headerContent.brand}
-        navLinks={headerContent.navLinks}
-        loginAction={headerContent.loginAction}
-        primaryAction={headerContent.primaryAction}
-      />
-
-      <main className="bg-[#f5f6f7] pt-20 text-[#2c2f30]">
+      <main className="bg-[#f5f6f7] text-[#2c2f30]">
         <HeroSection
           badge={heroContent.badge}
           title={heroContent.title}
