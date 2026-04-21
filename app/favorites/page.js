@@ -1,13 +1,13 @@
-import React from 'react';
-import Image from 'next/image';
+import { footerContent } from "@/components/content/landingContent";
+import SiteFooter from "@/components/layout/SiteFooter";
 // 1. Impor ikon dari lucide-react di bagian atas
-import { Heart, Star, Clock, Search } from 'lucide-react';
+import { Clock, Heart, Search, Star } from "lucide-react";
 
 export default function FavoritesPage() {
   return (
-    <div className="min-h-screen bg-[#f5f6f7] pt-24 pb-12 font-body">
-      
-      <main className="max-w-7xl mx-auto px-6 md:px-12 space-y-10">
+    <>
+      <div className="min-h-screen bg-[#f5f6f7] pt-24 pb-12 font-body">
+        <main className="max-w-7xl mx-auto px-6 md:px-12 space-y-10">
         
         {/* --- SECTION 1: HEADER BANNER & SEARCH --- */}
         <header className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 bg-[#e6e8ea] p-8 md:p-10 rounded-[2rem]">
@@ -197,7 +197,15 @@ export default function FavoritesPage() {
           </button>
         </div>
 
-      </main>
-    </div>
+        </main>
+      </div>
+
+      <SiteFooter
+        brand={footerContent.brand}
+        legalText={footerContent.legalText}
+        socialItems={footerContent.socialItems}
+        linkGroups={footerContent.linkGroups}
+      />
+    </>
   );
 }
