@@ -1,11 +1,11 @@
-"use client"; // Tambahkan ini karena kita butuh usePathname
+"use client"; // Wajib ada agar usePathname berfungsi
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import ActionLink from "@/components/ui/ActionLink";
 
 export default function SiteHeader({
-  brand = "Recipeat", // Aku beri default value jaga-jaga jika props kosong
+  brand = "Recipeat",
   navLinks = [
     { label: "Explore", href: "/explore" },
     { label: "Meal Plans", href: "/meal-plans" },
@@ -15,8 +15,14 @@ export default function SiteHeader({
   loginAction = { label: "Login", href: "/login" },
   primaryAction = { label: "Sign Up", href: "/signup" },
 }) {
-  // Panggil usePathname di sini
   const pathname = usePathname();
+
+  // --- LOGIKA PENYEMBUNYI HEADER ---
+  // Jika URL saat ini adalah /login atau /signup, header ini akan menghilang (return null)
+  if (pathname === "/login" || pathname === "/signup") {
+    return null; 
+  }
+  // ---------------------------------
 
   return (
     <header className="fixed top-0 z-50 w-full bg-[#f5f6f7]/80 backdrop-blur-xl shadow-sm shadow-[#006941]/5">
@@ -27,11 +33,9 @@ export default function SiteHeader({
 
         <nav className="hidden items-center gap-8 md:flex">
           {navLinks.map((link) => {
-            // Cek apakah halaman sedang aktif
             const isActive = pathname === link.href;
 
             return (
-              // Aku ubah tag <a> menjadi <Link> dan gabungkan class milikmu
               <Link
                 key={link.label}
                 href={link.href}
@@ -40,8 +44,6 @@ export default function SiteHeader({
                 }`}
               >
                 {link.label}
-                
-                {/* Garis hijau penanda menu aktif muncul tepat di bawah teks */}
                 {isActive && (
                   <span className="absolute left-0 -bottom-[6px] w-full h-[3px] bg-[#006941] rounded-t-md" />
                 )}
@@ -51,7 +53,6 @@ export default function SiteHeader({
         </nav>
 
         <div className="flex items-center gap-4">
-          {/* Tag <a> ini juga sebaiknya pakai <Link> untuk Next.js */}
           <Link
             className="hidden text-sm font-semibold text-slate-600 transition-colors hover:text-[#006941] lg:block"
             href={loginAction.href}
