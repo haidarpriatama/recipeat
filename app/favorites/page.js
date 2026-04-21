@@ -1,9 +1,10 @@
 import React from 'react';
 import Image from 'next/image';
+// 1. Impor ikon dari lucide-react di bagian atas
+import { Heart, Star, Clock, Search } from 'lucide-react';
 
 export default function FavoritesPage() {
   return (
-    // min-h-screen dan pt-24 agar konten tidak tertutup oleh navbar global
     <div className="min-h-screen bg-[#f5f6f7] pt-24 pb-12 font-body">
       
       <main className="max-w-7xl mx-auto px-6 md:px-12 space-y-10">
@@ -20,9 +21,11 @@ export default function FavoritesPage() {
           </div>
           
           <div className="w-full md:w-96 relative group">
-            <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-[#006941] transition-colors">
-              search
-            </span>
+            {/* Menggunakan Lucide Search */}
+            <div className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-[#006941] transition-colors">
+              <Search size={20} />
+            </div>
+            
             <input 
               className="w-full bg-white text-slate-800 rounded-xl py-4 pl-12 pr-4 border-none shadow-[inset_0_2px_4px_rgba(0,0,0,0.02)] focus:ring-2 focus:ring-[#7bfeb8] outline-none transition-all font-body text-sm placeholder:text-slate-400" 
               placeholder="Search saved recipes..." 
@@ -54,12 +57,13 @@ export default function FavoritesPage() {
           <article className="bg-white rounded-[1.5rem] p-4 shadow-sm hover:shadow-xl flex flex-col gap-5 group cursor-pointer transition-all duration-300 hover:-translate-y-2 border border-slate-100">
             <div className="relative w-full aspect-square rounded-xl overflow-hidden bg-slate-100">
               <img 
-                src="/recipe-1.png" // Ganti dengan path gambarmu di folder public
+                src="/favorite4.png" 
                 alt="Roasted Harvest Buddha Bowl" 
                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out" 
               />
               <button className="absolute top-3 right-3 w-10 h-10 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center text-red-500 hover:bg-white transition-colors shadow-md">
-                <span className="material-symbols-outlined text-[20px]" style={{ fontVariationSettings: "'FILL' 1" }}>favorite</span>
+                {/* Menggunakan Lucide Heart dengan properti fill */}
+                <Heart size={20} fill="currentColor" />
               </button>
             </div>
             <div className="flex flex-col flex-grow space-y-3 px-2">
@@ -72,11 +76,13 @@ export default function FavoritesPage() {
               </h3>
               <div className="mt-auto flex items-center justify-between text-slate-500 text-sm pt-2">
                 <div className="flex items-center gap-1 text-[#8c4a00]">
-                  <span className="material-symbols-outlined text-[16px]" style={{ fontVariationSettings: "'FILL' 1" }}>star</span>
+                  {/* Menggunakan Lucide Star */}
+                  <Star size={16} fill="currentColor" />
                   <span className="font-bold">4.9</span>
                 </div>
                 <div className="flex items-center gap-1 font-medium">
-                  <span className="material-symbols-outlined text-[16px]">schedule</span>
+                  {/* Menggunakan Lucide Clock */}
+                  <Clock size={16} />
                   <span>25 min</span>
                 </div>
               </div>
@@ -87,12 +93,12 @@ export default function FavoritesPage() {
           <article className="bg-white rounded-[1.5rem] p-4 shadow-sm hover:shadow-xl flex flex-col gap-5 group cursor-pointer transition-all duration-300 hover:-translate-y-2 border border-slate-100">
             <div className="relative w-full aspect-square rounded-xl overflow-hidden bg-slate-100">
               <img 
-                src="/recipe-2.png" 
+                src="/favorit3.png" 
                 alt="Honey Glazed Salmon" 
                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out" 
               />
               <button className="absolute top-3 right-3 w-10 h-10 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center text-red-500 hover:bg-white transition-colors shadow-md">
-                <span className="material-symbols-outlined text-[20px]" style={{ fontVariationSettings: "'FILL' 1" }}>favorite</span>
+                <Heart size={20} fill="currentColor" />
               </button>
             </div>
             <div className="flex flex-col flex-grow space-y-3 px-2">
@@ -105,11 +111,11 @@ export default function FavoritesPage() {
               </h3>
               <div className="mt-auto flex items-center justify-between text-slate-500 text-sm pt-2">
                 <div className="flex items-center gap-1 text-[#8c4a00]">
-                  <span className="material-symbols-outlined text-[16px]" style={{ fontVariationSettings: "'FILL' 1" }}>star</span>
+                  <Star size={16} fill="currentColor" />
                   <span className="font-bold">4.8</span>
                 </div>
                 <div className="flex items-center gap-1 font-medium">
-                  <span className="material-symbols-outlined text-[16px]">schedule</span>
+                  <Clock size={16} />
                   <span>20 min</span>
                 </div>
               </div>
@@ -120,12 +126,12 @@ export default function FavoritesPage() {
           <article className="bg-white rounded-[1.5rem] p-4 shadow-sm hover:shadow-xl flex flex-col gap-5 group cursor-pointer transition-all duration-300 hover:-translate-y-2 border border-slate-100">
             <div className="relative w-full aspect-square rounded-xl overflow-hidden bg-slate-100">
               <img 
-                src="/recipe-3.png" 
+                src="/favorit2.png" 
                 alt="Artisan Avocado Toast" 
                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out" 
               />
               <button className="absolute top-3 right-3 w-10 h-10 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center text-red-500 hover:bg-white transition-colors shadow-md">
-                <span className="material-symbols-outlined text-[20px]" style={{ fontVariationSettings: "'FILL' 1" }}>favorite</span>
+                <Heart size={20} fill="currentColor" />
               </button>
             </div>
             <div className="flex flex-col flex-grow space-y-3 px-2">
@@ -138,11 +144,11 @@ export default function FavoritesPage() {
               </h3>
               <div className="mt-auto flex items-center justify-between text-slate-500 text-sm pt-2">
                 <div className="flex items-center gap-1 text-[#8c4a00]">
-                  <span className="material-symbols-outlined text-[16px]" style={{ fontVariationSettings: "'FILL' 1" }}>star</span>
+                  <Star size={16} fill="currentColor" />
                   <span className="font-bold">4.7</span>
                 </div>
                 <div className="flex items-center gap-1 font-medium">
-                  <span className="material-symbols-outlined text-[16px]">schedule</span>
+                  <Clock size={16} />
                   <span>10 min</span>
                 </div>
               </div>
@@ -153,12 +159,12 @@ export default function FavoritesPage() {
           <article className="bg-white rounded-[1.5rem] p-4 shadow-sm hover:shadow-xl flex flex-col gap-5 group cursor-pointer transition-all duration-300 hover:-translate-y-2 border border-slate-100">
             <div className="relative w-full aspect-square rounded-xl overflow-hidden bg-slate-100">
               <img 
-                src="/recipe-4.png" 
+                src="/favorit1.png" 
                 alt="Creamy Wild Mushroom Risotto" 
                 className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out" 
               />
               <button className="absolute top-3 right-3 w-10 h-10 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center text-red-500 hover:bg-white transition-colors shadow-md">
-                <span className="material-symbols-outlined text-[20px]" style={{ fontVariationSettings: "'FILL' 1" }}>favorite</span>
+                <Heart size={20} fill="currentColor" />
               </button>
             </div>
             <div className="flex flex-col flex-grow space-y-3 px-2">
@@ -171,11 +177,11 @@ export default function FavoritesPage() {
               </h3>
               <div className="mt-auto flex items-center justify-between text-slate-500 text-sm pt-2">
                 <div className="flex items-center gap-1 text-[#8c4a00]">
-                  <span className="material-symbols-outlined text-[16px]" style={{ fontVariationSettings: "'FILL' 1" }}>star</span>
+                  <Star size={16} fill="currentColor" />
                   <span className="font-bold">4.9</span>
                 </div>
                 <div className="flex items-center gap-1 font-medium">
-                  <span className="material-symbols-outlined text-[16px]">schedule</span>
+                  <Clock size={16} />
                   <span>45 min</span>
                 </div>
               </div>
