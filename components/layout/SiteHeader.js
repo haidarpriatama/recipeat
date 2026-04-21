@@ -26,7 +26,7 @@ export default function SiteHeader({
 
   return (
     <header className="fixed top-0 z-50 w-full bg-[#f5f6f7]/80 backdrop-blur-xl shadow-sm shadow-[#006941]/5">
-      <div className="mx-auto flex h-20 max-w-7xl items-center justify-between px-8">
+      <div className="flex h-20 w-full items-center justify-between px-6 md:px-10">
         <Link className="text-2xl font-black tracking-tighter text-[#006941]" href="/">
           {brand}
         </Link>
