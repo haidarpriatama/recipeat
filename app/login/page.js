@@ -1,8 +1,56 @@
-import React from 'react';
+'use client';
+
+import React, { useState, useEffect, Suspense } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { signIn } from 'next-auth/react';
 
-export default function LoginPage() {
+function LoginForm() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  
+  const [formData, setFormData] = useState({ email: '', password: '' });
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [successMsg, setSuccessMsg] = useState('');
+
+  useEffect(() => {
+    if (searchParams.get('registered') === 'true') {
+      setSuccessMsg('Account created successfully. Please sign in.');
+    }
+  }, [searchParams]);
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError('');
+    setSuccessMsg('');
+    setLoading(true);
+
+    try {
+      const result = await signIn('credentials', {
+        redirect: false,
+        email: formData.email,
+        password: formData.password,
+      });
+
+      if (result?.error) {
+        setError('Invalid email or password');
+      } else {
+        router.push('/explore');
+        router.refresh();
+      }
+    } catch (err) {
+      setError('An unexpected error occurred');
+    } finally {
+      setLoading(false);
+    }
+  };
   return (
     <div className="-mt-20 bg-[#f5f6f7] font-body text-on-surface antialiased overflow-x-hidden min-h-screen flex flex-col relative">
   
@@ -66,8 +114,20 @@ export default function LoginPage() {
               </p>
             </div>
 
+            {/* Error & Success Messages */}
+            {error && (
+              <div className="p-4 bg-red-50 border border-red-200 rounded-xl text-red-600 text-sm">
+                {error}
+              </div>
+            )}
+            {successMsg && (
+              <div className="p-4 bg-green-50 border border-green-200 rounded-xl text-green-700 text-sm">
+                {successMsg}
+              </div>
+            )}
+
             {/* Form Login */}
-            <form className="space-y-6">
+            <form className="space-y-6" onSubmit={handleSubmit}>
               <div className="space-y-4">
                 {/* Input Email */}
                 <div className="space-y-2">
@@ -83,6 +143,9 @@ export default function LoginPage() {
                     name="email"
                     placeholder="chef@recipeat.com"
                     type="email"
+                    value={formData.email}
+                    onChange={handleChange}
+                    required
                   />
                 </div>
                 
@@ -108,16 +171,24 @@ export default function LoginPage() {
                     name="password"
                     placeholder="••••••••"
                     type="password"
+                    value={formData.password}
+                    onChange={handleChange}
+                    required
                   />
                 </div>
               </div>
               
               {/* Tombol Sign In */}
               <button
-                className="w-full py-4 bg-[#006941] hover:bg-[#004b2d] text-white font-headline font-bold text-lg rounded-full shadow-lg active:scale-[0.98] transition-all"
+                className="w-full py-4 bg-[#006941] hover:bg-[#004b2d] text-white font-headline font-bold text-lg rounded-full shadow-lg active:scale-[0.98] transition-all disabled:opacity-70 flex justify-center items-center"
                 type="submit"
+                disabled={loading}
               >
-                Sign In
+                {loading ? (
+                  <span className="animate-spin rounded-full h-5 w-5 border-2 border-white border-t-transparent"></span>
+                ) : (
+                  'Sign In'
+                )}
               </button>
             </form>
 
@@ -174,5 +245,17 @@ export default function LoginPage() {
         </section>
       </main>
     </div>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center bg-[#f5f6f7]">
+        <div className="animate-spin rounded-full h-8 w-8 border-4 border-[#006941] border-t-transparent"></div>
+      </div>
+    }>
+      <LoginForm />
+    </Suspense>
   );
 }

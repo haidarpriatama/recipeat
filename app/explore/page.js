@@ -340,7 +340,7 @@ export default function ExplorePage() {
                     type="button"
                     className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-[#006941] px-10 py-3.5 font-bold text-white transition-all hover:bg-[#005c38] md:w-auto"
                   >
-                    Cari Resep
+                    Find Recipes
                     <Search className="h-4 w-4" />
                   </button>
                 </div>
@@ -517,7 +517,7 @@ export default function ExplorePage() {
         </div>
 
         <div className="mx-auto mt-12 flex max-w-screen-2xl flex-col justify-between gap-3 border-t border-[#abadae]/20 pt-8 text-xs font-bold uppercase tracking-widest text-[#595c5d] md:flex-row">
-          <span>© 2024 Recipeat UI. All rights reserved.</span>
+          <span>© 2025 Recipeat UI. All rights reserved.</span>
           <span>Designed for the Modern Kitchen</span>
         </div>
       </footer>

@@ -17,8 +17,8 @@ export default function SiteHeader({
   const pathname = usePathname();
 
   // --- LOGIKA PENYEMBUNYI HEADER ---
-  // Jika URL saat ini adalah /login atau /signup, header ini akan menghilang (return null)
-  if (pathname === "/login" || pathname === "/signup") {
+  // Jika URL saat ini adalah /login, /signup, atau berada di /admin, header ini akan menghilang (return null)
+  if (pathname === "/login" || pathname === "/signup" || pathname.startsWith("/admin")) {
     return null; 
   }
   // ---------------------------------

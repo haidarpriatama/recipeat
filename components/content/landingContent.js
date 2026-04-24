@@ -11,7 +11,7 @@ export const headerContent = {
   },
   primaryAction: {
     label: "Sign Up",
-    href: "/sign-up",
+    href: "/signup",
   },
 };
 
@@ -28,7 +28,7 @@ export const heroContent = {
     "Professional-grade meal planning that synchronizes your pantry with seasonal inspiration. Eat better, spend less, and cook with confidence.",
   primaryAction: {
     label: "Sign Up",
-    href: "/sign-up",
+    href: "/signup",
   },
   secondaryAction: {
     label: "How it Works",
@@ -127,7 +127,7 @@ export const ctaContent = {
     "Join 50,000+ chefs reducing food waste and discovering new flavors every single day.",
   action: {
     label: "Start Your Free Week",
-    href: "/sign-up",
+    href: "/signup",
   },
   note: "No credit card required • Cancel anytime",
 };

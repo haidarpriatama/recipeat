@@ -1,5 +1,6 @@
 import { footerContent } from "@/components/content/landingContent";
 import SiteFooter from "@/components/layout/SiteFooter";
+import Image from "next/image";
 // 1. Impor ikon dari lucide-react di bagian atas
 import { Clock, Heart, Search, Star } from "lucide-react";
 
@@ -56,10 +57,12 @@ export default function FavoritesPage() {
           {/* Card 1: Buddha Bowl */}
           <article className="bg-white rounded-[1.5rem] p-4 shadow-sm hover:shadow-xl flex flex-col gap-5 group cursor-pointer transition-all duration-300 hover:-translate-y-2 border border-slate-100">
             <div className="relative w-full aspect-square rounded-xl overflow-hidden bg-slate-100">
-              <img 
+              <Image 
                 src="/favorite4.png" 
                 alt="Roasted Harvest Buddha Bowl" 
-                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out" 
+                fill
+                sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 25vw"
+                className="object-cover group-hover:scale-105 transition-transform duration-700 ease-out" 
               />
               <button className="absolute top-3 right-3 w-10 h-10 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center text-red-500 hover:bg-white transition-colors shadow-md">
                 {/* Menggunakan Lucide Heart dengan properti fill */}
@@ -92,10 +95,12 @@ export default function FavoritesPage() {
           {/* Card 2: Salmon */}
           <article className="bg-white rounded-[1.5rem] p-4 shadow-sm hover:shadow-xl flex flex-col gap-5 group cursor-pointer transition-all duration-300 hover:-translate-y-2 border border-slate-100">
             <div className="relative w-full aspect-square rounded-xl overflow-hidden bg-slate-100">
-              <img 
+              <Image 
                 src="/favorit3.png" 
                 alt="Honey Glazed Salmon" 
-                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out" 
+                fill
+                sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 25vw"
+                className="object-cover group-hover:scale-105 transition-transform duration-700 ease-out" 
               />
               <button className="absolute top-3 right-3 w-10 h-10 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center text-red-500 hover:bg-white transition-colors shadow-md">
                 <Heart size={20} fill="currentColor" />
@@ -125,10 +130,12 @@ export default function FavoritesPage() {
           {/* Card 3: Avocado Toast */}
           <article className="bg-white rounded-[1.5rem] p-4 shadow-sm hover:shadow-xl flex flex-col gap-5 group cursor-pointer transition-all duration-300 hover:-translate-y-2 border border-slate-100">
             <div className="relative w-full aspect-square rounded-xl overflow-hidden bg-slate-100">
-              <img 
+              <Image 
                 src="/favorit2.png" 
                 alt="Artisan Avocado Toast" 
-                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out" 
+                fill
+                sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 25vw"
+                className="object-cover group-hover:scale-105 transition-transform duration-700 ease-out" 
               />
               <button className="absolute top-3 right-3 w-10 h-10 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center text-red-500 hover:bg-white transition-colors shadow-md">
                 <Heart size={20} fill="currentColor" />
@@ -158,10 +165,12 @@ export default function FavoritesPage() {
           {/* Card 4: Mushroom Risotto */}
           <article className="bg-white rounded-[1.5rem] p-4 shadow-sm hover:shadow-xl flex flex-col gap-5 group cursor-pointer transition-all duration-300 hover:-translate-y-2 border border-slate-100">
             <div className="relative w-full aspect-square rounded-xl overflow-hidden bg-slate-100">
-              <img 
+              <Image 
                 src="/favorit1.png" 
                 alt="Creamy Wild Mushroom Risotto" 
-                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 ease-out" 
+                fill
+                sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 25vw"
+                className="object-cover group-hover:scale-105 transition-transform duration-700 ease-out" 
               />
               <button className="absolute top-3 right-3 w-10 h-10 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center text-red-500 hover:bg-white transition-colors shadow-md">
                 <Heart size={20} fill="currentColor" />

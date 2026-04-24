@@ -1,8 +1,57 @@
-import React from 'react';
+'use client';
+
+import React, { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
+import { User, Mail, Lock, ArrowRight } from 'lucide-react';
 
 export default function SignUpPage() {
+  const router = useRouter();
+  const [formData, setFormData] = useState({ username: '', email: '', password: '', terms: false });
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+
+  const handleChange = (e) => {
+    const { name, value, type, checked } = e.target;
+    setFormData(prev => ({ ...prev, [name]: type === 'checkbox' ? checked : value }));
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError('');
+    setLoading(true);
+
+    if (!formData.terms) {
+      setError('Please accept the Terms of Service and Privacy Policy');
+      setLoading(false);
+      return;
+    }
+
+    try {
+      const res = await fetch('/api/users', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          name: formData.username,
+          email: formData.email,
+          password: formData.password,
+        }),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.message || 'Registration failed');
+      }
+
+      router.push('/login?registered=true');
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
   return (
     <div className="-mt-20 bg-[#f5f6f7] font-body text-on-surface antialiased overflow-x-hidden min-h-screen flex flex-col relative">
       
@@ -22,7 +71,7 @@ export default function SignUpPage() {
       <main className="flex-grow flex flex-col md:flex-row h-screen">
         
         {/* Panel Visual Kiri */}
-        <section className="relative hidden md:block md:w-1/2 lg:w-3/5 h-screen sticky top-0 overflow-hidden bg-slate-900">
+        <section className="relative hidden md:block md:w-1/2 lg:w-3/5 h-screen overflow-hidden bg-slate-900">
           {/* Pastikan kamu memasukkan gambar sayuran hijau (kale/bayam) ini ke folder public dengan nama signup-bg.png */}
           <Image
             src="/sayursignup.png" 
@@ -73,7 +122,14 @@ export default function SignUpPage() {
             </div>
 
             {/* Form Sign Up */}
-            <form className="space-y-6">
+            <form className="space-y-6" onSubmit={handleSubmit}>
+              
+              {/* Error Message */}
+              {error && (
+                <div className="p-4 bg-red-50 border border-red-200 rounded-xl text-red-600 text-sm">
+                  {error}
+                </div>
+              )}
               
               {/* Input: Username */}
               <div className="space-y-2">
@@ -86,9 +142,12 @@ export default function SignUpPage() {
                     id="username" 
                     name="username" 
                     placeholder="chef_curator" 
-                    type="text" 
+                    type="text"
+                    value={formData.username}
+                    onChange={handleChange}
+                    required
                   />
-                  <span className="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 text-slate-400">person</span>
+                  <User className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400" size={20} />
                 </div>
               </div>
 
@@ -103,9 +162,12 @@ export default function SignUpPage() {
                     id="email" 
                     name="email" 
                     placeholder="you@kitchen.com" 
-                    type="email" 
+                    type="email"
+                    value={formData.email}
+                    onChange={handleChange}
+                    required
                   />
-                  <span className="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 text-slate-400">mail</span>
+                  <Mail className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400" size={20} />
                 </div>
               </div>
 
@@ -120,9 +182,12 @@ export default function SignUpPage() {
                     id="password" 
                     name="password" 
                     placeholder="••••••••" 
-                    type="password" 
+                    type="password"
+                    value={formData.password}
+                    onChange={handleChange}
+                    required
                   />
-                  <span className="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 text-slate-400">lock</span>
+                  <Lock className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400" size={20} />
                 </div>
               </div>
 
@@ -133,7 +198,9 @@ export default function SignUpPage() {
                     className="h-5 w-5 rounded border-slate-300 text-[#006941] focus:ring-[#006941]/20 transition-all cursor-pointer" 
                     id="terms" 
                     name="terms" 
-                    type="checkbox" 
+                    type="checkbox"
+                    checked={formData.terms}
+                    onChange={handleChange}
                   />
                 </div>
                 <label className="text-sm text-slate-600 leading-tight" htmlFor="terms">
@@ -143,11 +210,21 @@ export default function SignUpPage() {
 
               {/* Tombol Submit */}
               <button 
-                className="w-full py-4 bg-gradient-to-r from-[#006941] to-[#004b2d] text-white font-headline font-bold text-lg rounded-xl shadow-lg hover:opacity-90 active:scale-[0.98] transition-all flex items-center justify-center gap-2 group" 
+                className="w-full py-4 bg-gradient-to-r from-[#006941] to-[#004b2d] text-white font-headline font-bold text-lg rounded-xl shadow-lg hover:opacity-90 active:scale-[0.98] transition-all flex items-center justify-center gap-2 group disabled:opacity-50 disabled:cursor-not-allowed" 
                 type="submit"
+                disabled={loading}
               >
-                Create Account
-                <span className="material-symbols-outlined text-white group-hover:translate-x-1 transition-transform">arrow_forward</span>
+                {loading ? (
+                  <>
+                    <span className="animate-spin rounded-full h-5 w-5 border-2 border-white border-t-transparent"></span>
+                    Creating...
+                  </>
+                ) : (
+                  <>
+                    Create Account
+                    <ArrowRight className="text-white group-hover:translate-x-1 transition-transform" size={20} />
+                  </>
+                )}
               </button>
             </form>
 
