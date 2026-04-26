@@ -4,7 +4,12 @@ import React, { useState, useEffect, Suspense } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { signIn } from 'next-auth/react';
+import { createClient } from '@supabase/supabase-js';
+
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+);
 
 function LoginForm() {
   const router = useRouter();
@@ -33,15 +38,14 @@ function LoginForm() {
     setLoading(true);
 
     try {
-      const result = await signIn('credentials', {
-        redirect: false,
+      const { data, error: supabaseError } = await supabase.auth.signInWithPassword({
         email: formData.email,
         password: formData.password,
       });
 
-      if (result?.error) {
-        setError('Invalid email or password');
-      } else {
+      if (supabaseError) {
+        setError(supabaseError.message);
+      } else if (data.user) {
         router.push('/explore');
         router.refresh();
       }

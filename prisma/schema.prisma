@@ -20,7 +20,7 @@ enum Role {
 
 // Model User untuk menyimpan informasi pengguna
 model User {
-  id            Int       @id @default(autoincrement())
+  id            String    @id
   name          String
   email         String    @unique
   emailVerified DateTime?
@@ -39,7 +39,7 @@ model User {
 // Model Account untuk NextAuth OAuth providers
 model Account {
   id                Int     @id @default(autoincrement())
-  userId            Int
+  userId            String
   type              String
   provider          String
   providerAccountId String
@@ -60,7 +60,7 @@ model Account {
 model Session {
   id           Int      @id @default(autoincrement())
   sessionToken String   @unique
-  userId       Int
+  userId           String
   expires      DateTime
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -122,7 +122,7 @@ model RecipeIngredient {
 
 // Model Favorite untuk menyimpan resep favorit pengguna
 model Favorite {
-  userId   Int
+  userId   String
   recipeId Int
   savedAt  DateTime @default(now())
 
@@ -135,7 +135,7 @@ model Favorite {
 // Model MealPlan untuk menyimpan rencana makan pengguna
 model MealPlan {
   id        Int      @id @default(autoincrement())
-  userId    Int
+  userId    String
   weekStart DateTime
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

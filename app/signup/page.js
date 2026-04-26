@@ -5,6 +5,12 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { User, Mail, Lock, ArrowRight } from 'lucide-react';
+import { createClient } from '@supabase/supabase-js';
+
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+);
 
 export default function SignUpPage() {
   const router = useRouter();
@@ -29,20 +35,18 @@ export default function SignUpPage() {
     }
 
     try {
-      const res = await fetch('/api/users', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          name: formData.username,
-          email: formData.email,
-          password: formData.password,
-        }),
+      const { data, error: supabaseError } = await supabase.auth.signUp({
+        email: formData.email,
+        password: formData.password,
+        options: {
+          data: {
+            name: formData.username,
+          },
+        },
       });
 
-      const data = await res.json();
-
-      if (!res.ok) {
-        throw new Error(data.message || 'Registration failed');
+      if (supabaseError) {
+        throw new Error(supabaseError.message);
       }
 
       router.push('/login?registered=true');
