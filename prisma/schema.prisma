@@ -80,6 +80,7 @@ model Recipe {
   id          Int      @id @default(autoincrement())
   title       String
   description String?
+  instructions String?  // Cara pembuatan resep
   imageUrl    String?
   cookTime    Int      // Waktu memasak dalam menit
   rating      Float    @default(0)
@@ -100,24 +101,14 @@ model Category {
   recipes Recipe[] // Relasi ke tabel Recipe
 }
 
-// Model Ingredient untuk bahan makanan yang digunakan dalam resep
-model Ingredient {
-  id      Int    @id @default(autoincrement())
-  name    String @unique
-
-  recipes RecipeIngredient[]  // Relasi ke RecipeIngredient
-}
-
-// Model RecipeIngredient untuk relasi many-to-many antara Recipe dan Ingredient
+// Model RecipeIngredient untuk detail bahan resep
 model RecipeIngredient {
-  recipeId     Int
-  ingredientId Int
-  quantity     String   // Jumlah bahan yang digunakan, bisa diperbaiki jika diperlukan
+  id             Int      @id @default(autoincrement())
+  recipeId       Int
+  ingredientName String
+  quantity       String
 
-  recipe     Recipe     @relation(fields: [recipeId], references: [id])  // Relasi ke Recipe
-  ingredient Ingredient @relation(fields: [ingredientId], references: [id])  // Relasi ke Ingredient
-
-  @@id([recipeId, ingredientId]) // Primary key gabungan
+  recipe         Recipe   @relation(fields: [recipeId], references: [id], onDelete: Cascade)
 }
 
 // Model Favorite untuk menyimpan resep favorit pengguna
