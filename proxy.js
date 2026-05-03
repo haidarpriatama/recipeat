@@ -5,10 +5,10 @@ export default auth((req) => {
   const isLoggedIn = !!req.auth;
   const { pathname } = req.nextUrl;
 
-  const isProtectedRoute = 
-    pathname.startsWith('/favorites') || 
-    pathname.startsWith('/meal-plans') || 
-    pathname.startsWith('/account');
+  // Only guard routes that rely on NextAuth server session.
+  // Favorites / meal-plans use Supabase client session via AuthGuard,
+  // so checking them here causes false redirects to /login.
+  const isProtectedRoute = pathname.startsWith('/admin');
 
   if (isProtectedRoute && !isLoggedIn) {
     const loginUrl = new URL('/login', req.nextUrl);

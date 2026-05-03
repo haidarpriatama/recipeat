@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { LogOut, User } from "lucide-react";
+import { Bell, LogOut, User } from "lucide-react";
 import { supabase } from "@/lib/supabaseClient";
 
 /**
@@ -15,7 +15,32 @@ export default function AuthNav() {
   const router = useRouter();
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [notificationsOpen, setNotificationsOpen] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
+
+  const notifications = [
+    {
+      id: 1,
+      title: "Meal plan ready",
+      description: "Your weekly plan for this week is ready.",
+      time: "2m ago",
+      unread: true,
+    },
+    {
+      id: 2,
+      title: "Low stock alert",
+      description: "Spinach and eggs are running low.",
+      time: "1h ago",
+      unread: true,
+    },
+    {
+      id: 3,
+      title: "New recipe saved",
+      description: "Honey Glazed Salmon was added to favorites.",
+      time: "Yesterday",
+      unread: false,
+    },
+  ];
 
   useEffect(() => {
     // Get initial session
@@ -43,7 +68,7 @@ export default function AuthNav() {
 
   if (loading) {
     // Render a placeholder to avoid layout shift
-    return <div className="h-9 w-32 rounded-full bg-slate-200 animate-pulse" />;
+    return <div className="h-10 w-24 rounded-full bg-slate-200 animate-pulse" />;
   }
 
   if (!user) {
@@ -76,57 +101,94 @@ export default function AuthNav() {
     .toUpperCase();
 
   return (
-    <div className="relative">
+    <div className="relative flex items-center gap-2">
       <button
-        onClick={() => setDropdownOpen((o) => !o)}
-        className="flex items-center gap-2 rounded-full bg-[#dff5e8] px-3 py-1.5 text-[#006941] font-semibold text-sm hover:bg-[#c8efd8] transition-colors"
-        aria-label="Open user menu"
+        type="button"
+        onClick={() => {
+          setNotificationsOpen((open) => !open);
+          setDropdownOpen(false);
+        }}
+        aria-label="Open notifications"
+        aria-expanded={notificationsOpen}
+        className="relative inline-flex h-10 w-10 items-center justify-center rounded-full border border-[#d2d9d5] bg-white text-[#595c5d] transition-colors hover:text-[#006941]"
       >
-        {/* Avatar */}
-        <span className="relative flex h-7 w-7 shrink-0 items-center justify-center overflow-hidden rounded-full bg-[#7bfeb8] font-bold text-[#004b2d]">
-          {avatarUrl ? (
-            <Image
-              src={avatarUrl}
-              alt={displayName}
-              fill
-              sizes="28px"
-              className="object-cover"
-            />
-          ) : (
-            <span className="text-xs">{initials}</span>
-          )}
-        </span>
-        <span className="hidden lg:block max-w-[120px] truncate">{displayName}</span>
-        <span className="ml-0.5 text-[#006941]">▾</span>
+        <Bell className="h-5 w-5" />
+        <span className="absolute right-2.5 top-2.5 h-2 w-2 rounded-full bg-[#8c4a00]" />
       </button>
 
-      {/* Dropdown */}
-      {dropdownOpen && (
-        <>
-          {/* Backdrop */}
-          <div
-            className="fixed inset-0 z-40"
-            onClick={() => setDropdownOpen(false)}
+      <button
+        type="button"
+        onClick={() => {
+          setDropdownOpen((open) => !open);
+          setNotificationsOpen(false);
+        }}
+        className="relative flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-full border-2 border-[#7bfeb8] bg-[#7bfeb8] text-[#004b2d] shadow-sm"
+        aria-label="Open user menu"
+        aria-expanded={dropdownOpen}
+      >
+        {avatarUrl ? (
+          <Image
+            src={avatarUrl}
+            alt={displayName}
+            fill
+            sizes="40px"
+            className="object-cover"
           />
-          <div className="absolute right-0 z-50 mt-2 w-48 rounded-2xl border border-slate-100 bg-white py-2 shadow-xl shadow-black/10">
-            <Link
-              href="/profile"
-              onClick={() => setDropdownOpen(false)}
-              className="flex items-center gap-3 px-4 py-2.5 text-sm font-medium text-slate-700 hover:bg-[#f3fcf3] hover:text-[#006941] transition-colors"
-            >
-              <User size={15} />
-              My Profile
-            </Link>
-            <hr className="my-1 border-slate-100" />
-            <button
-              onClick={handleLogout}
-              className="flex w-full items-center gap-3 px-4 py-2.5 text-sm font-medium text-red-600 hover:bg-red-50 transition-colors"
-            >
-              <LogOut size={15} />
-              Sign Out
-            </button>
+        ) : (
+          <span className="text-sm font-bold">{initials}</span>
+        )}
+      </button>
+
+      {(dropdownOpen || notificationsOpen) && (
+        <div
+          className="fixed inset-0 z-40"
+          onClick={() => {
+            setDropdownOpen(false);
+            setNotificationsOpen(false);
+          }}
+        />
+      )}
+
+      {notificationsOpen && (
+        <div className="absolute right-12 top-12 z-50 w-80 overflow-hidden rounded-2xl border border-slate-100 bg-white shadow-xl shadow-black/10">
+          <div className="flex items-center justify-between border-b border-slate-100 px-4 py-3">
+            <p className="text-sm font-bold text-[#2c2f30]">Notifications</p>
+            <span className="text-xs font-semibold text-[#595c5d]">{notifications.length} items</span>
           </div>
-        </>
+          <div className="max-h-72 overflow-y-auto">
+            {notifications.map((item) => (
+              <div key={item.id} className="border-b border-slate-100 px-4 py-3 last:border-b-0">
+                <div className="mb-1 flex items-start justify-between gap-3">
+                  <p className="text-sm font-semibold text-[#2c2f30]">{item.title}</p>
+                  {item.unread && <span className="mt-1 h-2 w-2 shrink-0 rounded-full bg-[#006941]" />}
+                </div>
+                <p className="text-xs text-[#595c5d]">{item.description}</p>
+                <p className="mt-1 text-[11px] font-medium text-[#8d9092]">{item.time}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {dropdownOpen && (
+        <div className="absolute right-0 top-12 z-50 w-48 rounded-2xl border border-slate-100 bg-white py-2 shadow-xl shadow-black/10">
+          <Link
+            href="/profile"
+            onClick={() => setDropdownOpen(false)}
+            className="flex items-center gap-3 px-4 py-2.5 text-sm font-medium text-slate-700 transition-colors hover:bg-[#f3fcf3] hover:text-[#006941]"
+          >
+            <User size={15} />
+            My Profile
+          </Link>
+          <hr className="my-1 border-slate-100" />
+          <button
+            onClick={handleLogout}
+            className="flex w-full items-center gap-3 px-4 py-2.5 text-sm font-medium text-red-600 transition-colors hover:bg-red-50"
+          >
+            <LogOut size={15} />
+            Sign Out
+          </button>
+        </div>
       )}
     </div>
   );
