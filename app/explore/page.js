@@ -13,6 +13,11 @@ import {
   Search,
 } from "lucide-react";
 
+export const metadata = {
+  title: "Explore – Recipeat",
+  description: "Discover new recipes and culinary inspiration.",
+};
+
 const FILTERS = {
   mealType: [
     { label: "Breakfast", selected: true },
@@ -235,39 +240,6 @@ export default function ExplorePage() {
   return (
     <div className="min-h-screen bg-[#f5f6f7] text-[#2c2f30]">
       <main className="mx-auto w-full max-w-screen-2xl px-6 py-8 md:px-12">
-        <section className="mb-8 rounded-xl border border-[#abadae]/15 bg-[#f8f9f9] p-4 shadow-sm shadow-[#006941]/5">
-          <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-            <div className="relative w-full md:max-w-xl">
-              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-[#595c5d]" />
-              <input
-                type="text"
-                placeholder="Search recipes, ingredients..."
-                className="w-full rounded-md border border-[#abadae]/20 bg-white py-2 pl-10 pr-4 text-sm outline-none transition-all focus:border-[#006941]/30 focus:ring-2 focus:ring-[#006941]/20"
-              />
-            </div>
-
-            <div className="flex items-center justify-end gap-3">
-              <button
-                type="button"
-                className="inline-flex h-9 w-9 items-center justify-center rounded-full text-[#595c5d] transition-colors hover:bg-[#eff1f2] hover:text-[#006941]"
-                aria-label="Notifications"
-              >
-                <Bell className="h-5 w-5" />
-              </button>
-
-              <div className="relative h-9 w-9 overflow-hidden rounded-full border border-[#d9efe3]">
-                <Image
-                  src="https://lh3.googleusercontent.com/aida-public/AB6AXuDREpvjVNS31SasBbNF9YiJDnYD9NnYwmZ5No5gdAE74FPLJSWRVXFG-3zWhtynyFmVr3CNi9pMGNb6_UpOTSBujLC2jz7dLssWmSWOBC69SX8fetFGkkFx2QK6lIINxwlLRBEy8VWPu4hpQs6khePc36s3u3x9225ZwRhxlK6ZY5Eal4hrNf2tV4XImmKHjLtglZdncs88xZNBH4xqTYogW6NuC6X9nDZH9EjnKMg4s5yQkwyfT0KUo6MCKLDLhDlghuPUIt9OPMTk"
-                  alt="User profile"
-                  fill
-                  className="object-cover"
-                  sizes="36px"
-                />
-              </div>
-            </div>
-          </div>
-        </section>
-
         <section className="group relative mb-12 h-[400px] w-full overflow-hidden rounded-xl shadow-[0_32px_64px_-12px_rgba(0,105,65,0.08)]">
           <Image
             src="https://lh3.googleusercontent.com/aida-public/AB6AXuBTW3Cl9bj3m4KQymVuSqGCTkb_DiqKPFjNvng-3EOw10Ry8VXeNfQAC256wM3To0X6I9RqMZYUpVsp60bjXVlQlGcZCvGoDaJe0UKixOotAoazzHY4m6xXIdfjRI5agMytUlSCyetnVc1CxEw3-ql2pv3ZUM0rWEF2UE3gseIdsRdnpPN79o89TuOZl0GnwiCnoa2n8MSvuoMvoCuqRyExSjJySVR5QHDDUmvuqgHub2oJqxzSO1Xdl74HxWblhELbhINlMOu8h4uX"

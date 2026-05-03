@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import ActionLink from "@/components/ui/ActionLink";
+import AuthNav from "@/components/layout/AuthNav";
 
 export default function SiteHeader({
   brand = "Recipeat",
@@ -11,8 +11,6 @@ export default function SiteHeader({
     { label: "Meal Plans", href: "/meal-plans" },
     { label: "Favorites", href: "/favorites" },
   ],
-  loginAction = { label: "Login", href: "/login" },
-  primaryAction = { label: "Sign Up", href: "/signup" },
 }) {
   const pathname = usePathname();
 
@@ -55,25 +53,8 @@ export default function SiteHeader({
           })}
         </nav>
 
-        <div className="flex items-center gap-4">
-          <Link
-            className="hidden text-sm font-semibold text-[#006941] transition-colors hover:text-[#004b2d] lg:block"
-            href={loginAction.href}
-          >
-            {loginAction.label}
-          </Link>
-
-          {primaryAction && (
-            <ActionLink
-              href={primaryAction.href}
-              size="sm"
-              variant="header"
-              className="bg-[#dff5e8] text-[#006941] shadow-[#006941]/10 hover:bg-[#c8efd8]"
-            >
-              {primaryAction.label}
-            </ActionLink>
-          )}
-        </div>
+        {/* Auth-aware right section */}
+        <AuthNav />
       </div>
     </header>
   );

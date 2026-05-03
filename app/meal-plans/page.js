@@ -15,6 +15,12 @@ import { footerContent } from "@/components/content/landingContent";
 import SiteFooter from "@/components/layout/SiteFooter";
 import ActionLink from "@/components/ui/ActionLink";
 import SectionHeading from "@/components/ui/SectionHeading";
+import AuthGuard from "@/components/layout/AuthGuard";
+
+export const metadata = {
+  title: "Meal Plans – Recipeat",
+  description: "Plan your weekly meals and track nutrition.",
+};
 
 const CALENDAR_DAYS = [
   { label: 28, muted: true },
@@ -327,6 +333,7 @@ function GroceryListCard() {
 
 export default function MealPlansPage() {
   return (
+    <AuthGuard>
     <>
       <div className="bg-[#f5f6f7] text-[#2c2f30]">
         <div className="mx-auto grid max-w-screen-2xl grid-cols-1 gap-8 px-6 py-8 lg:grid-cols-12 lg:px-10">
@@ -405,5 +412,6 @@ export default function MealPlansPage() {
         linkGroups={footerContent.linkGroups}
       />
     </>
+    </AuthGuard>
   );
 }

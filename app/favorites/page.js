@@ -1,11 +1,18 @@
 import { footerContent } from "@/components/content/landingContent";
 import SiteFooter from "@/components/layout/SiteFooter";
+import AuthGuard from "@/components/layout/AuthGuard";
 import Image from "next/image";
 // 1. Impor ikon dari lucide-react di bagian atas
 import { Clock, Heart, Search, Star } from "lucide-react";
 
+export const metadata = {
+  title: "Favorites – Recipeat",
+  description: "Your saved recipes collection.",
+};
+
 export default function FavoritesPage() {
   return (
+    <AuthGuard>
     <>
       <div className="min-h-screen bg-[#f5f6f7] pt-24 pb-12 font-body">
         <main className="max-w-7xl mx-auto px-6 md:px-12 space-y-10">
@@ -216,5 +223,6 @@ export default function FavoritesPage() {
         linkGroups={footerContent.linkGroups}
       />
     </>
+    </AuthGuard>
   );
 }
