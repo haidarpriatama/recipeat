@@ -44,17 +44,17 @@ export default function FavoritesPage() {
 
         {/* --- SECTION 2: FILTERS / TAGS --- */}
         <div className="flex flex-wrap gap-3">
-          <button className="px-5 py-2.5 bg-[#7bfeb8] text-[#004b2d] rounded-xl font-semibold text-sm tracking-wide transition-colors">
+          <button className="px-5 py-2.5 bg-[#006941] text-[#FFFFFF] rounded-xl font-semibold text-sm tracking-wide transition-colors">
             All Saved
           </button>
           <button className="px-5 py-2.5 bg-white text-slate-700 hover:bg-slate-50 border border-slate-200 rounded-xl font-medium text-sm tracking-wide transition-colors shadow-sm">
-            Dinner
+            Sarapan
           </button>
           <button className="px-5 py-2.5 bg-white text-slate-700 hover:bg-slate-50 border border-slate-200 rounded-xl font-medium text-sm tracking-wide transition-colors shadow-sm">
-            Quick & Easy
+            Makan Siang
           </button>
           <button className="px-5 py-2.5 bg-white text-slate-700 hover:bg-slate-50 border border-slate-200 rounded-xl font-medium text-sm tracking-wide transition-colors shadow-sm">
-            Vegan
+            Makan Malam
           </button>
         </div>
 

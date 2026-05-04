@@ -149,60 +149,6 @@ function CalendarCard() {
   );
 }
 
-function NutritionCard() {
-  const totalCalories = 1840;
-
-  return (
-    <section className="rounded-2xl border border-[#abadae]/20 bg-[#eff1f2] p-6">
-      <h3 className="mb-4 text-lg font-bold">Daily Nutrition</h3>
-
-      <div className="space-y-6">
-        {DAILY_NUTRITION.map((macro) => {
-          const progress = Math.min(100, Math.round((macro.current / macro.target) * 100));
-
-          return (
-            <div key={macro.label}>
-              <div className="mb-2 flex items-center justify-between text-sm">
-                <span className="font-semibold">{macro.label}</span>
-                <span className="font-bold text-[#006941]">
-                  {macro.current}
-                  {macro.unit} / {macro.target}
-                  {macro.unit}
-                </span>
-              </div>
-
-              <div className={`h-2 w-full overflow-hidden rounded-full ${macro.track}`}>
-                <div className={`h-full rounded-full ${macro.fill}`} style={{ width: `${progress}%` }} />
-              </div>
-            </div>
-          );
-        })}
-      </div>
-
-      <div className="mt-6 flex items-baseline justify-between border-t border-[#abadae]/20 pt-6">
-        <span className="text-sm text-[#595c5d]">Total Calories</span>
-        <span className="text-2xl font-black text-[#006941]">
-          {totalCalories.toLocaleString()} <span className="text-xs font-medium text-[#595c5d]">kcal</span>
-        </span>
-      </div>
-    </section>
-  );
-}
-
-function StockAlertCard() {
-  return (
-    <section className="flex items-start gap-3 rounded-2xl border border-[#ffc69a] bg-[#fff0e7] p-5">
-      <CircleAlert className="mt-0.5 h-5 w-5 shrink-0 text-[#8c4a00]" />
-      <div>
-        <h4 className="text-sm font-bold text-[#6f3a00]">Low on Stocks</h4>
-        <p className="mt-1 text-xs text-[#7c4100]">
-          Avocados, Greek Yogurt, and Spinach are running low. Update your shopping list.
-        </p>
-      </div>
-    </section>
-  );
-}
-
 function TimelineItem({ meal }) {
   if (meal.empty) {
     return (
@@ -287,49 +233,7 @@ function MealTimeline() {
   );
 }
 
-function GroceryListCard() {
-  return (
-    <section className="rounded-2xl bg-white p-6 shadow-[0_24px_48px_-12px_rgba(0,105,65,0.08)]">
-      <div className="mb-6 flex items-center justify-between">
-        <h3 className="text-lg font-bold">Grocery List</h3>
-        <span className="rounded-md bg-[#caffdc] px-2 py-1 text-xs font-bold text-[#00603b]">12 ITEMS</span>
-      </div>
 
-      <div className="max-h-[620px] space-y-6 overflow-y-auto pr-1">
-        {GROCERY_GROUPS.map((group) => (
-          <div key={group.title}>
-            <span className="mb-3 block text-xs font-bold uppercase tracking-widest text-[#757778]">
-              {group.title}
-            </span>
-
-            <ul className="space-y-3">
-              {group.items.map((item) => (
-                <li key={item.label}>
-                  <label className="flex cursor-pointer items-center gap-3 text-sm font-medium text-[#2c2f30]">
-                    <input
-                      type="checkbox"
-                      defaultChecked={item.checked}
-                      className="h-5 w-5 rounded-md border-[#abadae] accent-[#8c4a00]"
-                    />
-                    <span className={item.checked ? "text-[#757778] line-through" : ""}>{item.label}</span>
-                  </label>
-                </li>
-              ))}
-            </ul>
-          </div>
-        ))}
-      </div>
-
-      <button
-        type="button"
-        className="mt-8 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-[#e6e8ea] py-3 font-bold text-[#2c2f30] transition-colors hover:bg-[#dadddf]"
-      >
-        <Share2 className="h-4 w-4" />
-        Export List
-      </button>
-    </section>
-  );
-}
 
 export default function MealPlansPage() {
   return (
@@ -339,8 +243,6 @@ export default function MealPlansPage() {
         <div className="mx-auto grid max-w-screen-2xl grid-cols-1 gap-8 px-6 py-8 lg:grid-cols-12 lg:px-10">
           <aside className="space-y-6 lg:col-span-3">
             <CalendarCard />
-            <NutritionCard />
-            <StockAlertCard />
           </aside>
 
           <section className="space-y-8 lg:col-span-6">
@@ -363,15 +265,8 @@ export default function MealPlansPage() {
                   <Bell className="h-5 w-5" />
                 </button>
 
-                <button
-                  type="button"
-                  aria-label="Shopping basket"
-                  className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-[#abadae]/25 bg-white text-[#595c5d] transition-colors hover:text-[#006941]"
-                >
-                  <ShoppingBasket className="h-5 w-5" />
-                </button>
-
-                <ActionLink href="/recipes" size="sm" className="rounded-xl">
+                {/* Tombol keranjang belanja sudah dihapus dari sini */}
+                <ActionLink href="/recipes" size="sm" className="rounded-xl !text-white hover:!text-white">
                   Cook Now
                 </ActionLink>
               </div>
@@ -399,7 +294,6 @@ export default function MealPlansPage() {
 
           <aside className="lg:col-span-3">
             <div className="lg:sticky lg:top-28">
-              <GroceryListCard />
             </div>
           </aside>
         </div>

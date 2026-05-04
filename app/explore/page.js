@@ -3,6 +3,7 @@ export const dynamic = "force-dynamic";
 import Image from "next/image";
 import prisma from "@/lib/prisma";
 import Link from "next/link";
+import SmartDiscovery from "@/components/SmartDiscovery/SmartDiscovery";
 import {
   ArrowRight,
   Bell,
@@ -144,45 +145,6 @@ function FilterSidebar() {
           </div>
         </div>
       </div>
-
-      <div>
-        <h3 className="mb-6 text-sm font-bold uppercase tracking-widest text-[#006941]">
-          Dietary Preferences
-        </h3>
-        <div className="flex flex-wrap gap-2">
-          {FILTERS.dietary.map((item) => (
-            <span
-              key={item.label}
-              className={`rounded-full px-3 py-1.5 text-xs font-bold ${
-                item.active
-                  ? "border border-[#e4ede5] bg-[#f3fcf3] text-[#58615a]"
-                  : "bg-[#eff1f2] text-[#595c5d]"
-              }`}
-            >
-              {item.label}
-            </span>
-          ))}
-        </div>
-      </div>
-
-      <div>
-        <h3 className="mb-6 text-sm font-bold uppercase tracking-widest text-[#006941]">Cuisines</h3>
-        <div className="space-y-3">
-          {FILTERS.cuisines.map((cuisine) => (
-            <label key={cuisine} className="group flex cursor-pointer items-center gap-3">
-              <input
-                type="radio"
-                name="cuisine"
-                defaultChecked={cuisine === "Mexican"}
-                className="h-5 w-5 border-[#abadae]/30 accent-[#006941]"
-              />
-              <span className="font-medium text-[#595c5d] transition-colors group-hover:text-[#006941]">
-                {cuisine}
-              </span>
-            </label>
-          ))}
-        </div>
-      </div>
     </aside>
   );
 }
@@ -317,64 +279,15 @@ export default async function ExplorePage() {
           </div>
         </section>
 
-        <div className="flex flex-col gap-12 lg:flex-row">
+<div className="flex flex-col gap-12 lg:flex-row">
           <FilterSidebar />
 
           <section className="flex-1">
-            <div className="mb-10 rounded-2xl border border-[#abadae]/10 bg-[#eff1f2] p-8">
-              <div className="flex flex-col gap-6">
-                <div>
-                  <h2 className="mb-2 text-xl font-extrabold tracking-tight">Smart Discovery</h2>
-                  <p className="text-sm font-medium text-[#595c5d]">
-                    Find recipes based on what&apos;s in your pantry right now.
-                  </p>
-                </div>
+            
+            {/* INI DIA KOMPONEN SMART DISCOVERY YANG BARU */}
+            <SmartDiscovery />
 
-                <div className="flex flex-col items-center gap-4 md:flex-row">
-                  <div className="relative w-full flex-1">
-                    <Search className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-[#595c5d]" />
-                    <input
-                      type="text"
-                      placeholder="Search for ingredients (e.g. Salmon, Kale, Garlic...)"
-                      className="w-full rounded-xl border border-[#abadae]/20 bg-white py-3.5 pl-12 pr-4 text-sm shadow-sm outline-none transition-all focus:border-[#006941] focus:ring-2 focus:ring-[#006941]/20"
-                    />
-                  </div>
-
-                  <button
-                    type="button"
-                    className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-[#006941] px-10 py-3.5 font-bold text-white transition-all hover:bg-[#005c38] md:w-auto"
-                  >
-                    Find Recipes
-                    <Search className="h-4 w-4" />
-                  </button>
-                </div>
-
-                <div className="space-y-3">
-                  <h3 className="text-xs font-bold uppercase tracking-widest text-[#006941]">Quick Add</h3>
-                  <div className="flex flex-wrap gap-2">
-                    {QUICK_ADD.map((item) => (
-                      <button
-                        key={item.label}
-                        type="button"
-                        className={`inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm transition-all ${
-                          item.added
-                            ? "border-[#006941] bg-[#7bfeb8]/30 font-bold text-[#006941]"
-                            : "border-[#abadae]/30 bg-white font-semibold text-[#595c5d] hover:border-[#006941] hover:text-[#006941]"
-                        }`}
-                      >
-                        {item.added ? (
-                          <CheckCircle2 className="h-4 w-4" />
-                        ) : (
-                          <PlusCircle className="h-4 w-4" />
-                        )}
-                        {item.label}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            </div>
-
+            {/* --- BAGIAN BAWAH (DISCOVER FLAVORS & RESEP) TETAP SAMA --- */}
             <div className="mb-8 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
               <div>
                 <h2 className="mb-1 text-3xl font-extrabold tracking-tight">Discover Flavors</h2>
