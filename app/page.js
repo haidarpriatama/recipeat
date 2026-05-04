@@ -1,3 +1,5 @@
+export const dynamic = "force-dynamic";
+
 import {
   ctaContent,
   featuresContent,
@@ -10,8 +12,33 @@ import CtaSection from "@/components/sections/CtaSection";
 import FeaturesSection from "@/components/sections/FeaturesSection";
 import HeroSection from "@/components/sections/HeroSection";
 import RecipesSection from "@/components/sections/RecipesSection";
+import prisma from "@/lib/prisma";
 
-export default function HomePage() {
+export default async function HomePage() {
+  let dynamicRecipeCards = recipesContent.cards;
+  try {
+    const latestRecipes = await prisma.recipe.findMany({
+      take: 3,
+      include: { category: true },
+      orderBy: { createdAt: 'desc' }
+    });
+
+    if (latestRecipes.length > 0) {
+      dynamicRecipeCards = latestRecipes.map((recipe) => ({
+        id: recipe.id,
+        title: recipe.title,
+        image: recipe.imageUrl || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=800&q=80',
+        alt: recipe.title,
+        label: recipe.category?.name || 'Recipe',
+        rating: recipe.rating ? recipe.rating.toFixed(1) : '5.0',
+        time: `${recipe.cookTime}m`,
+        tags: ["Featured", "Delicious"],
+      }));
+    }
+  } catch (error) {
+    console.error("Error fetching recipes:", error);
+  }
+
   return (
     <>
       <main className="bg-[#f5f6f7] text-[#2c2f30]">
@@ -35,7 +62,7 @@ export default function HomePage() {
           title={recipesContent.title}
           description={recipesContent.description}
           browseAction={recipesContent.browseAction}
-          cards={recipesContent.cards}
+          cards={dynamicRecipeCards}
         />
 
         <CtaSection
