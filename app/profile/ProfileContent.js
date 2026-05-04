@@ -61,6 +61,15 @@ export default function ProfileContent() {
   const [authChecked, setAuthChecked] = useState(false);
   const [user, setUser] = useState(null);
 
+  // Form state
+  const [formData, setFormData] = useState({
+    username: "sarahcooks",
+    fullName: "Sarah Jenkins",
+    email: "sarah.jenkins@example.com",
+    bio: "Culinary enthusiast and amateur food photographer. Believes that every meal should be an occasion.",
+  });
+  const [saved, setSaved] = useState(false);
+
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (!session) {
@@ -79,14 +88,6 @@ export default function ProfileContent() {
     });
   }, [router]);
 
-  // Form state
-  const [formData, setFormData] = useState({
-    username: "sarahcooks",
-    fullName: "Sarah Jenkins",
-    email: "sarah.jenkins@example.com",
-    bio: "Culinary enthusiast and amateur food photographer. Believes that every meal should be an occasion.",
-  });
-  const [saved, setSaved] = useState(false);
 
   const handleChange = (e) => {
     setFormData((prev) => ({ ...prev, [e.target.id]: e.target.value }));
