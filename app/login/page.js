@@ -22,7 +22,9 @@ function LoginForm() {
 
   useEffect(() => {
     if (searchParams.get('registered') === 'true') {
-      setSuccessMsg('Account created successfully. Please sign in.');
+      setTimeout(() => {
+        setSuccessMsg('Account created successfully. Please sign in.');
+      }, 0);
     }
   }, [searchParams]);
 
