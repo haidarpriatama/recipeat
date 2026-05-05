@@ -160,6 +160,11 @@ async function main() {
     ];
 
     for (const data of recipesData) {
+      // Generate random nutrition if not provided
+      const protein = Math.floor(Math.random() * 40) + 10;
+      const carbs = Math.floor(Math.random() * 60) + 20;
+      const fats = Math.floor(Math.random() * 20) + 5;
+
       await prisma.recipe.create({
         data: {
           title: data.title,
@@ -168,8 +173,19 @@ async function main() {
           cookTime: data.cookTime,
           categoryId: data.categoryId,
           imageUrl: data.imageUrl,
+          protein,
+          carbs,
+          fats,
           ingredients: {
-            create: data.ingredients
+            create: data.ingredients.map(ing => ({
+              quantity: ing.quantity,
+              ingredient: {
+                connectOrCreate: {
+                  where: { name: ing.ingredientName },
+                  create: { name: ing.ingredientName }
+                }
+              }
+            }))
           }
         }
       });

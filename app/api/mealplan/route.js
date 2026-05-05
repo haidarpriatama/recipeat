@@ -9,7 +9,7 @@ export async function GET() {
     if (!session?.user) return Response.json({ message: 'Unauthorized' }, { status: 401 });
 
     const mealPlans = await prisma.mealPlan.findMany({
-      where: { userId: Number(session.user.id) }
+      where: { userId: session.user.id }
     });
     return Response.json(mealPlans, { status: 200 });
   } catch (error) {
@@ -18,20 +18,67 @@ export async function GET() {
   }
 }
 
-// Menambahkan meal plan baru
+// Menambahkan resep ke meal plan
 export async function POST(request) {
   try {
     const session = await auth();
     if (!session?.user) return Response.json({ message: 'Unauthorized' }, { status: 401 });
 
-    const { weekStart } = await request.json();
-    const newMealPlan = await prisma.mealPlan.create({
-      data: { userId: Number(session.user.id), weekStart },
+    const body = await request.json();
+    const { recipeId, dayOfWeek, mealType, weekStart } = body;
+
+    const weekStartDate = new Date(weekStart);
+    weekStartDate.setHours(0, 0, 0, 0);
+
+    // Pastikan user ada di DB dan ambil ID-nya
+    const dbUser = await prisma.user.upsert({
+      where: { email: session.user.email },
+      update: { name: session.user.name || session.user.email },
+      create: {
+        id: session.user.id,
+        email: session.user.email,
+        name: session.user.name || session.user.email,
+      },
     });
-    return Response.json(newMealPlan, { status: 201 });
+
+    const userId = dbUser.id;
+
+    // Cari atau buat MealPlan untuk minggu tersebut
+    let mealPlan = await prisma.mealPlan.findFirst({
+      where: { userId, weekStart: weekStartDate },
+    });
+
+    if (!mealPlan) {
+      mealPlan = await prisma.mealPlan.create({
+        data: { userId, weekStart: weekStartDate },
+      });
+    }
+
+    // Tambahkan resep ke MealPlanRecipe
+    if (recipeId && dayOfWeek) {
+      const rId = parseInt(recipeId, 10);
+      await prisma.mealPlanRecipe.upsert({
+        where: {
+          mealPlanId_recipeId_dayOfWeek: {
+            mealPlanId: mealPlan.id,
+            recipeId: rId,
+            dayOfWeek,
+          },
+        },
+        update: { mealType: mealType || 'Lunch' },
+        create: {
+          mealPlanId: mealPlan.id,
+          recipeId: rId,
+          dayOfWeek,
+          mealType: mealType || 'Lunch',
+        },
+      });
+    }
+
+    return Response.json(mealPlan, { status: 201 });
   } catch (error) {
     console.error('POST /api/mealplan error:', error);
-    return Response.json({ message: 'Internal server error' }, { status: 500 });
+    return Response.json({ message: 'Internal server error', error: error.message }, { status: 500 });
   }
 }
 
@@ -41,13 +88,35 @@ export async function DELETE(request) {
     const session = await auth();
     if (!session?.user) return Response.json({ message: 'Unauthorized' }, { status: 401 });
 
-    const { id } = await request.json();
-    
-    // Pastikan meal plan milik user tersebut
-    const deletedMealPlan = await prisma.mealPlan.deleteMany({
-      where: { id: Number(id), userId: Number(session.user.id) },
+    const dbUser = await prisma.user.upsert({
+      where: { email: session.user.email },
+      update: {},
+      create: {
+        id: session.user.id,
+        email: session.user.email,
+        name: session.user.name || session.user.email,
+      },
     });
-    
+
+    const { id, mealPlanId, recipeId, dayOfWeek, mealType } = await request.json();
+
+    if (mealPlanId && recipeId && dayOfWeek) {
+      const deleted = await prisma.mealPlanRecipe.deleteMany({
+        where: {
+          mealPlanId: Number(mealPlanId),
+          recipeId: Number(recipeId),
+          dayOfWeek,
+          mealType,
+          mealPlan: { userId: dbUser.id },
+        },
+      });
+      return Response.json(deleted, { status: 200 });
+    }
+
+    const deletedMealPlan = await prisma.mealPlan.deleteMany({
+      where: { id: Number(id), userId: dbUser.id },
+    });
+
     return Response.json(deletedMealPlan, { status: 200 });
   } catch (error) {
     console.error('DELETE /api/mealplan error:', error);

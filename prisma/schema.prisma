@@ -84,6 +84,9 @@ model Recipe {
   imageUrl    String?
   cookTime    Int      // Waktu memasak dalam menit
   rating      Float    @default(0)
+  protein     Int      @default(0)
+  carbs       Int      @default(0)
+  fats        Int      @default(0)
   categoryId  Int
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
@@ -101,14 +104,22 @@ model Category {
   recipes Recipe[] // Relasi ke tabel Recipe
 }
 
+// Model Ingredient untuk menyimpan daftar bahan unik
+model Ingredient {
+  id      Int      @id @default(autoincrement())
+  name    String   @unique
+  recipes RecipeIngredient[]
+}
+
 // Model RecipeIngredient untuk detail bahan resep
 model RecipeIngredient {
   id             Int      @id @default(autoincrement())
   recipeId       Int
-  ingredientName String
+  ingredientId   Int
   quantity       String
 
-  recipe         Recipe   @relation(fields: [recipeId], references: [id], onDelete: Cascade)
+  recipe         Recipe     @relation(fields: [recipeId], references: [id], onDelete: Cascade)
+  ingredient     Ingredient @relation(fields: [ingredientId], references: [id])
 }
 
 // Model Favorite untuk menyimpan resep favorit pengguna
@@ -140,6 +151,7 @@ model MealPlanRecipe {
   mealPlanId Int
   recipeId   Int
   dayOfWeek  String  // Menyimpan hari dalam minggu (Monday, Tuesday, dll.)
+  mealType   String  @default("Lunch") // Breakfast, Lunch, Dinner
 
   mealPlan MealPlan @relation(fields: [mealPlanId], references: [id]) // Relasi ke MealPlan
   recipe   Recipe   @relation(fields: [recipeId], references: [id])   // Relasi ke Recipe

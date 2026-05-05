@@ -5,6 +5,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Clock3, Flame, Star, ChefHat, ArrowLeft } from "lucide-react";
+import AddToMealPlanButton from "@/components/MealPlan/AddToMealPlanButton";
 
 export const metadata = {
   title: "Recipe Details – Recipeat",
@@ -22,7 +23,7 @@ export default async function RecipeDetailPage({ params }) {
     where: { id: recipeId },
     include: {
       category: true,
-      ingredients: true,
+      ingredients: { include: { ingredient: true } },
     },
   });
 
@@ -85,8 +86,10 @@ export default async function RecipeDetailPage({ params }) {
                 </div>
               </div>
 
+              <AddToMealPlanButton recipeId={recipe.id} />
+
               {/* Ingredients & Instructions Section */}
-              <div className="space-y-12">
+              <div className="mt-12 space-y-12">
                 <div>
                   <h3 className="mb-6 flex items-center gap-2 text-xl font-bold text-slate-900">
                     <ChefHat className="h-5 w-5 text-[#006941]" /> Ingredients
@@ -95,7 +98,7 @@ export default async function RecipeDetailPage({ params }) {
                     {recipe.ingredients && recipe.ingredients.length > 0 ? (
                       recipe.ingredients.map((ing) => (
                         <li key={ing.id} className="flex items-center justify-between border-b border-slate-50 pb-3 text-slate-600">
-                          <span className="font-medium">{ing.ingredientName}</span>
+                          <span className="font-medium">{ing.ingredient.name}</span>
                           <span className="font-bold text-slate-900">{ing.quantity}</span>
                         </li>
                       ))

@@ -1,25 +1,49 @@
-"use client"; // Wajib karena kita pakai useState
+"use client";
 
 import React, { useState } from 'react';
 import { Search, Plus, X } from 'lucide-react';
+import { useRouter, useSearchParams } from 'next/navigation';
 
-export default function SmartDiscovery() {
-  // 1. Data daftar semua bahan yang tersedia di database/sistem
+export default function SmartDiscovery({ initialQuery = "", initialIngredients = [] }) {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+
+  // 1. Data daftar semua bahan yang tersedia di database/sistem (disesuaikan dengan bahasa resep)
   const availableIngredients = [
-    "Eggs", "Spinach", "Tomato", "Garlic", "Onion", 
-    "Olive Oil", "Chicken", "Mushroom", "Bell Pepper", "Beef", "Pasta"
+    "Telur", "Bayam", "Tomat", "Bawang Putih", "Bawang Merah", 
+    "Minyak Goreng", "Ayam", "Jamur", "Daging Sapi", "Cabai", "Pasta", "Keju"
   ];
 
   // 2. State untuk menyimpan bahan yang DIPILIH dan status Pop-up
-  const [selectedIngredients, setSelectedIngredients] = useState(["Eggs", "Spinach"]);
+  const [selectedIngredients, setSelectedIngredients] = useState(initialIngredients);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState(initialQuery);
 
-  // 3. Fungsi untuk menghapus bahan dari daftar pilihan
+  // 3. Fungsi untuk melakukan pencarian
+  const handleSearch = () => {
+    const params = new URLSearchParams(searchParams.toString());
+    
+    if (searchQuery) {
+      params.set('q', searchQuery);
+    } else {
+      params.delete('q');
+    }
+
+    if (selectedIngredients.length > 0) {
+      params.set('ingredients', selectedIngredients.join(','));
+    } else {
+      params.delete('ingredients');
+    }
+
+    router.push(`/explore?${params.toString()}`);
+  };
+
+  // 4. Fungsi untuk menghapus bahan dari daftar pilihan
   const removeIngredient = (ingredientToRemove) => {
     setSelectedIngredients(selectedIngredients.filter(item => item !== ingredientToRemove));
   };
 
-  // 4. Fungsi untuk menambah bahan dari Pop-up
+  // 5. Fungsi untuk menambah bahan dari Pop-up
   const toggleIngredient = (ingredient) => {
     if (selectedIngredients.includes(ingredient)) {
       removeIngredient(ingredient); // Hapus jika sudah ada (toggle off)
@@ -45,11 +69,17 @@ export default function SmartDiscovery() {
           </div>
           <input
             type="text"
-            placeholder="Search for ingredients (e.g. Salmon, Kale, Garlic...)"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+            placeholder="Search for recipes or ingredients (e.g. Salmon, Pasta...)"
             className="w-full bg-white rounded-xl py-4 pl-12 pr-4 border-none shadow-[0_2px_8px_rgba(0,0,0,0.04)] focus:ring-2 focus:ring-[#006941] outline-none transition-shadow"
           />
         </div>
-        <button className="bg-[#006941] hover:bg-[#005535] text-white px-8 py-4 rounded-xl font-bold transition-colors flex items-center gap-2 shadow-md">
+        <button 
+          onClick={handleSearch}
+          className="bg-[#006941] hover:bg-[#005535] text-white px-8 py-4 rounded-xl font-bold transition-colors flex items-center gap-2 shadow-md"
+        >
           Find Recipes <Search size={18} />
         </button>
       </div>

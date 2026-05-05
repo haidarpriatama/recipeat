@@ -1,26 +1,29 @@
-import { auth } from "@/lib/auth";
-import { NextResponse } from "next/server";
+// proxy.js - Next.js 16 menggunakan nama file "proxy.js" (bukan "middleware.js")
+// Fungsi harus di-export sebagai named export "proxy"
+import { NextResponse } from 'next/server';
 
-export default auth((req) => {
-  const isLoggedIn = !!req.auth;
-  const { pathname } = req.nextUrl;
+export function proxy(request) {
+  const { pathname } = request.nextUrl;
 
-  // Only guard routes that rely on NextAuth server session.
-  // Favorites / meal-plans use Supabase client session via AuthGuard,
-  // so checking them here causes false redirects to /login.
-  const isProtectedRoute = pathname.startsWith('/admin');
+  // Hanya lindungi route /admin
+  // Route lain (favorites, meal-plans) pakai Supabase client session via AuthGuard
+  const isAdminRoute = pathname.startsWith('/admin');
 
-  if (isProtectedRoute && !isLoggedIn) {
-    const loginUrl = new URL('/login', req.nextUrl);
-    // You could also add a callbackUrl parameter here to redirect the user back after login
-    return NextResponse.redirect(loginUrl);
+  if (isAdminRoute) {
+    // Cek apakah ada session cookie dari next-auth
+    const sessionToken = 
+      request.cookies.get('__Secure-next-auth.session-token')?.value ||
+      request.cookies.get('next-auth.session-token')?.value;
+
+    if (!sessionToken) {
+      const loginUrl = new URL('/login', request.nextUrl);
+      return NextResponse.redirect(loginUrl);
+    }
   }
 
-  // Continue to the requested page
   return NextResponse.next();
-});
+}
 
-// Optionally, configure matcher to only run middleware on specific paths
 export const config = {
   matcher: ['/((?!api|_next/static|_next/image|favicon.ico).*)'],
 };

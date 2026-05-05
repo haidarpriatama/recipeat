@@ -2,15 +2,34 @@ import { footerContent } from "@/components/content/landingContent";
 import SiteFooter from "@/components/layout/SiteFooter";
 import AuthGuard from "@/components/layout/AuthGuard";
 import Image from "next/image";
-// 1. Impor ikon dari lucide-react di bagian atas
+import Link from "next/link";
 import { Clock, Heart, Search, Star } from "lucide-react";
+import prisma from "@/lib/prisma";
+import { auth } from "@/lib/auth";
+import FavoriteButton from "@/components/RecipeCard/FavoriteButton";
 
 export const metadata = {
   title: "Favorites – Recipeat",
   description: "Your saved recipes collection.",
 };
 
-export default function FavoritesPage() {
+export default async function FavoritesPage() {
+  const session = await auth();
+  const userId = session?.user?.id;
+
+  let favorites = [];
+  if (userId) {
+    favorites = await prisma.favorite.findMany({
+      where: { userId },
+      include: {
+        recipe: {
+          include: { category: true }
+        }
+      },
+      orderBy: { savedAt: 'desc' }
+    });
+  }
+
   return (
     <AuthGuard>
     <>
@@ -29,7 +48,6 @@ export default function FavoritesPage() {
           </div>
           
           <div className="w-full md:w-96 relative group">
-            {/* Menggunakan Lucide Search */}
             <div className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-[#006941] transition-colors">
               <Search size={20} />
             </div>
@@ -47,171 +65,79 @@ export default function FavoritesPage() {
           <button className="px-5 py-2.5 bg-[#006941] text-[#FFFFFF] rounded-xl font-semibold text-sm tracking-wide transition-colors">
             All Saved
           </button>
-          <button className="px-5 py-2.5 bg-white text-slate-700 hover:bg-slate-50 border border-slate-200 rounded-xl font-medium text-sm tracking-wide transition-colors shadow-sm">
-            Sarapan
-          </button>
-          <button className="px-5 py-2.5 bg-white text-slate-700 hover:bg-slate-50 border border-slate-200 rounded-xl font-medium text-sm tracking-wide transition-colors shadow-sm">
-            Makan Siang
-          </button>
-          <button className="px-5 py-2.5 bg-white text-slate-700 hover:bg-slate-50 border border-slate-200 rounded-xl font-medium text-sm tracking-wide transition-colors shadow-sm">
-            Makan Malam
-          </button>
         </div>
 
         {/* --- SECTION 3: RECIPE GRID --- */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
-          
-          {/* Card 1: Buddha Bowl */}
-          <article className="bg-white rounded-[1.5rem] p-4 shadow-sm hover:shadow-xl flex flex-col gap-5 group cursor-pointer transition-all duration-300 hover:-translate-y-2 border border-slate-100">
-            <div className="relative w-full aspect-square rounded-xl overflow-hidden bg-slate-100">
-              <Image 
-                src="/favorite4.png" 
-                alt="Roasted Harvest Buddha Bowl" 
-                fill
-                sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 25vw"
-                className="object-cover group-hover:scale-105 transition-transform duration-700 ease-out" 
-              />
-              <button className="absolute top-3 right-3 w-10 h-10 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center text-red-500 hover:bg-white transition-colors shadow-md">
-                {/* Menggunakan Lucide Heart dengan properti fill */}
-                <Heart size={20} fill="currentColor" />
-              </button>
+        {favorites.length === 0 ? (
+          <div className="flex flex-col items-center justify-center py-20 text-center space-y-4">
+            <div className="w-20 h-20 bg-slate-100 rounded-full flex items-center justify-center text-slate-400">
+              <Heart size={40} />
             </div>
-            <div className="flex flex-col flex-grow space-y-3 px-2">
-              <div className="flex flex-wrap gap-2">
-                <span className="px-3 py-1 bg-[#f3fcf3] text-[#006941] text-xs font-semibold rounded-lg">Vegan</span>
-                <span className="px-3 py-1 bg-[#f3fcf3] text-[#006941] text-xs font-semibold rounded-lg">Healthy</span>
-              </div>
-              <h3 className="font-headline font-bold text-xl leading-tight text-slate-800 group-hover:text-[#006941] transition-colors">
-                Roasted Harvest Buddha Bowl
-              </h3>
-              <div className="mt-auto flex items-center justify-between text-slate-500 text-sm pt-2">
-                <div className="flex items-center gap-1 text-[#8c4a00]">
-                  {/* Menggunakan Lucide Star */}
-                  <Star size={16} fill="currentColor" />
-                  <span className="font-bold">4.9</span>
-                </div>
-                <div className="flex items-center gap-1 font-medium">
-                  {/* Menggunakan Lucide Clock */}
-                  <Clock size={16} />
-                  <span>25 min</span>
-                </div>
-              </div>
+            <div className="space-y-1">
+              <h3 className="text-xl font-bold text-slate-800">No favorites yet</h3>
+              <p className="text-slate-500">Explore our recipes and save your favorites to see them here.</p>
             </div>
-          </article>
+            <Link 
+              href="/explore" 
+              className="px-6 py-3 bg-[#006941] text-white rounded-xl font-bold hover:opacity-90 transition-opacity"
+            >
+              Start Exploring
+            </Link>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+            {favorites.map((fav) => (
+              <article key={fav.recipe.id} className="bg-white rounded-[1.5rem] p-4 shadow-sm hover:shadow-xl flex flex-col gap-5 group cursor-pointer transition-all duration-300 hover:-translate-y-2 border border-slate-100">
+                <div className="relative w-full aspect-square rounded-xl overflow-hidden bg-slate-100">
+                  <Link href={`/recipes/${fav.recipe.id}`} className="block h-full">
+                    <Image 
+                      src={fav.recipe.imageUrl || "/favorite4.png"} 
+                      alt={fav.recipe.title} 
+                      fill
+                      sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 25vw"
+                      className="object-cover group-hover:scale-105 transition-transform duration-700 ease-out" 
+                    />
+                  </Link>
+                  <FavoriteButton 
+                    recipeId={fav.recipe.id} 
+                    initialFavorited={true}
+                    className="absolute top-3 right-3"
+                  />
+                </div>
+                <div className="flex flex-col flex-grow space-y-3 px-2">
+                  <div className="flex flex-wrap gap-2">
+                    <span className="px-3 py-1 bg-[#f3fcf3] text-[#006941] text-xs font-semibold rounded-lg">
+                      {fav.recipe.category?.name || "Recipe"}
+                    </span>
+                  </div>
+                  <Link href={`/recipes/${fav.recipe.id}`}>
+                    <h3 className="font-headline font-bold text-xl leading-tight text-slate-800 group-hover:text-[#006941] transition-colors">
+                      {fav.recipe.title}
+                    </h3>
+                  </Link>
+                  <div className="mt-auto flex items-center justify-between text-slate-500 text-sm pt-2">
+                    <div className="flex items-center gap-1 text-[#8c4a00]">
+                      <Star size={16} fill="currentColor" />
+                      <span className="font-bold">{fav.recipe.rating || "0.0"}</span>
+                    </div>
+                    <div className="flex items-center gap-1 font-medium">
+                      <Clock size={16} />
+                      <span>{fav.recipe.cookTime} min</span>
+                    </div>
+                  </div>
+                </div>
+              </article>
+            ))}
+          </div>
+        )}
 
-          {/* Card 2: Salmon */}
-          <article className="bg-white rounded-[1.5rem] p-4 shadow-sm hover:shadow-xl flex flex-col gap-5 group cursor-pointer transition-all duration-300 hover:-translate-y-2 border border-slate-100">
-            <div className="relative w-full aspect-square rounded-xl overflow-hidden bg-slate-100">
-              <Image 
-                src="/favorit3.png" 
-                alt="Honey Glazed Salmon" 
-                fill
-                sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 25vw"
-                className="object-cover group-hover:scale-105 transition-transform duration-700 ease-out" 
-              />
-              <button className="absolute top-3 right-3 w-10 h-10 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center text-red-500 hover:bg-white transition-colors shadow-md">
-                <Heart size={20} fill="currentColor" />
-              </button>
-            </div>
-            <div className="flex flex-col flex-grow space-y-3 px-2">
-              <div className="flex flex-wrap gap-2">
-                <span className="px-3 py-1 bg-[#f3fcf3] text-[#006941] text-xs font-semibold rounded-lg">High Protein</span>
-                <span className="px-3 py-1 bg-[#f3fcf3] text-[#006941] text-xs font-semibold rounded-lg">Dinner</span>
-              </div>
-              <h3 className="font-headline font-bold text-xl leading-tight text-slate-800 group-hover:text-[#006941] transition-colors">
-                Honey Glazed Salmon
-              </h3>
-              <div className="mt-auto flex items-center justify-between text-slate-500 text-sm pt-2">
-                <div className="flex items-center gap-1 text-[#8c4a00]">
-                  <Star size={16} fill="currentColor" />
-                  <span className="font-bold">4.8</span>
-                </div>
-                <div className="flex items-center gap-1 font-medium">
-                  <Clock size={16} />
-                  <span>20 min</span>
-                </div>
-              </div>
-            </div>
-          </article>
-
-          {/* Card 3: Avocado Toast */}
-          <article className="bg-white rounded-[1.5rem] p-4 shadow-sm hover:shadow-xl flex flex-col gap-5 group cursor-pointer transition-all duration-300 hover:-translate-y-2 border border-slate-100">
-            <div className="relative w-full aspect-square rounded-xl overflow-hidden bg-slate-100">
-              <Image 
-                src="/favorit2.png" 
-                alt="Artisan Avocado Toast" 
-                fill
-                sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 25vw"
-                className="object-cover group-hover:scale-105 transition-transform duration-700 ease-out" 
-              />
-              <button className="absolute top-3 right-3 w-10 h-10 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center text-red-500 hover:bg-white transition-colors shadow-md">
-                <Heart size={20} fill="currentColor" />
-              </button>
-            </div>
-            <div className="flex flex-col flex-grow space-y-3 px-2">
-              <div className="flex flex-wrap gap-2">
-                <span className="px-3 py-1 bg-[#f3fcf3] text-[#006941] text-xs font-semibold rounded-lg">Breakfast</span>
-                <span className="px-3 py-1 bg-[#f3fcf3] text-[#006941] text-xs font-semibold rounded-lg">Quick</span>
-              </div>
-              <h3 className="font-headline font-bold text-xl leading-tight text-slate-800 group-hover:text-[#006941] transition-colors">
-                Artisan Avocado Toast
-              </h3>
-              <div className="mt-auto flex items-center justify-between text-slate-500 text-sm pt-2">
-                <div className="flex items-center gap-1 text-[#8c4a00]">
-                  <Star size={16} fill="currentColor" />
-                  <span className="font-bold">4.7</span>
-                </div>
-                <div className="flex items-center gap-1 font-medium">
-                  <Clock size={16} />
-                  <span>10 min</span>
-                </div>
-              </div>
-            </div>
-          </article>
-
-          {/* Card 4: Mushroom Risotto */}
-          <article className="bg-white rounded-[1.5rem] p-4 shadow-sm hover:shadow-xl flex flex-col gap-5 group cursor-pointer transition-all duration-300 hover:-translate-y-2 border border-slate-100">
-            <div className="relative w-full aspect-square rounded-xl overflow-hidden bg-slate-100">
-              <Image 
-                src="/favorit1.png" 
-                alt="Creamy Wild Mushroom Risotto" 
-                fill
-                sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 25vw"
-                className="object-cover group-hover:scale-105 transition-transform duration-700 ease-out" 
-              />
-              <button className="absolute top-3 right-3 w-10 h-10 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center text-red-500 hover:bg-white transition-colors shadow-md">
-                <Heart size={20} fill="currentColor" />
-              </button>
-            </div>
-            <div className="flex flex-col flex-grow space-y-3 px-2">
-              <div className="flex flex-wrap gap-2">
-                <span className="px-3 py-1 bg-[#f3fcf3] text-[#006941] text-xs font-semibold rounded-lg">Comfort Food</span>
-                <span className="px-3 py-1 bg-[#f3fcf3] text-[#006941] text-xs font-semibold rounded-lg">Dinner</span>
-              </div>
-              <h3 className="font-headline font-bold text-xl leading-tight text-slate-800 group-hover:text-[#006941] transition-colors">
-                Creamy Wild Mushroom Risotto
-              </h3>
-              <div className="mt-auto flex items-center justify-between text-slate-500 text-sm pt-2">
-                <div className="flex items-center gap-1 text-[#8c4a00]">
-                  <Star size={16} fill="currentColor" />
-                  <span className="font-bold">4.9</span>
-                </div>
-                <div className="flex items-center gap-1 font-medium">
-                  <Clock size={16} />
-                  <span>45 min</span>
-                </div>
-              </div>
-            </div>
-          </article>
-
-        </div>
-
-        {/* --- SECTION 4: LOAD MORE BUTTON --- */}
-        <div className="flex justify-center pt-8 pb-4">
-          <button className="px-8 py-4 bg-[#e0e3e4] text-slate-700 hover:bg-[#dadddf] rounded-xl font-headline font-bold tracking-tight transition-colors shadow-sm active:scale-95">
-            Load More Favorites
-          </button>
-        </div>
+        {favorites.length > 0 && (
+          <div className="flex justify-center pt-8 pb-4">
+            <button className="px-8 py-4 bg-[#e0e3e4] text-slate-700 hover:bg-[#dadddf] rounded-xl font-headline font-bold tracking-tight transition-colors shadow-sm active:scale-95">
+              Load More Favorites
+            </button>
+          </div>
+        )}
 
         </main>
       </div>
