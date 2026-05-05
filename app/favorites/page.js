@@ -35,7 +35,7 @@ export default function FavoritesPage() {
             </div>
             
             <input 
-              className="w-full bg-white text-slate-800 rounded-xl py-4 pl-12 pr-4 border-none shadow-[inset_0_2px_4px_rgba(0,0,0,0.02)] focus:ring-2 focus:ring-[#7bfeb8] outline-none transition-all font-body text-sm placeholder:text-slate-400" 
+              className="w-full bg-white text-slate-800 rounded-xl py-4 pl-12 pr-4 border-none shadow-[inset_0_2px_4px_rgba(0,0,0,0.02)] focus:ring-2 focus:ring-[#006941] outline-none transition-all font-body text-sm placeholder:text-slate-400" 
               placeholder="Search saved recipes..." 
               type="text" 
             />
