@@ -4,6 +4,8 @@ import Image from "next/image";
 import prisma from "@/lib/prisma";
 import Link from "next/link";
 import SmartDiscovery from "@/components/SmartDiscovery/SmartDiscovery";
+import { auth } from "@/lib/auth";
+import FavoriteButton from "@/components/RecipeCard/FavoriteButton";
 import {
   ArrowRight,
   Bell,
@@ -149,7 +151,8 @@ function FilterSidebar() {
   );
 }
 
-function RecipeCard({ recipe }) {
+function RecipeCard({ recipe, slot }) {
+  const destination = slot ? `/recipes/${recipe.id}?slot=${encodeURIComponent(slot)}` : `/recipes/${recipe.id}`;
   const cardContent = (
     <article className="h-full group flex cursor-pointer flex-col overflow-hidden rounded-xl border border-transparent bg-white shadow-[0_32px_64px_-12px_rgba(0,105,65,0.08)] transition-all hover:border-[#006941]/10">
       <div className="relative h-56">
@@ -161,15 +164,11 @@ function RecipeCard({ recipe }) {
           sizes="(min-width: 1280px) 26vw, (min-width: 768px) 40vw, 100vw"
         />
 
-        <button
-          type="button"
-          className={`absolute right-4 top-4 flex h-10 w-10 items-center justify-center rounded-full bg-white/90 backdrop-blur transition-colors hover:bg-white ${
-            recipe.favorite ? "text-[#8c4a00]" : "text-[#757778]"
-          }`}
-          aria-label="Toggle favorite"
-        >
-          <Heart className="h-5 w-5" fill={recipe.favorite ? "currentColor" : "none"} />
-        </button>
+        <FavoriteButton 
+          recipeId={recipe.id} 
+          initialFavorited={recipe.favorite} 
+          className="absolute right-4 top-4"
+        />
 
         <div className="absolute bottom-4 left-4">
           <span className="rounded-full bg-black/50 px-3 py-1 text-[10px] font-bold uppercase text-white backdrop-blur-sm">
@@ -202,16 +201,55 @@ function RecipeCard({ recipe }) {
   );
 
   if (recipe.id) {
-    return <Link href={`/recipes/${recipe.id}`} className="block h-full">{cardContent}</Link>;
+    return <Link href={destination} className="block h-full">{cardContent}</Link>;
   }
   return cardContent;
 }
 
-export default async function ExplorePage() {
-  let displayRecipes = RECIPES;
+export default async function ExplorePage({ searchParams: searchParamsPromise }) {
+  const searchParams = await searchParamsPromise;
+  const session = await auth();
+  const userId = session?.user?.id;
+
+  const query = searchParams?.q || "";
+  const categoryFilter = searchParams?.category || "";
+  const slotFilter = searchParams?.slot || "";
+  const ingredientsFilter = searchParams?.ingredients ? searchParams.ingredients.split(",") : [];
+
+  let displayRecipes = [];
   try {
+    // Build the Prisma query filter
+    const where = {
+      AND: [
+        query ? {
+          OR: [
+            { title: { contains: query, mode: 'insensitive' } },
+            { description: { contains: query, mode: 'insensitive' } }
+          ]
+        } : {},
+        categoryFilter ? {
+          category: { name: { equals: categoryFilter, mode: 'insensitive' } }
+        } : {},
+        ingredientsFilter.length > 0 ? {
+          ingredients: {
+            some: {
+              ingredient: {
+                OR: ingredientsFilter.map(ing => ({
+                  name: { contains: ing, mode: 'insensitive' }
+                }))
+              }
+            }
+          }
+        } : {}
+      ]
+    };
+
     const dbRecipes = await prisma.recipe.findMany({
-      include: { category: true },
+      where,
+      include: { 
+        category: true,
+        favorites: userId ? { where: { userId } } : false
+      },
       orderBy: { createdAt: 'desc' }
     });
 
@@ -224,11 +262,15 @@ export default async function ExplorePage() {
         time: `${recipe.cookTime}m`,
         calories: "350 kcal",
         label: recipe.category?.name || 'Recipe',
-        favorite: false,
+        favorite: recipe.favorites?.length > 0,
       }));
+    } else if (!query && !categoryFilter && ingredientsFilter.length === 0) {
+      // Fallback to static data only if no search/filter is applied and DB is empty
+      displayRecipes = RECIPES;
     }
   } catch (error) {
     console.error("Error fetching recipes:", error);
+    displayRecipes = RECIPES;
   }
 
   return (
@@ -285,13 +327,15 @@ export default async function ExplorePage() {
           <section className="flex-1">
             
             {/* INI DIA KOMPONEN SMART DISCOVERY YANG BARU */}
-            <SmartDiscovery />
+            <SmartDiscovery initialQuery={query} initialIngredients={ingredientsFilter} />
 
             {/* --- BAGIAN BAWAH (DISCOVER FLAVORS & RESEP) TETAP SAMA --- */}
             <div className="mb-8 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
               <div>
-                <h2 className="mb-1 text-3xl font-extrabold tracking-tight">Discover Flavors</h2>
-                <p className="text-[#595c5d]">248 recipes found for your current selection</p>
+                <h2 className="mb-1 text-3xl font-extrabold tracking-tight">
+                  {query || ingredientsFilter.length > 0 ? "Search Results" : "Discover Flavors"}
+                </h2>
+                <p className="text-[#595c5d]">{displayRecipes.length} recipes found for your current selection</p>
               </div>
 
               <div className="flex items-center gap-3">
@@ -306,7 +350,7 @@ export default async function ExplorePage() {
 
             <div className="grid grid-cols-1 gap-8 md:grid-cols-2 xl:grid-cols-3">
               {displayRecipes.map((recipe) => (
-                <RecipeCard key={recipe.title} recipe={recipe} />
+                <RecipeCard key={recipe.title} recipe={recipe} slot={slotFilter} />
               ))}
             </div>
 
