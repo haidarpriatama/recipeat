@@ -10,6 +10,13 @@ const nextConfig = {
         protocol: "https",
         hostname: "images.unsplash.com",
       },
+      // --- Ini bagian yang baru ditambahkan untuk Supabase ---
+      {
+        protocol: "https",
+        hostname: "yrcgxyozneomuikomlgc.supabase.co",
+        pathname: "/storage/v1/object/public/**",
+      },
+      // ------------------------------------------------------
     ],
   },
 };
