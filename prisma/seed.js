@@ -5,8 +5,7 @@ require('dotenv').config();
 
 async function main() {
   const connectionString = process.env.DATABASE_URL;
-  const useSsl = process.env.DB_SSL === 'true' || (connectionString && connectionString.includes('supabase.co'));
-  const pool = new Pool({ connectionString, ssl: useSsl ? { rejectUnauthorized: false } : false });
+  const pool = new Pool({ connectionString });
   const adapter = new PrismaPg(pool);
   const prisma = new PrismaClient({ adapter });
 

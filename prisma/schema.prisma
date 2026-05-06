@@ -10,9 +10,7 @@ generator client {
 // Datasource configuration to connect to PostgreSQL
 datasource db {
   provider = "postgresql"
-  url      = env("DATABASE_URL")
 }
-
 
 // Enum Role untuk membedakan jenis peran pengguna
 enum Role {
