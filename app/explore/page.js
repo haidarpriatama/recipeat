@@ -256,7 +256,6 @@ export default async function ExplorePage({ searchParams: searchParamsPromise })
       }),
       prisma.ingredient.findMany({
         select: { name: true },
-        orderBy: { name: 'asc' },
       }),
     ]);
 
