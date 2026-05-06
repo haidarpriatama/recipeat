@@ -1,11 +1,11 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { Bell, LogOut, User } from "lucide-react";
-import { supabase } from "@/lib/supabaseClient";
+import { signOut, useSession } from "next-auth/react";
 
 /**
  * AuthNav — rendered inside SiteHeader.
@@ -13,10 +13,10 @@ import { supabase } from "@/lib/supabaseClient";
  */
 export default function AuthNav() {
   const router = useRouter();
-  const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const { data: session, status } = useSession();
   const [notificationsOpen, setNotificationsOpen] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const user = session?.user;
 
   const notifications = [
     {
@@ -42,31 +42,14 @@ export default function AuthNav() {
     },
   ];
 
-  useEffect(() => {
-    // Get initial session
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setUser(session?.user ?? null);
-      setLoading(false);
-    });
-
-    // Listen for auth state changes (login / logout)
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
-      setUser(session?.user ?? null);
-    });
-
-    return () => subscription.unsubscribe();
-  }, []);
-
   const handleLogout = async () => {
-    await supabase.auth.signOut();
+    await signOut({ redirect: false });
     setDropdownOpen(false);
     router.push("/");
     router.refresh();
   };
 
-  if (loading) {
+  if (status === "loading") {
     // Render a placeholder to avoid layout shift
     return <div className="h-10 w-24 rounded-full bg-slate-200 animate-pulse" />;
   }
@@ -91,8 +74,8 @@ export default function AuthNav() {
   }
 
   // ── Logged-in state ──
-  const displayName = user.user_metadata?.name || user.email;
-  const avatarUrl = user.user_metadata?.avatar_url;
+  const displayName = user.name || user.email;
+  const avatarUrl = user.image;
   const initials = displayName
     .split(" ")
     .map((n) => n[0])

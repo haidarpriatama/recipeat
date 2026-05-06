@@ -2,12 +2,13 @@
 
 import { useState } from 'react';
 import { CalendarPlus, Check } from 'lucide-react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 
 export default function AddToMealPlanButton({ recipeId }) {
   const [isAdding, setIsAdding] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const router = useRouter();
+  const pathname = usePathname();
   const searchParams = useSearchParams();
 
   const handleAdd = async () => {
@@ -39,7 +40,9 @@ export default function AddToMealPlanButton({ recipeId }) {
       });
 
       if (res.status === 401) {
-        router.push('/login');
+        const queryString = searchParams.toString();
+        const callbackUrl = `${pathname}${queryString ? `?${queryString}` : ''}`;
+        router.push(`/login?callbackUrl=${encodeURIComponent(callbackUrl)}`);
         return;
       }
 

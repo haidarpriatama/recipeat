@@ -1,8 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { supabase } from "@/lib/supabaseClient";
+import { useSession } from "next-auth/react";
 
 /**
  * Wraps protected content.
@@ -10,19 +10,15 @@ import { supabase } from "@/lib/supabaseClient";
  */
 export default function AuthGuard({ children }) {
   const router = useRouter();
-  const [ready, setReady] = useState(false);
+  const { status } = useSession();
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      if (!session) {
-        router.replace("/login");
-      } else {
-        setReady(true);
-      }
-    });
-  }, [router]);
+    if (status === "unauthenticated") {
+      router.replace("/login");
+    }
+  }, [router, status]);
 
-  if (!ready) {
+  if (status === "loading" || status === "unauthenticated") {
     return (
       <div className="min-h-screen flex items-center justify-center bg-[#f5f6f7]">
         <div className="animate-spin rounded-full h-8 w-8 border-4 border-[#006941] border-t-transparent" />

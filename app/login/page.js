@@ -4,12 +4,7 @@ import React, { useState, useEffect, Suspense } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { createClient } from '@supabase/supabase-js';
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-);
+import { signIn } from 'next-auth/react';
 
 function LoginForm() {
   const router = useRouter();
@@ -40,17 +35,24 @@ function LoginForm() {
     setLoading(true);
 
     try {
-      const { data, error: supabaseError } = await supabase.auth.signInWithPassword({
+      const result = await signIn('credentials', {
         email: formData.email,
         password: formData.password,
+        redirect: false,
       });
 
-      if (supabaseError) {
-        setError(supabaseError.message);
-      } else if (data.user) {
-        router.push('/explore');
-        router.refresh();
+      if (result?.error) {
+        setError('Invalid email or password');
+        return;
       }
+
+      const callbackUrl = searchParams.get('callbackUrl');
+      const redirectTo = callbackUrl?.startsWith('/') && !callbackUrl.startsWith('//')
+        ? callbackUrl
+        : '/explore';
+
+      router.push(redirectTo);
+      router.refresh();
     } catch (err) {
       setError('An unexpected error occurred');
     } finally {
