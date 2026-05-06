@@ -7,6 +7,20 @@ import { notFound } from "next/navigation";
 import { Clock3, Flame, Star, ChefHat, ArrowLeft } from "lucide-react";
 import AddToMealPlanButton from "@/components/MealPlan/AddToMealPlanButton";
 
+const SERVING_TIPS = {
+  Sarapan:
+    "Sajikan dalam mangkuk atau piring cantik sambil masih hangat. Tambahkan potongan buah segar atau yogurt rendah lemak untuk menu sarapan sehat.",
+  "Makan Siang":
+    "Atur piring dengan makanan utama di tengah, sayuran segar di sisi, dan tambahkan irisan jeruk nipis atau saus rendah kalori untuk presentasi yang rapi.",
+  "Makan Malam":
+    "Sajikan hangat di atas piring lebar, beri hiasan daun kemangi atau seledri, dan gunakan porsi kecil untuk menjaga menu malam tetap ringan.",
+  Snack:
+    "Sajikan sebagai camilan sehat di atas piring kecil dengan beberapa potongan sayur atau buah sebagai pelengkap.",
+};
+
+const COOKING_GUIDANCE =
+  "Baca seluruh instruksi terlebih dahulu sebelum mulai memasak. Siapkan semua bahan dan peralatan di meja kerja Anda (mise en place). Ikuti setiap tahapan dengan teliti dan perhatikan warna, aroma, dan tekstur makanan saat memasak untuk hasil terbaik.";
+
 export const metadata = {
   title: "Recipe Details – Recipeat",
 };
@@ -109,24 +123,38 @@ export default async function RecipeDetailPage({ params }) {
                 </div>
 
                 <div>
-                  <h3 className="mb-6 text-xl font-bold text-slate-900">Instructions</h3>
-                  <div className="prose prose-slate max-w-none text-slate-600">
-                    {recipe.instructions ? (
-                      recipe.instructions.split('\n').map((step, idx) => {
-                        const cleanStep = step.replace(/^\d+\.\s*/, '').trim();
-                        if (!cleanStep) return null;
-                        return (
-                          <p key={idx} className="mb-4 flex gap-4">
-                            <span className="flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full bg-[#006941]/10 text-xs font-bold text-[#006941]">
-                              {idx + 1}
-                            </span>
-                            <span className="leading-relaxed">{cleanStep}</span>
-                          </p>
-                        );
-                      })
-                    ) : (
-                      <p>Instructions not provided.</p>
-                    )}
+                  <h3 className="mb-8 text-2xl font-bold text-slate-900">Instructions</h3>
+                  <div className="rounded-3xl border border-slate-100 bg-white p-8 shadow-sm">
+                    <div className="space-y-6">
+                      {recipe.instructions ? (
+                        recipe.instructions.split('\n').map((line, idx) => {
+                          if (!line.trim()) return null;
+                          
+                          const colonIndex = line.indexOf(':');
+                          if (colonIndex > 0) {
+                            const stageName = line.substring(0, colonIndex).trim();
+                            const stageDescription = line.substring(colonIndex + 1).trim();
+                            
+                            return (
+                              <div key={idx} className="border-l-4 border-[#006941] bg-[#f8faf8] px-5 py-4">
+                                <h4 className="mb-3 text-sm font-bold text-[#006941]">
+                                  {stageName}
+                                </h4>
+                                <p className="text-sm leading-relaxed text-slate-700">{stageDescription}</p>
+                              </div>
+                            );
+                          }
+                          
+                          return (
+                            <p key={idx} className="text-sm leading-relaxed text-slate-700">
+                              {line.trim()}
+                            </p>
+                          );
+                        })
+                      ) : (
+                        <p className="text-slate-500">Instructions not provided.</p>
+                      )}
+                    </div>
                   </div>
                 </div>
               </div>
