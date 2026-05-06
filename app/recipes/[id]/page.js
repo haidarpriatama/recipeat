@@ -25,6 +25,15 @@ export const metadata = {
   title: "Recipe Details – Recipeat",
 };
 
+function parseInstructionSteps(instructions) {
+  if (!instructions) return [];
+
+  return instructions
+    .split(/(?:^|\n)\s*\d+\.\s*/)
+    .map((step) => step.trim())
+    .filter(Boolean);
+}
+
 export default async function RecipeDetailPage({ params }) {
   const { id } = await params;
   const recipeId = parseInt(id, 10);
@@ -44,6 +53,8 @@ export default async function RecipeDetailPage({ params }) {
   if (!recipe) {
     notFound();
   }
+
+  const instructionSteps = parseInstructionSteps(recipe.instructions);
 
   return (
     <div className="min-h-screen bg-[#f5f6f7] pb-24 text-[#2c2f30]">
@@ -125,36 +136,25 @@ export default async function RecipeDetailPage({ params }) {
                 <div>
                   <h3 className="mb-8 text-2xl font-bold text-slate-900">Instructions</h3>
                   <div className="rounded-3xl border border-slate-100 bg-white p-8 shadow-sm">
-                    <div className="space-y-6">
-                      {recipe.instructions ? (
-                        recipe.instructions.split('\n').map((line, idx) => {
-                          if (!line.trim()) return null;
-                          
-                          const colonIndex = line.indexOf(':');
-                          if (colonIndex > 0) {
-                            const stageName = line.substring(0, colonIndex).trim();
-                            const stageDescription = line.substring(colonIndex + 1).trim();
-                            
-                            return (
-                              <div key={idx} className="border-l-4 border-[#006941] bg-[#f8faf8] px-5 py-4">
-                                <h4 className="mb-3 text-sm font-bold text-[#006941]">
-                                  {stageName}
-                                </h4>
-                                <p className="text-sm leading-relaxed text-slate-700">{stageDescription}</p>
-                              </div>
-                            );
-                          }
-                          
-                          return (
-                            <p key={idx} className="text-sm leading-relaxed text-slate-700">
-                              {line.trim()}
-                            </p>
-                          );
-                        })
-                      ) : (
-                        <p className="text-slate-500">Instructions not provided.</p>
-                      )}
-                    </div>
+                    {instructionSteps.length > 0 ? (
+                      <div className="space-y-0">
+                        {instructionSteps.map((step, idx) => (
+                          <div key={idx} className="relative flex gap-5 pb-8 last:pb-0">
+                            {idx < instructionSteps.length - 1 && (
+                              <span className="absolute left-5 top-11 h-[calc(100%-2.75rem)] w-px bg-[#006941]/25" />
+                            )}
+                            <div className="relative z-10 flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-full bg-[#006941] text-sm font-bold text-white shadow-md shadow-[#006941]/20">
+                              {idx + 1}
+                            </div>
+                            <div className="pt-1">
+                              <p className="text-sm leading-relaxed text-slate-700">{step}</p>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    ) : (
+                      <p className="text-slate-500">Instructions not provided.</p>
+                    )}
                   </div>
                 </div>
               </div>
