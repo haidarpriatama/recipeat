@@ -43,6 +43,11 @@ function getMealTypeLabel(categoryName) {
   return MEAL_TYPE_LABELS[categoryName] || categoryName || "Recipe";
 }
 
+function getCategoryNamesForMealType(mealType) {
+  const localName = Object.entries(MEAL_TYPE_LABELS).find(([, label]) => label === mealType)?.[0];
+  return localName ? [mealType, localName] : [mealType];
+}
+
 const RECIPES = [
   {
     title: "Honey Glazed Salmon with Wild Asparagus",
@@ -102,24 +107,38 @@ const RECIPES = [
   },
 ];
 
-function FilterSidebar() {
+function FilterSidebar({ selectedMealTypes = [], searchParams = {} }) {
   return (
     <aside className="w-full space-y-10 lg:w-64 lg:flex-shrink-0">
       <div>
         <h3 className="mb-6 text-sm font-bold uppercase tracking-widest text-[#006941]">Meal Type</h3>
         <div className="space-y-3">
-          {FILTERS.mealType.map((item) => (
-            <label key={item.label} className="group flex cursor-pointer items-center gap-3">
-              <input
-                type="checkbox"
-                defaultChecked={item.selected}
-                className="h-5 w-5 rounded border-[#abadae]/30 accent-[#006941]"
-              />
-              <span className="font-medium text-[#595c5d] transition-colors group-hover:text-[#006941]">
-                {item.label}
-              </span>
-            </label>
-          ))}
+          {FILTERS.mealType.map((item) => {
+            const isSelected = selectedMealTypes.includes(item.label);
+            const nextMealTypes = isSelected
+              ? selectedMealTypes.filter((mealType) => mealType !== item.label)
+              : [...selectedMealTypes, item.label];
+            const params = new URLSearchParams(searchParams);
+
+            if (nextMealTypes.length > 0) {
+              params.set("mealTypes", nextMealTypes.join(","));
+            } else {
+              params.delete("mealTypes");
+            }
+
+            return (
+              <Link key={item.label} href={`/explore?${params.toString()}`} className="group flex cursor-pointer items-center gap-3">
+                <span className={`flex h-5 w-5 items-center justify-center rounded border ${
+                  isSelected ? "border-[#006941] bg-[#006941]" : "border-[#abadae]/30 bg-white"
+                }`}>
+                  {isSelected && <span className="h-2 w-2 rounded-full bg-white" />}
+                </span>
+                <span className="font-medium text-[#595c5d] transition-colors group-hover:text-[#006941]">
+                  {item.label}
+                </span>
+              </Link>
+            );
+          })}
         </div>
       </div>
 
@@ -206,6 +225,7 @@ export default async function ExplorePage({ searchParams: searchParamsPromise })
   const query = searchParams?.q || "";
   const categoryFilter = searchParams?.category || "";
   const slotFilter = searchParams?.slot || "";
+  const selectedMealTypes = searchParams?.mealTypes ? searchParams.mealTypes.split(",").filter(Boolean) : [];
   const ingredientsFilter = searchParams?.ingredients ? searchParams.ingredients.split(",") : [];
 
   let displayRecipes = [];
@@ -222,6 +242,15 @@ export default async function ExplorePage({ searchParams: searchParamsPromise })
         } : {},
         categoryFilter ? {
           category: { name: { equals: categoryFilter, mode: 'insensitive' } }
+        } : {},
+        selectedMealTypes.length > 0 ? {
+          category: {
+            OR: selectedMealTypes.flatMap((mealType) =>
+              getCategoryNamesForMealType(mealType).map((categoryName) => ({
+                name: { equals: categoryName, mode: 'insensitive' }
+              }))
+            )
+          }
         } : {},
         ingredientsFilter.length > 0 ? {
           ingredients: {
@@ -264,7 +293,7 @@ export default async function ExplorePage({ searchParams: searchParamsPromise })
         label: getMealTypeLabel(recipe.category?.name),
         favorite: recipe.favorites?.length > 0,
       }));
-    } else if (!query && !categoryFilter && ingredientsFilter.length === 0) {
+    } else if (!query && !categoryFilter && selectedMealTypes.length === 0 && ingredientsFilter.length === 0) {
       // Fallback to static data only if no search/filter is applied and DB is empty
       displayRecipes = RECIPES;
     }
@@ -322,7 +351,7 @@ export default async function ExplorePage({ searchParams: searchParamsPromise })
         </section>
 
 <div className="flex flex-col gap-12 lg:flex-row">
-          <FilterSidebar />
+          <FilterSidebar selectedMealTypes={selectedMealTypes} searchParams={searchParams} />
 
           <section className="flex-1">
             

@@ -7,54 +7,20 @@ import { useRouter } from "next/navigation";
 import {
   ArrowRight,
   Clock,
-  Heart,
   Mail,
   Save,
   Star,
   User,
 } from "lucide-react";
+import FavoriteButton from "@/components/RecipeCard/FavoriteButton";
 import SiteFooter from "@/components/layout/SiteFooter";
 import { footerContent } from "@/components/content/landingContent";
 import { supabase } from "@/lib/supabaseClient";
 
-// --------------- Favourite recipe data ---------------
-const FAVORITE_RECIPES = [
-  {
-    id: 1,
-    title: "Artisan Avocado Toast",
-    image:
-      "https://lh3.googleusercontent.com/aida-public/AB6AXuBYunktJJg0jp7YCZQB5UjqMPUICaqCLwp0oGsuy88pIquqnFhEieOLNGBsRP2L84XnrBOqAblatTzOPgAsxO2x5HA6B439DnvE6VjRBfRmY7G3CfYHnp2Cjd9ICjuvA53hten6NsXhmIP4G80xGJwFsmgeWDHyG-6dV1QuCOhhWcXuGc1b100IOE7Xpuoq_yF23TTGQsh3vkVLCZbH_fwXOZ7LwddJmBeLVCw3sGvOyNC-0EjrH1QPmRP5EK8Y7yEwiznSw9d8MjbP",
-    alt: "Artisan sourdough avocado toast with microgreens",
-    rating: "4.9",
-    time: "15 min",
-    tags: ["Breakfast", "Quick"],
-  },
-  {
-    id: 2,
-    title: "Harvest Buddha Bowl",
-    image:
-      "https://lh3.googleusercontent.com/aida-public/AB6AXuAUKwD8esOKMs8ahlQdlALQFLlAt945U4zm14pi_fNCi16zq43Uhyqf7uRRZuhO0W-GYsZRVkejR0tLly3BNhtnYBwwQ-1ttyD-037FkzJvvk9LQ2Ae5xsiyKoIcNKlbA2fBya7nbPZ-ecSDcFMnqzLI1vhvqyfh0gD1tVkSY0VinnJoIIZKClM3cf5nGnaQeYzpE3Zstp5mt1FNNTO_BkVX0Cu5vPXgvntOi2rdatyTng0DreYrV6HL2kxiqqFoN_FWSlkyoLhzD9B",
-    alt: "Vegan buddha bowl with quinoa and roasted sweet potatoes",
-    rating: "4.8",
-    time: "35 min",
-    tags: ["Vegan", "Healthy"],
-  },
-  {
-    id: 3,
-    title: "Rustic Pesto Pasta",
-    image:
-      "https://lh3.googleusercontent.com/aida-public/AB6AXuBbQ36MCUhr_uC15qV9qFzh6cH-tg_8lPKLNNoCcnUaoKnvoL17h-nRUNWMYYfE96RxhAC1WCpgNHunHCY6KDrv_4McGEk8jUDK3-QarYofNY26gABBKjy8pVGB3AKbg6JyJ9mE4hT5KPV088zYXdrLjxQrmPLcadwXL6wx4r3TUYIymJfPXHIE8CUbvM78PtK3IrC89Ne3_WWlx3qxeVg4X47jRHluePllPlj4TPstMxjc6iQD9pbBDKyfoRXY_mg2tVnWqqJSsmTO",
-    alt: "Fresh basil pesto pasta with cherry tomatoes",
-    rating: "5.0",
-    time: "25 min",
-    tags: ["Comfort Food", "Dinner"],
-  },
-];
-
 const AVATAR_URL =
   "https://lh3.googleusercontent.com/aida-public/AB6AXuBBgil31kVK_AuFTC6fWU7FOCH9iz0_hqgfgxzAhxE3o5I0k0JqTIqHmew7S3xoYB7v9wibwNlmoJYF5guu-vFSGLCTed_U1D3PHURjtR5BGHtWXEOG2Yfx7G64dvQfHEdEL51afvX5Ikbq2FnLN_DcEa9OklYAo5ELC35jEDdWA_unZywmpNKxS6TT_QcLSSikv77IZQwyLLEvYfNAV6l1UP5NtN_xt9Uud_0PbVOn01WSCuf4yrYkuR_1RQwsB1acoCOybIYQviQI";
 
-export default function ProfileContent() {
+export default function ProfileContent({ favorites = [], favoriteCount = 0 }) {
   const router = useRouter();
 
   // ── Auth guard: redirect to login if not logged in ──
@@ -150,7 +116,7 @@ export default function ProfileContent() {
                   </p>
                 </div>
                 <div className="flex-1 bg-[#eff1f2] rounded-xl p-3">
-                  <p className="font-headline font-bold text-[#006941] text-xl">128</p>
+                  <p className="font-headline font-bold text-[#006941] text-xl">{favoriteCount}</p>
                   <p className="text-xs text-slate-500 uppercase tracking-wider font-semibold mt-0.5">
                     Saved
                   </p>
@@ -268,55 +234,67 @@ export default function ProfileContent() {
               </Link>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {FAVORITE_RECIPES.map((recipe) => (
-                <article
-                  key={recipe.id}
-                  className="bg-white rounded-[1.5rem] p-4 shadow-sm hover:shadow-xl flex flex-col gap-5 group cursor-pointer transition-all duration-300 hover:-translate-y-2 border border-slate-100"
-                >
-                  <div className="relative w-full aspect-[4/3] rounded-xl overflow-hidden bg-slate-100">
-                    <Image
-                      src={recipe.image}
-                      alt={recipe.alt}
-                      fill
-                      sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                      className="object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
-                    />
-                    <button className="absolute top-3 right-3 w-10 h-10 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center text-red-500 hover:bg-white transition-colors shadow-md">
-                      <Heart size={18} fill="currentColor" />
-                    </button>
-                  </div>
-
-                  <div className="flex flex-col flex-grow space-y-3 px-2">
-                    <div className="flex flex-wrap gap-2">
-                      {recipe.tags.map((tag) => (
-                        <span
-                          key={tag}
-                          className="px-3 py-1 bg-[#f3fcf3] text-[#006941] text-xs font-semibold rounded-lg"
-                        >
-                          {tag}
-                        </span>
-                      ))}
+            {favorites.length === 0 ? (
+              <div className="rounded-[1.5rem] border border-slate-100 bg-white p-10 text-center text-slate-500">
+                No favorites yet.
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                {favorites.map((recipe) => (
+                  <article
+                    key={recipe.id}
+                    className="bg-white rounded-[1.5rem] p-4 shadow-sm hover:shadow-xl flex flex-col gap-5 group cursor-pointer transition-all duration-300 hover:-translate-y-2 border border-slate-100"
+                  >
+                    <div className="relative w-full aspect-[4/3] rounded-xl overflow-hidden bg-slate-100">
+                      <Link href={`/recipes/${recipe.id}`} className="block h-full">
+                        <Image
+                          src={recipe.image}
+                          alt={recipe.alt}
+                          fill
+                          sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                          className="object-cover group-hover:scale-105 transition-transform duration-700 ease-out"
+                        />
+                      </Link>
+                      <FavoriteButton
+                        recipeId={recipe.id}
+                        initialFavorited={true}
+                        className="absolute top-3 right-3"
+                      />
                     </div>
 
-                    <h3 className="font-headline font-bold text-xl leading-tight text-slate-800 group-hover:text-[#006941] transition-colors">
-                      {recipe.title}
-                    </h3>
-
-                    <div className="mt-auto flex items-center justify-between text-slate-500 text-sm pt-2">
-                      <div className="flex items-center gap-1 text-[#8c4a00]">
-                        <Star size={16} fill="currentColor" />
-                        <span className="font-bold">{recipe.rating}</span>
+                    <div className="flex flex-col flex-grow space-y-3 px-2">
+                      <div className="flex flex-wrap gap-2">
+                        {recipe.tags.map((tag) => (
+                          <span
+                            key={tag}
+                            className="px-3 py-1 bg-[#f3fcf3] text-[#006941] text-xs font-semibold rounded-lg"
+                          >
+                            {tag}
+                          </span>
+                        ))}
                       </div>
-                      <div className="flex items-center gap-1 font-medium">
-                        <Clock size={16} />
-                        <span>{recipe.time}</span>
+
+                      <Link href={`/recipes/${recipe.id}`}>
+                        <h3 className="font-headline font-bold text-xl leading-tight text-slate-800 group-hover:text-[#006941] transition-colors">
+                          {recipe.title}
+                        </h3>
+                      </Link>
+
+                      <div className="mt-auto flex items-center justify-between text-slate-500 text-sm pt-2">
+                        <div className="flex items-center gap-1 text-[#8c4a00]">
+                          <Star size={16} fill="currentColor" />
+                          <span className="font-bold">{recipe.rating}</span>
+                        </div>
+                        <div className="flex items-center gap-1 font-medium">
+                          <Clock size={16} />
+                          <span>{recipe.time}</span>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                </article>
-              ))}
-            </div>
+                  </article>
+                ))}
+              </div>
+            )}
           </section>
         </main>
       </div>
