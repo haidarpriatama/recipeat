@@ -62,39 +62,32 @@ export default async function MealPlansPage() {
     }), { protein: 0, carbs: 0, fats: 0 });
   }
 
-  // Map database meals to UI slots
-  // In a real app, we might have a 'mealType' in MealPlanRecipe, 
-  // but here we'll just distribute them or show what we have.
-  // Map database meals to UI slots
   const slots = ["Breakfast", "Lunch", "Dinner"];
+  const getSlotTime = (slot) => slot === "Breakfast" ? "08:00 AM" : slot === "Lunch" ? "01:30 PM" : "07:30 PM";
   const timelineMeals = slots.map((slot) => {
-    // Find a meal that matches this slot (Breakfast, Lunch, or Dinner)
-    const mealRecord = todayMeals.find(r => r.mealType === slot);
-    
-    if (mealRecord) {
-      const index = slots.indexOf(slot);
-      return {
-        slot,
-        mealType: slot,
-        time: index === 0 ? "08:00 AM" : index === 1 ? "01:30 PM" : "07:30 PM",
-        title: mealRecord.recipe.title,
-        description: mealRecord.recipe.description || "No description available.",
-        image: mealRecord.recipe.imageUrl || "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=800&q=80",
-        imageAlt: mealRecord.recipe.title,
-        prepTime: `${mealRecord.recipe.cookTime} min`,
-        difficulty: "Medium",
-        calories: `${((mealRecord.recipe.protein || 0) * 4) + ((mealRecord.recipe.carbs || 0) * 4) + ((mealRecord.recipe.fats || 0) * 9)} kcal`,
-        id: mealRecord.recipe.id,
-        mealPlanId: mealPlan.id,
-        dayOfWeek: mealRecord.dayOfWeek
-      };
-    }
-    const index = slots.indexOf(slot);
+    const slotMeals = todayMeals.filter(r => r.mealType === slot);
+    const meals = slotMeals.map((mealRecord) => ({
+      slot,
+      mealType: slot,
+      time: getSlotTime(slot),
+      title: mealRecord.recipe.title,
+      description: mealRecord.recipe.description || "No description available.",
+      image: mealRecord.recipe.imageUrl || "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=800&q=80",
+      imageAlt: mealRecord.recipe.title,
+      prepTime: `${mealRecord.recipe.cookTime} min`,
+      difficulty: "Medium",
+      calories: `${((mealRecord.recipe.protein || 0) * 4) + ((mealRecord.recipe.carbs || 0) * 4) + ((mealRecord.recipe.fats || 0) * 9)} kcal`,
+      id: mealRecord.recipe.id,
+      mealPlanId: mealPlan.id,
+      dayOfWeek: mealRecord.dayOfWeek
+    }));
+
     return {
       slot,
       mealType: slot,
-      time: index === 0 ? "08:00 AM" : index === 1 ? "01:30 PM" : "07:30 PM",
-      empty: true
+      time: getSlotTime(slot),
+      meals,
+      remaining: 3 - slotMeals.length,
     };
   });
 
@@ -162,8 +155,8 @@ export default async function MealPlansPage() {
             </div>
 
             <div className="relative space-y-12 before:absolute before:bottom-4 before:left-6 before:top-4 before:w-0.5 before:bg-[#7bfeb8]">
-              {timelineMeals.map((meal) => (
-                <TimelineItem key={`${meal.slot}-${meal.time}`} meal={meal} />
+              {timelineMeals.map((group) => (
+                <TimelineItem key={group.slot} group={group} />
               ))}
             </div>
           </section>
@@ -227,22 +220,28 @@ function CalendarCard() {
   );
 }
 
-function TimelineItem({ meal }) {
-  if (meal.empty) {
-    return (
-      <article className="group relative pl-16">
-        <div className="absolute left-4 top-1 z-10 h-4 w-4 rounded-full bg-[#006941] ring-4 ring-[#caffdc]" />
-        <div className="mb-4 flex items-center gap-4">
-          <span className="rounded-full bg-[#f3fcf3] px-3 py-1 text-xs font-bold uppercase tracking-wider text-[#58615a]">{meal.slot}</span>
-          <span className="text-sm font-medium text-[#595c5d]">{meal.time}</span>
-        </div>
-        <Link href={`/explore?slot=${meal.slot}`} className="flex w-full flex-col items-center justify-center rounded-2xl border-2 border-dashed border-[#abadae] bg-white/60 p-8 text-center transition-all hover:border-[#006941] hover:bg-[#f3fcf3]">
-          <PlusCircle className="mb-2 h-9 w-9 text-[#757778] transition-colors group-hover:text-[#006941]" />
-          <span className="text-sm font-bold text-[#757778] transition-colors group-hover:text-[#006941]">Plan your {meal.slot.toLowerCase()}</span>
-        </Link>
-      </article>
-    );
-  }
+function TimelineItem({ group }) {
+  return (
+    <article className="group relative pl-16">
+      <div className="absolute left-4 top-1 z-10 h-4 w-4 rounded-full bg-[#006941] ring-4 ring-[#caffdc]" />
+      <div className="mb-4 flex items-center gap-4">
+        <span className="rounded-full bg-[#f3fcf3] px-3 py-1 text-xs font-bold uppercase tracking-wider text-[#58615a]">{group.slot}</span>
+        <span className="text-sm font-medium text-[#595c5d]">{group.time}</span>
+      </div>
 
-  return <MealCard meal={meal} />;
+      <div className="space-y-4">
+        {group.meals.map((meal) => (
+          <MealCard key={meal.id} meal={meal} compact />
+        ))}
+
+        {group.remaining > 0 && (
+          <Link href={`/explore?slot=${group.slot}`} className="flex w-full flex-col items-center justify-center rounded-2xl border-2 border-dashed border-[#abadae] bg-white/60 p-8 text-center transition-all hover:border-[#006941] hover:bg-[#f3fcf3]">
+            <PlusCircle className="mb-2 h-9 w-9 text-[#757778] transition-colors group-hover:text-[#006941]" />
+            <span className="text-sm font-bold text-[#757778] transition-colors group-hover:text-[#006941]">Plan your {group.slot.toLowerCase()}</span>
+            <span className="mt-1 text-xs font-medium text-[#959798]">{group.remaining} slot{group.remaining === 1 ? "" : "s"} left</span>
+          </Link>
+        )}
+      </div>
+    </article>
+  );
 }

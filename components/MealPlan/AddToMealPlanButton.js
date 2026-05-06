@@ -1,12 +1,13 @@
 "use client";
 
 import { useState } from 'react';
-import { CalendarPlus, Check } from 'lucide-react';
+import { AlertCircle, CalendarPlus, Check } from 'lucide-react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 
-export default function AddToMealPlanButton({ recipeId }) {
+export default function AddToMealPlanButton({ recipeId, mealType }) {
   const [isAdding, setIsAdding] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
+  const [warning, setWarning] = useState("");
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -14,11 +15,9 @@ export default function AddToMealPlanButton({ recipeId }) {
   const handleAdd = async () => {
     setIsAdding(true);
     try {
-      // Get the intended slot from URL if available
-      const intendedSlot = searchParams.get('slot') || "Lunch";
+      setWarning("");
+      const intendedSlot = mealType || searchParams.get('slot') || "Lunch";
 
-      // In a real app, we'd show a modal to pick the day.
-      // For this demo, we'll just add it to 'Monday' of the current week.
       const today = new Date();
       const DAYS = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
       const currentDay = DAYS[today.getDay()];
@@ -46,6 +45,12 @@ export default function AddToMealPlanButton({ recipeId }) {
         return;
       }
 
+      if (res.status === 409) {
+        const data = await res.json();
+        setWarning(data.message || `${intendedSlot} meal plan is full.`);
+        return;
+      }
+
       if (res.ok) {
         setIsSuccess(true);
         setTimeout(() => setIsSuccess(false), 2000);
@@ -59,25 +64,34 @@ export default function AddToMealPlanButton({ recipeId }) {
   };
 
   return (
-    <button
-      onClick={handleAdd}
-      disabled={isAdding || isSuccess}
-      className={`mt-8 inline-flex items-center justify-center gap-2 rounded-xl px-8 py-4 font-bold transition-all shadow-lg active:scale-95 ${
-        isSuccess 
-          ? "bg-green-500 text-white" 
-          : "bg-[#006941] hover:bg-[#005535] text-white"
-      }`}
-    >
-      {isSuccess ? (
-        <>
-          <Check className="h-5 w-5" /> Added to Plan
-        </>
-      ) : (
-        <>
-          <CalendarPlus className="h-5 w-5" /> 
-          {isAdding ? "Planning..." : "Plan this Meal"}
-        </>
+    <div className="mt-8">
+      <button
+        onClick={handleAdd}
+        disabled={isAdding || isSuccess}
+        className={`inline-flex items-center justify-center gap-2 rounded-xl px-8 py-4 font-bold transition-all shadow-lg active:scale-95 ${
+          isSuccess 
+            ? "bg-green-500 text-white" 
+            : "bg-[#006941] hover:bg-[#005535] text-white"
+        }`}
+      >
+        {isSuccess ? (
+          <>
+            <Check className="h-5 w-5" /> Added to Plan
+          </>
+        ) : (
+          <>
+            <CalendarPlus className="h-5 w-5" /> 
+            {isAdding ? "Planning..." : "Plan this Meal"}
+          </>
+        )}
+      </button>
+
+      {warning && (
+        <div className="mt-4 flex max-w-md items-start gap-3 rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm font-medium text-amber-800">
+          <AlertCircle className="mt-0.5 h-4 w-4 flex-shrink-0" />
+          <span>{warning}</span>
+        </div>
       )}
-    </button>
+    </div>
   );
 }

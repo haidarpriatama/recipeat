@@ -6,7 +6,7 @@ import Link from "next/link";
 import { Timer, UtensilsCrossed, Flame, Trash2, Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 
-export default function MealCard({ meal }) {
+export default function MealCard({ meal, compact = false }) {
   const router = useRouter();
   const [isDeleting, setIsDeleting] = useState(false);
 
@@ -39,26 +39,24 @@ export default function MealCard({ meal }) {
   };
 
   return (
-    <article className="group relative pl-16">
-      <div className="absolute left-4 top-1 z-10 h-4 w-4 rounded-full bg-[#006941] ring-4 ring-[#caffdc]" />
-      <div className="mb-4 flex items-center justify-between pr-4">
-        <div className="flex items-center gap-4">
+    <article className={compact ? "group relative" : "group relative pl-16"}>
+      {!compact && <div className="absolute left-4 top-1 z-10 h-4 w-4 rounded-full bg-[#006941] ring-4 ring-[#caffdc]" />}
+      {!compact && (
+        <div className="mb-4 flex items-center gap-4">
           <span className="rounded-full bg-[#f3fcf3] px-3 py-1 text-xs font-bold uppercase tracking-wider text-[#58615a]">{meal.slot}</span>
           <span className="text-sm font-medium text-[#595c5d]">{meal.time}</span>
         </div>
-        
-        {/* Delete Button */}
+      )}
+      
+      <div className="relative overflow-hidden rounded-2xl bg-white shadow-[0_16px_38px_-14px_rgba(0,0,0,0.12)] transition-shadow hover:shadow-[0_16px_38px_-14px_rgba(0,105,65,0.25)] md:flex">
         <button 
           onClick={handleDelete}
           disabled={isDeleting}
-          className="text-slate-300 hover:text-red-500 transition-colors p-1"
+          className="absolute right-4 top-4 z-20 rounded-full bg-white/90 p-2 text-slate-400 shadow-sm transition-colors hover:text-red-500"
           title="Remove from plan"
         >
           {isDeleting ? <Loader2 className="h-4 w-4 animate-spin" /> : <Trash2 className="h-4 w-4" />}
         </button>
-      </div>
-      
-      <div className="overflow-hidden rounded-2xl bg-white shadow-[0_16px_38px_-14px_rgba(0,0,0,0.12)] transition-shadow hover:shadow-[0_16px_38px_-14px_rgba(0,105,65,0.25)] md:flex">
         <div className="relative h-48 md:h-auto md:w-1/3">
           <Image src={meal.image} alt={meal.imageAlt} fill className="object-cover transition-transform duration-500 group-hover:scale-105" sizes="(min-width: 1024px) 25vw, (min-width: 768px) 35vw, 100vw" />
         </div>

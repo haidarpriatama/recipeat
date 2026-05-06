@@ -7,6 +7,16 @@ import { notFound } from "next/navigation";
 import { Clock3, Flame, Star, ChefHat, ArrowLeft } from "lucide-react";
 import AddToMealPlanButton from "@/components/MealPlan/AddToMealPlanButton";
 
+const MEAL_TYPE_LABELS = {
+  Sarapan: "Breakfast",
+  "Makan Siang": "Lunch",
+  "Makan Malam": "Dinner",
+};
+
+function getMealTypeLabel(categoryName) {
+  return MEAL_TYPE_LABELS[categoryName] || categoryName || "Recipe";
+}
+
 const SERVING_TIPS = {
   Sarapan:
     "Sajikan dalam mangkuk atau piring cantik sambil masih hangat. Tambahkan potongan buah segar atau yogurt rendah lemak untuk menu sarapan sehat.",
@@ -79,7 +89,7 @@ export default async function RecipeDetailPage({ params }) {
                 priority
               />
               <div className="absolute top-6 left-6 rounded-full bg-white/90 px-4 py-1.5 text-xs font-bold uppercase tracking-widest text-[#006941] backdrop-blur">
-                {recipe.category?.name || "Recipe"}
+                {getMealTypeLabel(recipe.category?.name)}
               </div>
             </div>
 
@@ -111,7 +121,7 @@ export default async function RecipeDetailPage({ params }) {
                 </div>
               </div>
 
-              <AddToMealPlanButton recipeId={recipe.id} />
+              <AddToMealPlanButton recipeId={recipe.id} mealType={getMealTypeLabel(recipe.category?.name)} />
 
               {/* Ingredients & Instructions Section */}
               <div className="mt-12 space-y-12">

@@ -54,9 +54,30 @@ export async function POST(request) {
       });
     }
 
-    // Tambahkan resep ke MealPlanRecipe
     if (recipeId && dayOfWeek) {
       const rId = parseInt(recipeId, 10);
+      const targetMealType = mealType || 'Lunch';
+      const existingSlotMeals = await prisma.mealPlanRecipe.count({
+        where: {
+          mealPlanId: mealPlan.id,
+          dayOfWeek,
+          mealType: targetMealType,
+        },
+      });
+      const existingRecipe = await prisma.mealPlanRecipe.findUnique({
+        where: {
+          mealPlanId_recipeId_dayOfWeek: {
+            mealPlanId: mealPlan.id,
+            recipeId: rId,
+            dayOfWeek,
+          },
+        },
+      });
+
+      if (!existingRecipe && existingSlotMeals >= 3) {
+        return Response.json({ message: `${targetMealType} meal plan is full. Maximum 3 recipes.` }, { status: 409 });
+      }
+
       await prisma.mealPlanRecipe.upsert({
         where: {
           mealPlanId_recipeId_dayOfWeek: {
@@ -65,12 +86,12 @@ export async function POST(request) {
             dayOfWeek,
           },
         },
-        update: { mealType: mealType || 'Lunch' },
+        update: { mealType: targetMealType },
         create: {
           mealPlanId: mealPlan.id,
           recipeId: rId,
           dayOfWeek,
-          mealType: mealType || 'Lunch',
+          mealType: targetMealType,
         },
       });
     }

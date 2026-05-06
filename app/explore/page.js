@@ -33,6 +33,16 @@ const FILTERS = {
   ],
 };
 
+const MEAL_TYPE_LABELS = {
+  Sarapan: "Breakfast",
+  "Makan Siang": "Lunch",
+  "Makan Malam": "Dinner",
+};
+
+function getMealTypeLabel(categoryName) {
+  return MEAL_TYPE_LABELS[categoryName] || categoryName || "Recipe";
+}
+
 const RECIPES = [
   {
     title: "Honey Glazed Salmon with Wild Asparagus",
@@ -251,7 +261,7 @@ export default async function ExplorePage({ searchParams: searchParamsPromise })
         alt: recipe.title,
         time: `${recipe.cookTime}m`,
         calories: "350 kcal",
-        label: recipe.category?.name || 'Recipe',
+        label: getMealTypeLabel(recipe.category?.name),
         favorite: recipe.favorites?.length > 0,
       }));
     } else if (!query && !categoryFilter && ingredientsFilter.length === 0) {
