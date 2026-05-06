@@ -167,30 +167,6 @@ export default async function MealPlansPage() {
               ))}
             </div>
           </section>
-
-          <aside className="lg:col-span-3">
-            <div className="lg:sticky lg:top-28">
-              <div className="rounded-2xl bg-white p-6 shadow-sm border border-slate-100 space-y-6">
-                <h3 className="text-lg font-bold">Nutrition Goal</h3>
-                <div className="space-y-4">
-                  {nutritionGoals.map((nutri) => (
-                    <div key={nutri.label} className="space-y-2">
-                      <div className="flex justify-between text-xs font-bold">
-                        <span>{nutri.label}</span>
-                        <span className="text-[#595c5d]">{nutri.current}/{nutri.target}{nutri.unit}</span>
-                      </div>
-                      <div className={`h-2 w-full rounded-full ${nutri.track}`}>
-                        <div 
-                          className={`h-full rounded-full ${nutri.fill}`} 
-                          style={{ width: `${Math.min((nutri.current / nutri.target) * 100, 100)}%` }}
-                        />
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </aside>
         </div>
       </div>
 

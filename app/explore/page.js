@@ -27,29 +27,11 @@ export const metadata = {
 
 const FILTERS = {
   mealType: [
-    { label: "Breakfast", selected: true },
+    { label: "Breakfast" },
     { label: "Lunch" },
-    { label: "Dinner", selected: true },
-    { label: "Snacks" },
+    { label: "Dinner" },
   ],
-  dietary: [
-    { label: "Vegan", active: true },
-    { label: "Gluten-Free" },
-    { label: "Keto", active: true },
-    { label: "Low Carb" },
-    { label: "Dairy-Free" },
-  ],
-  cuisines: ["Italian", "Mediterranean", "Japanese", "Mexican"],
 };
-
-const QUICK_ADD = [
-  { label: "Eggs" },
-  { label: "Spinach", added: true },
-  { label: "Tomato" },
-  { label: "Garlic", added: true },
-  { label: "Onion" },
-  { label: "Olive Oil" },
-];
 
 const RECIPES = [
   {
