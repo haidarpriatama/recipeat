@@ -5,6 +5,11 @@ require('dotenv').config();
 
 async function main() {
   const connectionString = process.env.DATABASE_URL;
+
+  if (!connectionString) {
+    throw new Error('DATABASE_URL belum diisi. Copy .env.example ke .env lalu isi DATABASE_URL.');
+  }
+
   const pool = new Pool({ connectionString });
   const adapter = new PrismaPg(pool);
   const prisma = new PrismaClient({ adapter });
@@ -12,18 +17,22 @@ async function main() {
   console.log('Sedang mengisi data awal...');
 
   try {
-    // 1. Bersihkan data lama
-    await prisma.mealPlanRecipe.deleteMany({});
-    await prisma.mealPlan.deleteMany({});
-    await prisma.favorite.deleteMany({});
-    await prisma.recipeIngredient.deleteMany({});
-    await prisma.recipe.deleteMany({});
-    await prisma.category.deleteMany({});
-
-    // 2. Tambah Kategori
-    const cat1 = await prisma.category.create({ data: { name: 'Sarapan' } });
-    const cat2 = await prisma.category.create({ data: { name: 'Makan Siang' } });
-    const cat3 = await prisma.category.create({ data: { name: 'Makan Malam' } });
+    // Seed dibuat idempotent agar aman dijalankan di device siapa pun tanpa menghapus data user.
+    const cat1 = await prisma.category.upsert({
+      where: { name: 'Sarapan' },
+      update: {},
+      create: { name: 'Sarapan' },
+    });
+    const cat2 = await prisma.category.upsert({
+      where: { name: 'Makan Siang' },
+      update: {},
+      create: { name: 'Makan Siang' },
+    });
+    const cat3 = await prisma.category.upsert({
+      where: { name: 'Makan Malam' },
+      update: {},
+      create: { name: 'Makan Malam' },
+    });
 
     // 3. Tambah 20 Resep beserta bahan-bahannya
     const recipesData = [
@@ -356,35 +365,49 @@ async function main() {
       const carbs = Math.floor(Math.random() * 60) + 20;
       const fats = Math.floor(Math.random() * 20) + 5;
 
-      await prisma.recipe.create({
-        data: {
-          title: data.title,
-          description: data.description,
-          instructions: data.instructions,
-          cookTime: data.cookTime,
-          categoryId: data.categoryId,
-          imageUrl: data.imageUrl,
-          protein,
-          carbs,
-          fats,
-          ingredients: {
-            create: data.ingredients.map(ing => ({
-              quantity: ing.quantity,
-              ingredient: {
-                connectOrCreate: {
-                  where: { name: ing.ingredientName },
-                  create: { name: ing.ingredientName }
-                }
+      const recipeData = {
+        title: data.title,
+        description: data.description,
+        instructions: data.instructions,
+        cookTime: data.cookTime,
+        categoryId: data.categoryId,
+        imageUrl: data.imageUrl,
+        protein,
+        carbs,
+        fats,
+        ingredients: {
+          create: data.ingredients.map(ing => ({
+            quantity: ing.quantity,
+            ingredient: {
+              connectOrCreate: {
+                where: { name: ing.ingredientName },
+                create: { name: ing.ingredientName }
               }
-            }))
-          }
+            }
+          }))
         }
+      };
+
+      const existingRecipe = await prisma.recipe.findFirst({
+        where: { title: data.title },
+        select: { id: true },
       });
+
+      if (existingRecipe) {
+        await prisma.recipeIngredient.deleteMany({ where: { recipeId: existingRecipe.id } });
+        await prisma.recipe.update({
+          where: { id: existingRecipe.id },
+          data: recipeData,
+        });
+      } else {
+        await prisma.recipe.create({ data: recipeData });
+      }
     }
 
-    console.log('BERHASIL! 20 Resep baru sudah masuk ke database.');
+    console.log('BERHASIL! Data resep awal sudah sinkron di database.');
   } catch (error) {
     console.error('Error saat seeding:', error);
+    process.exitCode = 1;
   } finally {
     await prisma.$disconnect();
   }

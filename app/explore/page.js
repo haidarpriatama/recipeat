@@ -217,6 +217,7 @@ export default async function ExplorePage({ searchParams: searchParamsPromise })
   const ingredientsFilter = searchParams?.ingredients ? searchParams.ingredients.split(",") : [];
 
   let displayRecipes = [];
+  let availableIngredients = [];
   try {
     // Build the Prisma query filter
     const where = {
@@ -244,14 +245,22 @@ export default async function ExplorePage({ searchParams: searchParamsPromise })
       ]
     };
 
-    const dbRecipes = await prisma.recipe.findMany({
-      where,
-      include: { 
-        category: true,
-        favorites: userId ? { where: { userId } } : false
-      },
-      orderBy: { createdAt: 'desc' }
-    });
+    const [dbRecipes, dbIngredients] = await Promise.all([
+      prisma.recipe.findMany({
+        where,
+        include: { 
+          category: true,
+          favorites: userId ? { where: { userId } } : false
+        },
+        orderBy: { createdAt: 'desc' }
+      }),
+      prisma.ingredient.findMany({
+        select: { name: true },
+        orderBy: { name: 'asc' },
+      }),
+    ]);
+
+    availableIngredients = dbIngredients.map((ingredient) => ingredient.name);
 
     if (dbRecipes.length > 0) {
       displayRecipes = dbRecipes.map((recipe) => ({
@@ -327,7 +336,11 @@ export default async function ExplorePage({ searchParams: searchParamsPromise })
           <section className="flex-1">
             
             {/* INI DIA KOMPONEN SMART DISCOVERY YANG BARU */}
-            <SmartDiscovery initialQuery={query} initialIngredients={ingredientsFilter} />
+            <SmartDiscovery
+              initialQuery={query}
+              initialIngredients={ingredientsFilter}
+              availableIngredients={availableIngredients}
+            />
 
             {/* --- BAGIAN BAWAH (DISCOVER FLAVORS & RESEP) TETAP SAMA --- */}
             <div className="mb-8 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">

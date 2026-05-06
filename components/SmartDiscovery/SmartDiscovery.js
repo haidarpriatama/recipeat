@@ -4,12 +4,11 @@ import React, { useState } from 'react';
 import { Search, Plus, X } from 'lucide-react';
 import { useRouter, useSearchParams } from 'next/navigation';
 
-export default function SmartDiscovery({ initialQuery = "", initialIngredients = [] }) {
+export default function SmartDiscovery({ initialQuery = "", initialIngredients = [], availableIngredients = [] }) {
   const router = useRouter();
   const searchParams = useSearchParams();
 
-  // 1. Data daftar semua bahan yang tersedia di database/sistem (disesuaikan dengan bahasa resep)
-  const availableIngredients = [
+  const ingredientOptions = availableIngredients.length > 0 ? availableIngredients : [
     "Telur", "Bayam", "Tomat", "Bawang Putih", "Bawang Merah", 
     "Minyak Goreng", "Ayam", "Jamur", "Daging Sapi", "Cabai", "Pasta", "Keju"
   ];
@@ -143,7 +142,7 @@ export default function SmartDiscovery({ initialQuery = "", initialIngredients =
             {/* Isi Modal (Pilihan Bahan) */}
             <div className="p-6 max-h-[60vh] overflow-y-auto">
               <div className="flex flex-wrap gap-3">
-                {availableIngredients.map((item) => {
+                {ingredientOptions.map((item) => {
                   const isSelected = selectedIngredients.includes(item);
                   return (
                     <button
