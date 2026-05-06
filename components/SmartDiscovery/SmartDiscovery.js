@@ -14,16 +14,12 @@ export default function SmartDiscovery({ initialQuery = "", initialIngredients =
     "Minyak Goreng", "Ayam", "Jamur", "Daging Sapi", "Cabai", "Pasta", "Keju"
   ];
 
+  // 2. State untuk menyimpan bahan yang DIPILIH dan status Pop-up
   const [selectedIngredients, setSelectedIngredients] = useState(initialIngredients);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState(initialQuery);
-  const [ingredientSearchQuery, setIngredientSearchQuery] = useState("");
-  const visibleIngredients = availableIngredients.slice(0, 8);
-  const customIngredients = selectedIngredients.filter((ingredient) => !visibleIngredients.includes(ingredient));
-  const filteredIngredients = availableIngredients.filter((ingredient) =>
-    ingredient.toLowerCase().includes(ingredientSearchQuery.toLowerCase())
-  );
 
+  // 3. Fungsi untuk melakukan pencarian
   const handleSearch = () => {
     const params = new URLSearchParams(searchParams.toString());
     
@@ -42,15 +38,17 @@ export default function SmartDiscovery({ initialQuery = "", initialIngredients =
     router.push(`/explore?${params.toString()}`);
   };
 
+  // 4. Fungsi untuk menghapus bahan dari daftar pilihan
   const removeIngredient = (ingredientToRemove) => {
     setSelectedIngredients(selectedIngredients.filter(item => item !== ingredientToRemove));
   };
 
+  // 5. Fungsi untuk menambah bahan dari Pop-up
   const toggleIngredient = (ingredient) => {
     if (selectedIngredients.includes(ingredient)) {
-      removeIngredient(ingredient);
+      removeIngredient(ingredient); // Hapus jika sudah ada (toggle off)
     } else {
-      setSelectedIngredients([...selectedIngredients, ingredient]);
+      setSelectedIngredients([...selectedIngredients, ingredient]); // Tambah jika belum ada
     }
   };
 
@@ -63,6 +61,7 @@ export default function SmartDiscovery({ initialQuery = "", initialIngredients =
         Find recipes based on what&apos;s in your pantry right now.
       </p>
 
+      {/* --- SEARCH BAR --- */}
       <div className="flex gap-4 mb-8">
         <div className="relative flex-grow">
           <div className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">
@@ -85,54 +84,54 @@ export default function SmartDiscovery({ initialQuery = "", initialIngredients =
         </button>
       </div>
 
+      {/* --- QUICK ADD SECTION --- */}
       <div>
+        {/* Label Quick Add + Ikon Plus */}
         <div className="flex items-center gap-2 mb-4">
           <span className="text-xs font-bold uppercase tracking-[0.15em] text-[#006941]">
             Quick Add
           </span>
-        </div>
-
-        <div className="flex flex-wrap gap-3">
-          {customIngredients.map((item) => (
-            <button
-              key={item}
-              onClick={() => toggleIngredient(item)}
-              className="px-4 py-2 rounded-full text-sm font-medium transition-all border bg-[#006941] border-[#006941] text-white shadow-md"
-            >
-              {item}
-            </button>
-          ))}
-          {visibleIngredients.map((item) => {
-            const isSelected = selectedIngredients.includes(item);
-            return (
-              <button
-                key={item}
-                onClick={() => toggleIngredient(item)}
-                className={`px-4 py-2 rounded-full text-sm font-medium transition-all border ${
-                  isSelected
-                    ? "bg-[#006941] border-[#006941] text-white shadow-md"
-                    : "bg-white border-slate-200 text-slate-600 hover:border-[#006941]/50 hover:bg-slate-50"
-                }`}
-              >
-                {item}
-              </button>
-            );
-          })}
           <button 
             onClick={() => setIsModalOpen(true)}
-            className="bg-[#006941]/10 text-[#006941] hover:bg-[#006941]/20 px-4 py-2 rounded-full transition-colors text-sm font-bold flex items-center gap-1"
+            className="bg-[#006941]/10 text-[#006941] hover:bg-[#006941]/20 p-1 rounded-full transition-colors"
+            title="Add ingredients"
           >
-            <Plus size={16} strokeWidth={3} /> Add More
+            <Plus size={16} strokeWidth={3} />
           </button>
+        </div>
+
+        {/* Daftar Bahan yang Dipilih */}
+        <div className="flex flex-wrap gap-3">
+          {selectedIngredients.length === 0 && (
+            <span className="text-sm text-slate-400 italic">No ingredients selected. Click + to add.</span>
+          )}
+          
+          {selectedIngredients.map((item) => (
+            <div 
+              key={item} 
+              className="flex items-center gap-2 px-4 py-2 bg-[#e0f2eb] border border-[#006941] text-[#006941] rounded-full text-sm font-semibold shadow-sm transition-all"
+            >
+              <span>{item}</span>
+              {/* Tombol Delete (X) */}
+              <button 
+                onClick={() => removeIngredient(item)}
+                className="hover:bg-[#006941]/20 rounded-full p-0.5 transition-colors"
+              >
+                <X size={14} strokeWidth={2.5} />
+              </button>
+            </div>
+          ))}
         </div>
       </div>
 
+      {/* --- POP-UP (MODAL) INGREDIENTS --- */}
       {isModalOpen && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-[#0c0f10]/40 backdrop-blur-sm px-4">
           <div className="bg-white rounded-2xl w-full max-w-lg shadow-2xl overflow-hidden transform transition-all">
             
+            {/* Header Modal */}
             <div className="flex justify-between items-center p-6 border-b border-slate-100">
-              <h3 className="font-headline text-xl font-bold text-[#2c2f30]">Add Ingredients</h3>
+              <h3 className="font-headline text-xl font-bold text-[#2c2f30]">Select Ingredients</h3>
               <button 
                 onClick={() => setIsModalOpen(false)}
                 className="text-slate-400 hover:text-red-500 transition-colors p-1"
@@ -141,21 +140,10 @@ export default function SmartDiscovery({ initialQuery = "", initialIngredients =
               </button>
             </div>
 
+            {/* Isi Modal (Pilihan Bahan) */}
             <div className="p-6 max-h-[60vh] overflow-y-auto">
-              <div className="relative mb-5">
-                <div className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400">
-                  <Search size={18} />
-                </div>
-                <input
-                  type="text"
-                  value={ingredientSearchQuery}
-                  onChange={(e) => setIngredientSearchQuery(e.target.value)}
-                  placeholder="Search ingredients..."
-                  className="w-full bg-slate-50 rounded-xl py-3 pl-11 pr-4 border border-slate-100 focus:ring-2 focus:ring-[#006941] outline-none transition-shadow"
-                />
-              </div>
               <div className="flex flex-wrap gap-3">
-                {filteredIngredients.map((item) => {
+                {availableIngredients.map((item) => {
                   const isSelected = selectedIngredients.includes(item);
                   return (
                     <button
@@ -171,12 +159,10 @@ export default function SmartDiscovery({ initialQuery = "", initialIngredients =
                     </button>
                   );
                 })}
-                {filteredIngredients.length === 0 && (
-                  <span className="text-sm text-slate-400 italic">No ingredients found.</span>
-                )}
               </div>
             </div>
 
+            {/* Footer Modal */}
             <div className="p-6 border-t border-slate-100 bg-slate-50 flex justify-end">
               <button 
                 onClick={() => setIsModalOpen(false)}
