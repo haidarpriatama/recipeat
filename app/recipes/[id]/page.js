@@ -133,7 +133,8 @@ export default async function RecipeDetailPage({ params }) {
                     {recipe.ingredients && recipe.ingredients.length > 0 ? (
                       recipe.ingredients.map((ing) => (
                         <li key={ing.id} className="flex items-center justify-between border-b border-slate-50 pb-3 text-slate-600">
-                          <span className="font-medium">{ing.ingredient.name}</span>
+                          {/* INI BAGIAN YANG DITAMBAHKAN OPTIONAL CHAINING (?.) */}
+                          <span className="font-medium">{ing.ingredient?.name || "Unknown Ingredient"}</span>
                           <span className="font-bold text-slate-900">{ing.quantity}</span>
                         </li>
                       ))
