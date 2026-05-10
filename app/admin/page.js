@@ -5,7 +5,10 @@ import { Users, UtensilsCrossed, Heart } from "lucide-react";
 
 export default async function AdminDashboardPage() {
   const session = await auth();
-  if (!session || session.user.role !== 'ADMIN') redirect('/');
+  if (!session?.user?.email) redirect('/');
+
+  const dbUser = await prisma.user.findUnique({ where: { email: session.user.email } });
+  if (!dbUser || dbUser.role !== 'ADMIN') redirect('/');
 
   // Fetch stats from DB
   const [totalUsers, totalRecipes, totalFavorites] = await Promise.all([

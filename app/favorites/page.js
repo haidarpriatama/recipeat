@@ -21,24 +21,28 @@ export default async function FavoritesPage({ searchParams: searchParamsPromise 
   const query = searchParams?.q || "";
 
   let favorites = [];
-  if (userId) {
-    favorites = await prisma.favorite.findMany({
-      where: { 
-        userId,
-        recipe: query ? {
-          OR: [
-            { title: { contains: query, mode: 'insensitive' } },
-            { description: { contains: query, mode: 'insensitive' } }
-          ]
-        } : undefined
-      },
-      include: {
-        recipe: {
-          include: { category: true }
-        }
-      },
-      orderBy: { savedAt: 'desc' }
-    });
+  if (userId && session?.user?.email) {
+    const dbUser = await prisma.user.findUnique({ where: { email: session.user.email } });
+    
+    if (dbUser) {
+      favorites = await prisma.favorite.findMany({
+        where: { 
+          userId: dbUser.id,
+          recipe: query ? {
+            OR: [
+              { title: { contains: query, mode: 'insensitive' } },
+              { description: { contains: query, mode: 'insensitive' } }
+            ]
+          } : undefined
+        },
+        include: {
+          recipe: {
+            include: { category: true }
+          }
+        },
+        orderBy: { savedAt: 'desc' }
+      });
+    }
   }
 
   return (

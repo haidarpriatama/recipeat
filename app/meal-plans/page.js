@@ -40,9 +40,11 @@ export default async function MealPlansPage() {
   let nutritionTotals = { protein: 0, carbs: 0, fats: 0 };
 
   if (userId) {
-    // Find the latest meal plan for this user
-    mealPlan = await prisma.mealPlan.findFirst({
-      where: { userId },
+    const dbUser = await prisma.user.findUnique({ where: { email: session.user.email } });
+    if (dbUser) {
+      // Find the latest meal plan for this user
+      mealPlan = await prisma.mealPlan.findFirst({
+        where: { userId: dbUser.id },
       include: {
         recipes: {
           include: { recipe: { include: { category: true } } }
@@ -51,15 +53,12 @@ export default async function MealPlansPage() {
       orderBy: { weekStart: 'desc' }
     });
 
-    if (mealPlan) {
-      todayMeals = mealPlan.recipes.filter(r => r.dayOfWeek === dayName);
-    }
+      if (mealPlan) {
+        todayMeals = mealPlan.recipes.filter(r => r.dayOfWeek === dayName);
+      }
 
-    nutritionTotals = todayMeals.reduce((acc, curr) => ({
-      protein: acc.protein + (curr.recipe.protein || 0),
-      carbs: acc.carbs + (curr.recipe.carbs || 0),
-      fats: acc.fats + (curr.recipe.fats || 0),
-    }), { protein: 0, carbs: 0, fats: 0 });
+      nutritionTotals = { protein: 0, carbs: 0, fats: 0 };
+    }
   }
 
   const slots = ["Breakfast", "Lunch", "Dinner"];
@@ -76,7 +75,7 @@ export default async function MealPlansPage() {
       imageAlt: mealRecord.recipe.title,
       prepTime: `${mealRecord.recipe.cookTime} min`,
       difficulty: "Medium",
-      calories: `${((mealRecord.recipe.protein || 0) * 4) + ((mealRecord.recipe.carbs || 0) * 4) + ((mealRecord.recipe.fats || 0) * 9)} kcal`,
+      calories: "N/A",
       id: mealRecord.recipe.id,
       mealPlanId: mealPlan.id,
       dayOfWeek: mealRecord.dayOfWeek

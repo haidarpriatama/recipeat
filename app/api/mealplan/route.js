@@ -8,8 +8,11 @@ export async function GET() {
     const session = await auth();
     if (!session?.user) return Response.json({ message: 'Unauthorized' }, { status: 401 });
 
+    const dbUser = await prisma.user.findUnique({ where: { email: session.user.email } });
+    if (!dbUser) return Response.json([], { status: 200 });
+
     const mealPlans = await prisma.mealPlan.findMany({
-      where: { userId: session.user.id }
+      where: { userId: dbUser.id }
     });
     return Response.json(mealPlans, { status: 200 });
   } catch (error) {

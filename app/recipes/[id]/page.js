@@ -7,6 +7,7 @@ import { notFound } from "next/navigation";
 import { Clock3, Flame, ChefHat, ArrowLeft } from "lucide-react";
 import AddToMealPlanButton from "@/components/MealPlan/AddToMealPlanButton";
 import FavoriteButton from "@/components/RecipeCard/FavoriteButton";
+import UserRecipeRating from "@/components/RecipeCard/UserRecipeRating";
 import { auth } from "@/lib/auth";
 
 const MEAL_TYPE_LABELS = {
@@ -55,14 +56,18 @@ export default async function RecipeDetailPage({ params }) {
   }
 
   const session = await auth();
-  const userId = session?.user?.id;
+  let realUserId = null;
+  if (session?.user?.email) {
+    const dbUser = await prisma.user.findUnique({ where: { email: session.user.email } });
+    if (dbUser) realUserId = dbUser.id;
+  }
 
   const recipe = await prisma.recipe.findUnique({
     where: { id: recipeId },
     include: {
       category: true,
       ingredients: { include: { ingredient: true } },
-      favorites: userId ? { where: { userId } } : false,
+      favorites: realUserId ? { where: { userId: realUserId } } : false,
     },
   });
 
@@ -101,9 +106,13 @@ export default async function RecipeDetailPage({ params }) {
 
             {/* Content Section */}
             <div className="flex flex-col justify-center p-10 md:p-16">
-              <h1 className="mb-6 text-4xl font-extrabold leading-tight text-slate-900 md:text-5xl">
+              <h1 className="mb-4 text-4xl font-extrabold leading-tight text-slate-900 md:text-5xl">
                 {recipe.title}
               </h1>
+              
+              <div className="mb-8">
+                <UserRecipeRating recipeId={recipe.id} />
+              </div>
               
               <p className="mb-10 text-lg leading-relaxed text-slate-500">
                 {recipe.description || "No description provided."}

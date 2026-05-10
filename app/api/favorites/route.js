@@ -8,8 +8,13 @@ export async function GET() {
   }
 
   try {
+    let dbUser = await prisma.user.findUnique({ where: { email: session.user.email } });
+    if (!dbUser) {
+      return Response.json([]);
+    }
+
     const favorites = await prisma.favorite.findMany({
-      where: { userId: session.user.id },
+      where: { userId: dbUser.id },
       include: { recipe: { include: { category: true } } },
     });
     return Response.json(favorites);
@@ -26,15 +31,17 @@ export async function POST(request) {
 
   try {
     // Ensure user exists in our DB (Fail-safe)
-    await prisma.user.upsert({
-      where: { id: session.user.id },
-      update: {},
-      create: { 
-        id: session.user.id, 
-        email: session.user.email, 
-        name: session.user.name || session.user.email 
-      },
-    });
+    let dbUser = await prisma.user.findUnique({ where: { email: session.user.email } });
+    if (!dbUser) {
+      dbUser = await prisma.user.create({
+        data: {
+          id: session.user.id,
+          email: session.user.email,
+          name: session.user.name || session.user.email
+        }
+      });
+    }
+    const realUserId = dbUser.id;
 
     const { recipeId } = await request.json();
     
@@ -42,7 +49,7 @@ export async function POST(request) {
     const existing = await prisma.favorite.findUnique({
       where: {
         userId_recipeId: {
-          userId: session.user.id,
+          userId: realUserId,
           recipeId: Number(recipeId),
         },
       },
@@ -53,7 +60,7 @@ export async function POST(request) {
       await prisma.favorite.delete({
         where: {
           userId_recipeId: {
-            userId: session.user.id,
+            userId: realUserId,
             recipeId: Number(recipeId),
           },
         },
@@ -63,7 +70,7 @@ export async function POST(request) {
       // Toggle on
       await prisma.favorite.create({
         data: {
-          userId: session.user.id,
+          userId: realUserId,
           recipeId: Number(recipeId),
         },
       });

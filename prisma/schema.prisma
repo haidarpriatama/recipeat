@@ -34,6 +34,7 @@ model User {
   sessions  Session[]
   favorites Favorite[]
   mealPlans MealPlan[]
+  ratings   Rating[]
 }
 
 // Model Account untuk NextAuth OAuth providers
@@ -91,6 +92,7 @@ model Recipe {
   ingredients RecipeIngredient[] // Relasi ke RecipeIngredient
   favorites   Favorite[]         // Relasi ke Favorite
   mealPlans   MealPlanRecipe[]   // Relasi ke MealPlanRecipe
+  ratings     Rating[]           // Relasi ke Rating
 }
 
 // Model Category untuk menyimpan kategori resep
@@ -153,4 +155,19 @@ model MealPlanRecipe {
   recipe   Recipe   @relation(fields: [recipeId], references: [id])   // Relasi ke Recipe
 
   @@id([mealPlanId, recipeId, dayOfWeek])  // Primary key gabungan
+}
+
+// Model Rating untuk menyimpan rating pengguna untuk resep
+model Rating {
+  id        Int      @id @default(autoincrement())
+  userId    String
+  recipeId  Int
+  score     Int      // Nilai rating dari 1-5
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  recipe Recipe @relation(fields: [recipeId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, recipeId]) // Satu rating per user per recipe
 }
