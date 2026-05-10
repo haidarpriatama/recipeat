@@ -19,11 +19,7 @@ export default function RecipeCard({ recipe }) {
       </div>
 
       <div className="p-8">
-        <div className="mb-4 flex items-center justify-between">
-          <div className="flex items-center gap-1 text-sm font-bold text-[#8c4a00]">
-            <Star className="h-4 w-4" strokeWidth={2.25} />
-            {recipe.rating}
-          </div>
+        <div className="mb-4 flex items-center justify-end">
           <div className="flex items-center gap-1 text-sm font-medium text-[#595c5d]">
             <Timer className="h-4 w-4" strokeWidth={2.25} />
             {recipe.time}

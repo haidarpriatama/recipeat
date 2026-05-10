@@ -29,7 +29,6 @@ export default async function ProfilePage() {
     title: fav.recipe.title,
     image: fav.recipe.imageUrl || "/favorite4.png",
     alt: fav.recipe.title,
-    rating: fav.recipe.rating || "0.0",
     time: `${fav.recipe.cookTime} min`,
     tags: [fav.recipe.category?.name || "Recipe"],
   }));

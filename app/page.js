@@ -13,6 +13,7 @@ import FeaturesSection from "@/components/sections/FeaturesSection";
 import HeroSection from "@/components/sections/HeroSection";
 import RecipesSection from "@/components/sections/RecipesSection";
 import prisma from "@/lib/prisma";
+import { auth } from "@/lib/auth";
 
 export default async function HomePage() {
   let dynamicRecipeCards = recipesContent.cards;
@@ -30,7 +31,6 @@ export default async function HomePage() {
         image: recipe.imageUrl || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=800&q=80',
         alt: recipe.title,
         label: recipe.category?.name || 'Recipe',
-        rating: recipe.rating ? recipe.rating.toFixed(1) : '5.0',
         time: `${recipe.cookTime}m`,
         tags: ["Featured", "Delicious"],
       }));
@@ -38,6 +38,8 @@ export default async function HomePage() {
   } catch (error) {
     console.error("Error fetching recipes:", error);
   }
+  const session = await auth();
+  const isLoggedIn = !!session?.user;
 
   return (
     <>
@@ -46,7 +48,7 @@ export default async function HomePage() {
           badge={heroContent.badge}
           title={heroContent.title}
           description={heroContent.description}
-          primaryAction={heroContent.primaryAction}
+          primaryAction={isLoggedIn ? { label: "Explore Now", href: "/explore" } : heroContent.primaryAction}
           secondaryAction={heroContent.secondaryAction}
           heroImage={heroContent.heroImage}
           tracker={heroContent.tracker}

@@ -9,7 +9,6 @@ import {
   Clock,
   Mail,
   Save,
-  Star,
   User,
 } from "lucide-react";
 import FavoriteButton from "@/components/RecipeCard/FavoriteButton";
@@ -280,11 +279,7 @@ export default function ProfileContent({ favorites = [], favoriteCount = 0 }) {
                         </h3>
                       </Link>
 
-                      <div className="mt-auto flex items-center justify-between text-slate-500 text-sm pt-2">
-                        <div className="flex items-center gap-1 text-[#8c4a00]">
-                          <Star size={16} fill="currentColor" />
-                          <span className="font-bold">{recipe.rating}</span>
-                        </div>
+                      <div className="mt-auto flex items-center justify-end text-slate-500 text-sm pt-2">
                         <div className="flex items-center gap-1 font-medium">
                           <Clock size={16} />
                           <span>{recipe.time}</span>

@@ -107,7 +107,14 @@ const RECIPES = [
   },
 ];
 
-function FilterSidebar({ selectedMealTypes = [], searchParams = {} }) {
+const SERVING_TIMES = [
+  { label: "<15 min", value: "under_15" },
+  { label: "<30 min", value: "under_30" },
+  { label: "<60 min", value: "under_60" },
+  { label: ">90 min", value: "over_90" },
+];
+
+function FilterSidebar({ selectedMealTypes = [], selectedServingTimes = [], searchParams = {} }) {
   return (
     <aside className="w-full space-y-10 lg:w-64 lg:flex-shrink-0">
       <div>
@@ -144,18 +151,37 @@ function FilterSidebar({ selectedMealTypes = [], searchParams = {} }) {
 
       <div>
         <h3 className="mb-6 text-sm font-bold uppercase tracking-widest text-[#006941]">Serving Time</h3>
-        <div className="space-y-4">
-          <input
-            type="range"
-            min="5"
-            max="120"
-            defaultValue="45"
-            className="h-1.5 w-full cursor-pointer appearance-none rounded-lg bg-[#e6e8ea] accent-[#006941]"
-          />
-          <div className="flex justify-between text-xs font-bold text-[#595c5d]">
-            <span>Under 15m</span>
-            <span>Max 2h</span>
-          </div>
+        <div className="space-y-3">
+          {SERVING_TIMES.map((item) => {
+            const isSelected = selectedServingTimes.includes(item.value);
+            const nextServingTimes = isSelected
+              ? selectedServingTimes.filter((t) => t !== item.value)
+              : [...selectedServingTimes, item.value];
+            
+            const params = new URLSearchParams(searchParams);
+
+            if (nextServingTimes.length > 0) {
+              params.set("servingTimes", nextServingTimes.join(","));
+            } else {
+              params.delete("servingTimes");
+            }
+            
+            // Reset page on filter change
+            params.delete("page");
+
+            return (
+              <Link key={item.label} href={`/explore?${params.toString()}`} className="group flex cursor-pointer items-center gap-3">
+                <span className={`flex h-5 w-5 items-center justify-center rounded border ${
+                  isSelected ? "border-[#006941] bg-[#006941]" : "border-[#abadae]/30 bg-white"
+                }`}>
+                  {isSelected && <span className="h-2 w-2 rounded-full bg-white" />}
+                </span>
+                <span className="font-medium text-[#595c5d] transition-colors group-hover:text-[#006941]">
+                  {item.label}
+                </span>
+              </Link>
+            );
+          })}
         </div>
       </div>
     </aside>
@@ -226,10 +252,16 @@ export default async function ExplorePage({ searchParams: searchParamsPromise })
   const categoryFilter = searchParams?.category || "";
   const slotFilter = searchParams?.slot || "";
   const selectedMealTypes = searchParams?.mealTypes ? searchParams.mealTypes.split(",").filter(Boolean) : [];
+  const selectedServingTimes = searchParams?.servingTimes ? searchParams.servingTimes.split(",").filter(Boolean) : [];
   const ingredientsFilter = searchParams?.ingredients ? searchParams.ingredients.split(",") : [];
+  
+  const page = parseInt(searchParams?.page || "1", 10);
+  const pageSize = 12;
+  const skip = (page - 1) * pageSize;
 
   let displayRecipes = [];
   let availableIngredients = [];
+  let totalRecipesCount = 0;
   try {
     // Build the Prisma query filter
     const where = {
@@ -252,6 +284,15 @@ export default async function ExplorePage({ searchParams: searchParamsPromise })
             )
           }
         } : {},
+        selectedServingTimes.length > 0 ? {
+          OR: selectedServingTimes.map((time) => {
+            if (time === "under_15") return { cookTime: { lt: 15 } };
+            if (time === "under_30") return { cookTime: { lt: 30 } };
+            if (time === "under_60") return { cookTime: { lt: 60 } };
+            if (time === "over_90") return { cookTime: { gt: 90 } };
+            return {};
+          })
+        } : {},
         ingredientsFilter.length > 0 ? {
           ingredients: {
             some: {
@@ -266,9 +307,11 @@ export default async function ExplorePage({ searchParams: searchParamsPromise })
       ]
     };
 
-    const [dbRecipes, dbIngredients] = await Promise.all([
+    const [dbRecipes, dbIngredients, count] = await Promise.all([
       prisma.recipe.findMany({
         where,
+        skip,
+        take: pageSize,
         include: { 
           category: true,
           favorites: userId ? { where: { userId } } : false
@@ -278,7 +321,9 @@ export default async function ExplorePage({ searchParams: searchParamsPromise })
       prisma.ingredient.findMany({
         select: { name: true },
       }),
+      prisma.recipe.count({ where })
     ]);
+    totalRecipesCount = count;
 
     availableIngredients = dbIngredients.map((ingredient) => ingredient.name);
 
@@ -351,7 +396,7 @@ export default async function ExplorePage({ searchParams: searchParamsPromise })
         </section>
 
 <div className="flex flex-col gap-12 lg:flex-row">
-          <FilterSidebar selectedMealTypes={selectedMealTypes} searchParams={searchParams} />
+          <FilterSidebar selectedMealTypes={selectedMealTypes} selectedServingTimes={selectedServingTimes} searchParams={searchParams} />
 
           <section className="flex-1">
             
@@ -368,16 +413,7 @@ export default async function ExplorePage({ searchParams: searchParamsPromise })
                 <h2 className="mb-1 text-3xl font-extrabold tracking-tight">
                   {query || ingredientsFilter.length > 0 ? "Search Results" : "Discover Flavors"}
                 </h2>
-                <p className="text-[#595c5d]">{displayRecipes.length} recipes found for your current selection</p>
-              </div>
-
-              <div className="flex items-center gap-3">
-                <span className="text-sm font-bold text-[#595c5d]">Sort by:</span>
-                <select className="cursor-pointer bg-transparent font-bold text-[#006941] outline-none">
-                  <option>Most Popular</option>
-                  <option>Newest First</option>
-                  <option>Quickest Prep</option>
-                </select>
+                <p className="text-[#595c5d]">{totalRecipesCount || displayRecipes.length} recipes found for your current selection</p>
               </div>
             </div>
 
@@ -387,46 +423,35 @@ export default async function ExplorePage({ searchParams: searchParamsPromise })
               ))}
             </div>
 
-            <div className="mt-16 flex items-center justify-center gap-2">
-              <button
-                type="button"
-                className="flex h-10 w-10 items-center justify-center rounded-full border border-[#abadae]/20 text-[#595c5d] transition-colors hover:bg-[#006941]/10"
-                aria-label="Previous page"
-              >
-                <ChevronLeft className="h-4 w-4" />
-              </button>
+            {totalRecipesCount > pageSize && (
+              <div className="mt-16 flex flex-wrap items-center justify-center gap-2">
+                <Link
+                  href={`/explore?${new URLSearchParams({...searchParams, page: Math.max(1, page - 1)}).toString()}`}
+                  className={`flex h-10 w-10 items-center justify-center rounded-full border border-[#abadae]/20 text-[#595c5d] transition-colors hover:bg-[#006941]/10 ${page <= 1 ? "pointer-events-none opacity-50" : ""}`}
+                >
+                  <ChevronLeft className="h-4 w-4" />
+                </Link>
 
-              <button type="button" className="h-10 w-10 rounded-full bg-[#006941] font-bold text-[#caffdc]">
-                1
-              </button>
-              <button
-                type="button"
-                className="h-10 w-10 rounded-full font-bold text-[#595c5d] transition-colors hover:bg-[#006941]/10"
-              >
-                2
-              </button>
-              <button
-                type="button"
-                className="h-10 w-10 rounded-full font-bold text-[#595c5d] transition-colors hover:bg-[#006941]/10"
-              >
-                3
-              </button>
-              <span className="px-2 text-[#595c5d]">...</span>
-              <button
-                type="button"
-                className="h-10 w-10 rounded-full font-bold text-[#595c5d] transition-colors hover:bg-[#006941]/10"
-              >
-                12
-              </button>
+                {Array.from({ length: Math.ceil(totalRecipesCount / pageSize) }).map((_, i) => (
+                  <Link
+                    key={i + 1}
+                    href={`/explore?${new URLSearchParams({...searchParams, page: i + 1}).toString()}`}
+                    className={`flex h-10 w-10 items-center justify-center rounded-full font-bold transition-colors ${
+                      page === i + 1 ? "bg-[#006941] text-white" : "text-[#595c5d] hover:bg-[#006941]/10"
+                    }`}
+                  >
+                    {i + 1}
+                  </Link>
+                ))}
 
-              <button
-                type="button"
-                className="flex h-10 w-10 items-center justify-center rounded-full border border-[#abadae]/20 text-[#595c5d] transition-colors hover:bg-[#006941]/10"
-                aria-label="Next page"
-              >
-                <ChevronRight className="h-4 w-4" />
-              </button>
-            </div>
+                <Link
+                  href={`/explore?${new URLSearchParams({...searchParams, page: Math.min(Math.ceil(totalRecipesCount / pageSize), page + 1)}).toString()}`}
+                  className={`flex h-10 w-10 items-center justify-center rounded-full border border-[#abadae]/20 text-[#595c5d] transition-colors hover:bg-[#006941]/10 ${page >= Math.ceil(totalRecipesCount / pageSize) ? "pointer-events-none opacity-50" : ""}`}
+                >
+                  <ChevronRight className="h-4 w-4" />
+                </Link>
+              </div>
+            )}
           </section>
         </div>
       </main>

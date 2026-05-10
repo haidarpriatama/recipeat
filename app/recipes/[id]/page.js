@@ -4,8 +4,10 @@ import prisma from "@/lib/prisma";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { Clock3, Flame, Star, ChefHat, ArrowLeft } from "lucide-react";
+import { Clock3, Flame, ChefHat, ArrowLeft } from "lucide-react";
 import AddToMealPlanButton from "@/components/MealPlan/AddToMealPlanButton";
+import FavoriteButton from "@/components/RecipeCard/FavoriteButton";
+import { auth } from "@/lib/auth";
 
 const MEAL_TYPE_LABELS = {
   Sarapan: "Breakfast",
@@ -52,11 +54,15 @@ export default async function RecipeDetailPage({ params }) {
     notFound();
   }
 
+  const session = await auth();
+  const userId = session?.user?.id;
+
   const recipe = await prisma.recipe.findUnique({
     where: { id: recipeId },
     include: {
       category: true,
       ingredients: { include: { ingredient: true } },
+      favorites: userId ? { where: { userId } } : false,
     },
   });
 
@@ -111,17 +117,12 @@ export default async function RecipeDetailPage({ params }) {
                     {recipe.cookTime} mins
                   </div>
                 </div>
-                <div className="h-10 w-[1px] bg-slate-100 hidden md:block"></div>
-                <div className="flex flex-col gap-1">
-                  <span className="text-xs font-bold uppercase tracking-widest text-slate-400">Rating</span>
-                  <div className="flex items-center gap-2 font-bold text-slate-800">
-                    <Star className="h-5 w-5 text-amber-500" fill="currentColor" />
-                    {recipe.rating ? recipe.rating.toFixed(1) : "5.0"}
-                  </div>
-                </div>
               </div>
 
-              <AddToMealPlanButton recipeId={recipe.id} mealType={getMealTypeLabel(recipe.category?.name)} />
+              <div className="mt-8 flex items-center gap-4">
+                <AddToMealPlanButton recipeId={recipe.id} mealType={getMealTypeLabel(recipe.category?.name)} />
+                <FavoriteButton recipeId={recipe.id} initialFavorited={recipe.favorites?.length > 0} className="relative !top-auto !right-auto h-[56px] w-[56px] bg-white border border-slate-200 shadow-sm hover:border-[#006941]" />
+              </div>
 
               {/* Ingredients & Instructions Section */}
               <div className="mt-12 space-y-12">

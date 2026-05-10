@@ -83,7 +83,6 @@ model Recipe {
   instructions String?  // Cara pembuatan resep
   imageUrl    String?
   cookTime    Int      // Waktu memasak dalam menit
-  rating      Float    @default(0)
   categoryId  Int
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt

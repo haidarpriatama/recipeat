@@ -3,7 +3,7 @@ import SiteFooter from "@/components/layout/SiteFooter";
 import AuthGuard from "@/components/layout/AuthGuard";
 import Image from "next/image";
 import Link from "next/link";
-import { Clock, Heart, Search, Star } from "lucide-react";
+import { Clock, Heart, Search } from "lucide-react";
 import prisma from "@/lib/prisma";
 import { auth } from "@/lib/auth";
 import FavoriteButton from "@/components/RecipeCard/FavoriteButton";
@@ -13,14 +13,25 @@ export const metadata = {
   description: "Your saved recipes collection.",
 };
 
-export default async function FavoritesPage() {
+export default async function FavoritesPage({ searchParams: searchParamsPromise }) {
+  const searchParams = await searchParamsPromise;
   const session = await auth();
   const userId = session?.user?.id;
+  
+  const query = searchParams?.q || "";
 
   let favorites = [];
   if (userId) {
     favorites = await prisma.favorite.findMany({
-      where: { userId },
+      where: { 
+        userId,
+        recipe: query ? {
+          OR: [
+            { title: { contains: query, mode: 'insensitive' } },
+            { description: { contains: query, mode: 'insensitive' } }
+          ]
+        } : undefined
+      },
       include: {
         recipe: {
           include: { category: true }
@@ -47,17 +58,19 @@ export default async function FavoritesPage() {
             </p>
           </div>
           
-          <div className="w-full md:w-96 relative group">
+          <form action="/favorites" className="w-full md:w-96 relative group">
             <div className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-[#006941] transition-colors">
               <Search size={20} />
             </div>
             
             <input 
+              name="q"
+              defaultValue={query}
               className="w-full bg-white text-slate-800 rounded-xl py-4 pl-12 pr-4 border-none shadow-[inset_0_2px_4px_rgba(0,0,0,0.02)] focus:ring-2 focus:ring-[#006941] outline-none transition-all font-body text-sm placeholder:text-slate-400" 
               placeholder="Search saved recipes..." 
               type="text" 
             />
-          </div>
+          </form>
         </header>
 
         {/* --- SECTION 2: FILTERS / TAGS --- */}
@@ -115,11 +128,7 @@ export default async function FavoritesPage() {
                       {fav.recipe.title}
                     </h3>
                   </Link>
-                  <div className="mt-auto flex items-center justify-between text-slate-500 text-sm pt-2">
-                    <div className="flex items-center gap-1 text-[#8c4a00]">
-                      <Star size={16} fill="currentColor" />
-                      <span className="font-bold">{fav.recipe.rating || "0.0"}</span>
-                    </div>
+                  <div className="mt-auto flex items-center justify-end text-slate-500 text-sm pt-2">
                     <div className="flex items-center gap-1 font-medium">
                       <Clock size={16} />
                       <span>{fav.recipe.cookTime} min</span>

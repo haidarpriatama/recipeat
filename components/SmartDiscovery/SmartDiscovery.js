@@ -110,13 +110,14 @@ export default function SmartDiscovery({ initialQuery = "", initialIngredients =
               <button
                 key={item}
                 onClick={() => toggleIngredient(item)}
-                className={`px-4 py-2 rounded-full text-sm font-medium transition-all border ${
+                className={`group flex items-center gap-1 px-4 py-2 rounded-full text-sm font-medium transition-all border ${
                   isSelected
-                    ? "bg-[#006941] border-[#006941] text-white shadow-md"
-                    : "bg-[#e0f2eb] border-[#006941] text-[#006941] shadow-sm hover:bg-[#006941] hover:text-white"
+                    ? "bg-[#006941] border-[#006941] text-white shadow-md hover:bg-red-500 hover:border-red-500"
+                    : "bg-transparent border-dashed border-[#006941]/40 text-[#006941] shadow-sm hover:border-solid hover:bg-[#006941] hover:text-white"
                 }`}
               >
-                {item}
+                <span>{item}</span>
+                {isSelected && <X size={14} className="hidden group-hover:block" />}
               </button>
             );
           })}
@@ -155,13 +156,14 @@ export default function SmartDiscovery({ initialQuery = "", initialIngredients =
                     <button
                       key={item}
                       onClick={() => toggleIngredient(item)}
-                      className={`px-4 py-2 rounded-full text-sm font-medium transition-all border ${
+                      className={`group flex items-center gap-1 px-4 py-2 rounded-full text-sm font-medium transition-all border ${
                         isSelected 
-                          ? "bg-[#006941] border-[#006941] text-white shadow-md" 
-                          : "bg-white border-slate-200 text-slate-600 hover:border-[#006941]/50 hover:bg-slate-50"
+                          ? "bg-[#006941] border-[#006941] text-white shadow-md hover:bg-red-500 hover:border-red-500" 
+                          : "bg-transparent border-dashed border-slate-300 text-slate-600 hover:border-solid hover:border-[#006941]/50 hover:bg-slate-50"
                       }`}
                     >
-                      {item}
+                      <span>{item}</span>
+                      {isSelected && <X size={14} className="hidden group-hover:block" />}
                     </button>
                   );
                 })}

@@ -64,7 +64,7 @@ export default function AddToMealPlanButton({ recipeId, mealType }) {
   };
 
   return (
-    <div className="mt-8">
+    <>
       <button
         onClick={handleAdd}
         disabled={isAdding || isSuccess}
@@ -92,6 +92,6 @@ export default function AddToMealPlanButton({ recipeId, mealType }) {
           <span>{warning}</span>
         </div>
       )}
-    </div>
+    </>
   );
 }
