@@ -54,12 +54,6 @@ export default async function AdminLayout({ children }) {
           </div>
 
           <div className="ml-6 flex items-center gap-2">
-            <button
-              type="button"
-              className="inline-flex h-10 w-10 items-center justify-center rounded-full text-[#595c5d] transition-colors hover:bg-[#e6e8ea] hover:text-[#006941]"
-            >
-              <Bell className="h-5 w-5" />
-            </button>
             <div className="inline-flex items-center gap-2 rounded-full bg-white px-3 py-2">
               <CircleUserRound className="h-5 w-5 text-[#006941]" />
               <span className="text-sm font-semibold text-[#2c2f30]">{session.user.name || session.user.email}</span>

@@ -4,7 +4,7 @@ import { Geist, Plus_Jakarta_Sans } from "next/font/google";
 // 1. Tambahkan Impor SiteHeader (dan SiteFooter jika ada) di sini
 import SiteHeader from "@/components/layout/SiteHeader";
 import { Providers } from "@/components/Providers";
-// import SiteFooter from "@/components/layout/SiteFooter"; // Buka komentar jika sudah punya file SiteFooter
+import MainContainer from "@/components/layout/MainContainer";
 
 const geist = Geist({
   subsets: ["latin"],
@@ -42,11 +42,9 @@ export default function RootLayout({ children }) {
           {/* 2. Panggil SiteHeader di posisi paling atas dalam body */}
           <SiteHeader />
 
-          {/* 3. Bungkus children dengan <main> dan beri padding-top (pt-20) 
-              agar konten tidak tertutup oleh navbar yang posisinya fixed (melayang) */}
-          <main className="min-h-screen pt-20">
+          <MainContainer>
             {children}
-          </main>
+          </MainContainer>
         </Providers>
 
         {/* 4. Letakkan Footer di sini nanti */}
