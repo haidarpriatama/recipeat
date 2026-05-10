@@ -58,7 +58,8 @@ export default async function AdminRecipesPage() {
         </div>
         <Link
           href="/admin/recipes/new"
-          className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-[#006941] to-[#005c38] px-6 py-3 font-bold text-white shadow-lg transition-opacity hover:opacity-90"
+          style={{ color: "white" }}
+          className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-[#006941] to-[#005c38] px-6 py-3 font-bold shadow-lg transition-opacity hover:opacity-90"
         >
           <PlusCircle className="h-5 w-5" />
           Add New Recipe
@@ -66,10 +67,10 @@ export default async function AdminRecipesPage() {
       </div>
 
       <div className="grid grid-cols-1 gap-4 md:grid-cols-4">
-        <StatCard label="Total Recipes" value={totalRecipes} tone="bg-[#eff1f2] text-[#2c2f30]" />
-        <StatCard label="Published" value={publishedRecipes} tone="bg-[#f3fcf3] text-[#006941]" />
-        <StatCard label="Drafts" value={draftRecipes} tone="bg-[#ffc69a]/40 text-[#7b4000]" />
-        <StatCard label="New This Week" value={newThisWeek} tone="bg-white text-[#2c2f30]" />
+        <StatCard label="Total Recipes" value={totalRecipes} tone="bg-white text-[#2c2f30] border border-[#eff1f2]" />
+        <StatCard label="Published" value={publishedRecipes} tone="bg-white text-[#2c2f30] border border-[#eff1f2]" />
+        <StatCard label="Drafts" value={draftRecipes} tone="bg-white text-[#2c2f30] border border-[#eff1f2]" />
+        <StatCard label="New This Week" value={newThisWeek} tone="bg-white text-[#2c2f30] border border-[#eff1f2]" />
       </div>
 
       <div className="overflow-hidden rounded-3xl bg-white shadow-[0_20px_50px_-20px_rgba(0,0,0,0.2)]">

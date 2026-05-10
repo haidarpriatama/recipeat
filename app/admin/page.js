@@ -15,10 +15,10 @@ export default async function AdminDashboardPage() {
   ]);
 
   const stats = [
-    { title: "Total Users", value: totalUsers, icon: Users, tone: "bg-white text-[#2c2f30]" },
-    { title: "Total Recipes", value: totalRecipes, icon: UtensilsCrossed, tone: "bg-[#f3fcf3] text-[#006941]" },
-    { title: "Favorites", value: totalFavorites, icon: Heart, tone: "bg-[#ffefee] text-[#b31b25]" },
-    { title: "Ingredients", value: totalIngredients, icon: Carrot, tone: "bg-[#fff0e7] text-[#8c4a00]" },
+    { title: "Total Users", value: totalUsers, icon: Users, tone: "bg-white text-[#2c2f30] border border-[#eff1f2]" },
+    { title: "Total Recipes", value: totalRecipes, icon: UtensilsCrossed, tone: "bg-white text-[#2c2f30] border border-[#eff1f2]" },
+    { title: "Favorites", value: totalFavorites, icon: Heart, tone: "bg-white text-[#2c2f30] border border-[#eff1f2]" },
+    { title: "Ingredients", value: totalIngredients, icon: Carrot, tone: "bg-white text-[#2c2f30] border border-[#eff1f2]" },
   ];
 
   return (
@@ -50,7 +50,7 @@ export default async function AdminDashboardPage() {
         <h2 className="text-xl font-extrabold text-[#2c2f30]">Quick Actions</h2>
         <p className="mt-1 text-sm text-[#595c5d]">Jump to high-frequency admin tools.</p>
         <div className="mt-6 flex flex-wrap gap-3">
-          <a href="/admin/recipes" className="rounded-xl bg-[#006941] px-5 py-3 text-sm font-bold text-white transition-colors hover:bg-[#005c38]">Manage Recipes</a>
+          <a href="/admin/recipes" style={{ color: "white" }} className="rounded-xl bg-[#006941] px-5 py-3 text-sm font-bold transition-colors hover:bg-[#005c38]">Manage Recipes</a>
           <a href="/admin/ingredients" className="rounded-xl bg-[#eff1f2] px-5 py-3 text-sm font-bold text-[#2c2f30] transition-colors hover:bg-[#e0e3e4]">Manage Ingredients</a>
           <a href="/admin/users" className="rounded-xl bg-[#eff1f2] px-5 py-3 text-sm font-bold text-[#2c2f30] transition-colors hover:bg-[#e0e3e4]">Manage Users</a>
         </div>

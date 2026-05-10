@@ -27,7 +27,8 @@ export default async function AdminLayout({ children }) {
         <div className="mt-auto space-y-2 pt-4">
           <Link
             href="/admin/recipes/new"
-            className="inline-flex w-full items-center justify-center rounded-xl bg-gradient-to-r from-[#006941] to-[#005c38] px-5 py-3 text-sm font-bold text-white shadow-[0_16px_32px_-16px_rgba(0,105,65,0.45)] transition-opacity hover:opacity-90"
+            style={{ color: "white" }}
+            className="inline-flex w-full items-center justify-center rounded-xl bg-gradient-to-r from-[#006941] to-[#005c38] px-5 py-3 text-sm font-bold shadow-[0_16px_32px_-16px_rgba(0,105,65,0.45)] transition-opacity hover:opacity-90"
           >
             Create New Recipe
           </Link>

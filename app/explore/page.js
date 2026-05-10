@@ -436,8 +436,9 @@ export default async function ExplorePage({ searchParams: searchParamsPromise })
                   <Link
                     key={i + 1}
                     href={`/explore?${new URLSearchParams({...searchParams, page: i + 1}).toString()}`}
+                    style={page === i + 1 ? { color: "white" } : {}}
                     className={`flex h-10 w-10 items-center justify-center rounded-full font-bold transition-colors ${
-                      page === i + 1 ? "bg-[#006941] text-white" : "text-[#595c5d] hover:bg-[#006941]/10"
+                      page === i + 1 ? "bg-[#006941]" : "text-[#595c5d] hover:bg-[#006941]/10"
                     }`}
                   >
                     {i + 1}
