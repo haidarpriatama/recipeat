@@ -17,6 +17,9 @@ export default function AdminSearchBar() {
 
   useEffect(() => {
     const timer = setTimeout(() => {
+      const currentQ = searchParams.get("q") || "";
+      if (query === currentQ) return; // Prevent interrupting navigation
+
       const params = new URLSearchParams(searchParams.toString());
       if (query) {
         params.set("q", query);

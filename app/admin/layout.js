@@ -1,8 +1,9 @@
 import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import Link from "next/link";
-import { LayoutDashboard, Users, UtensilsCrossed, Home, Carrot, Bell, CircleUserRound } from "lucide-react";
+import { Home, Bell, CircleUserRound } from "lucide-react";
 import AdminSearchBar from "@/components/admin/AdminSearchBar";
+import AdminSidebarNav from "@/components/admin/AdminSidebarNav";
 
 export default async function AdminLayout({ children }) {
   const session = await auth();
@@ -18,12 +19,7 @@ export default async function AdminLayout({ children }) {
           Recipeat Admin
         </Link>
 
-        <nav className="flex flex-1 flex-col gap-2">
-          <NavItem href="/admin" icon={LayoutDashboard} label="Dashboard" />
-          <NavItem href="/admin/recipes" icon={UtensilsCrossed} label="Manage Recipes" />
-          <NavItem href="/admin/ingredients" icon={Carrot} label="Manage Ingredients" />
-          <NavItem href="/admin/users" icon={Users} label="Users" />
-        </nav>
+        <AdminSidebarNav />
 
         <div className="mt-auto space-y-2 pt-4">
           <Link
@@ -61,14 +57,4 @@ export default async function AdminLayout({ children }) {
   );
 }
 
-function NavItem({ href, icon: Icon, label }) {
-  return (
-    <Link
-      href={href}
-      className="flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-semibold text-[#595c5d] transition-all hover:translate-x-1 hover:bg-[#e0e3e4] hover:text-[#2c2f30]"
-    >
-      <Icon size={18} />
-      <span>{label}</span>
-    </Link>
-  );
-}
+
