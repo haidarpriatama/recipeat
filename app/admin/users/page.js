@@ -4,52 +4,54 @@ import prisma from "@/lib/prisma";
 
 export default async function AdminUsersPage() {
   const session = await auth();
-  if (!session || session.user.role !== 'ADMIN') redirect('/');
+  if (!session || session.user.role !== "ADMIN") redirect("/");
 
   const users = await prisma.user.findMany({
-    orderBy: { createdAt: 'desc' },
+    orderBy: { createdAt: "desc" },
   });
 
   return (
     <div className="space-y-8">
       <div>
-        <h1 className="text-3xl font-bold text-slate-900">Users Management</h1>
-        <p className="text-slate-500 mt-2">View and manage all registered users in the application.</p>
+        <h1 className="text-4xl font-extrabold tracking-tight text-[#2c2f30]">Users Management</h1>
+        <p className="mt-2 text-[#595c5d]">Monitor roles and membership growth.</p>
       </div>
 
-      <div className="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden">
+      <div className="overflow-hidden rounded-3xl bg-white shadow-[0_20px_50px_-30px_rgba(44,47,48,0.25)]">
         <div className="overflow-x-auto">
-          <table className="w-full text-left border-collapse">
+          <table className="w-full border-collapse text-left">
             <thead>
-              <tr className="bg-slate-50 border-b border-slate-100">
-                <th className="py-4 px-6 font-semibold text-slate-600 text-sm uppercase tracking-wider">ID</th>
-                <th className="py-4 px-6 font-semibold text-slate-600 text-sm uppercase tracking-wider">Name</th>
-                <th className="py-4 px-6 font-semibold text-slate-600 text-sm uppercase tracking-wider">Email</th>
-                <th className="py-4 px-6 font-semibold text-slate-600 text-sm uppercase tracking-wider">Role</th>
-                <th className="py-4 px-6 font-semibold text-slate-600 text-sm uppercase tracking-wider">Joined At</th>
+              <tr className="bg-[#eff1f2]/60">
+                <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-[#595c5d]">ID</th>
+                <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-[#595c5d]">Name</th>
+                <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-[#595c5d]">Email</th>
+                <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-[#595c5d]">Role</th>
+                <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-[#595c5d]">Joined</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-slate-100">
+            <tbody className="divide-y divide-[#eff1f2]">
               {users.map((user) => (
-                <tr key={user.id} className="hover:bg-slate-50/50 transition-colors">
-                  <td className="py-4 px-6 text-slate-500">#{user.id}</td>
-                  <td className="py-4 px-6 font-medium text-slate-900">{user.name}</td>
-                  <td className="py-4 px-6 text-slate-600">{user.email}</td>
-                  <td className="py-4 px-6">
-                    <span className={`px-3 py-1 rounded-full text-xs font-bold ${
-                      user.role === 'ADMIN' ? 'bg-purple-100 text-purple-700' : 'bg-slate-100 text-slate-700'
-                    }`}>
+                <tr key={user.id} className="transition-colors hover:bg-[#f5f6f7]">
+                  <td className="px-6 py-4 text-sm text-[#595c5d]">{user.id}</td>
+                  <td className="px-6 py-4 font-semibold text-[#2c2f30]">{user.name}</td>
+                  <td className="px-6 py-4 text-sm text-[#595c5d]">{user.email}</td>
+                  <td className="px-6 py-4">
+                    <span
+                      className={`rounded-full px-3 py-1 text-xs font-bold ${
+                        user.role === "ADMIN" ? "bg-[#caffdc] text-[#006941]" : "bg-[#eff1f2] text-[#595c5d]"
+                      }`}
+                    >
                       {user.role}
                     </span>
                   </td>
-                  <td className="py-4 px-6 text-slate-500">
-                    {new Date(user.createdAt).toLocaleDateString()}
-                  </td>
+                  <td className="px-6 py-4 text-sm text-[#595c5d]">{new Date(user.createdAt).toLocaleDateString()}</td>
                 </tr>
               ))}
               {users.length === 0 && (
                 <tr>
-                  <td colSpan="5" className="py-8 text-center text-slate-500">No users found.</td>
+                  <td colSpan={5} className="px-6 py-10 text-center text-[#595c5d]">
+                    No users found.
+                  </td>
                 </tr>
               )}
             </tbody>

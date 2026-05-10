@@ -4,7 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { Bell, LogOut, User } from "lucide-react";
+import { Bell, LogOut, User, LayoutDashboard } from "lucide-react";
 import { signOut, useSession } from "next-auth/react";
 
 /**
@@ -169,7 +169,7 @@ export default function AuthNav() {
               onClick={() => setDropdownOpen(false)}
               className="flex items-center gap-3 px-4 py-2.5 text-sm font-medium text-slate-700 transition-colors hover:bg-[#f3fcf3] hover:text-[#006941]"
             >
-              <span className="text-xs font-bold">AD</span>
+              <LayoutDashboard size={15} />
               Admin
             </Link>
           )}
