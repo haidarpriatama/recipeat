@@ -9,9 +9,9 @@ const adapter = new PrismaPg(pool);
 const prisma = new PrismaClient({ adapter });
 
 async function addNewRecipes() {
-  const catSarapan = await prisma.category.findUnique({ where: { name: 'Sarapan' } });
-  const catSiang = await prisma.category.findUnique({ where: { name: 'Makan Siang' } });
-  const catMalam = await prisma.category.findUnique({ where: { name: 'Makan Malam' } });
+  const catSarapan = await prisma.category.findUnique({ where: { name: 'Breakfast' } });
+  const catSiang = await prisma.category.findUnique({ where: { name: 'Lunch' } });
+  const catMalam = await prisma.category.findUnique({ where: { name: 'Dinner' } });
 
   const newRecipes = [
     {

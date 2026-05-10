@@ -2,6 +2,7 @@ import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import prisma from "@/lib/prisma";
 import UserClientTable from "./UserClientTable";
+import UnverifiedUsersModal from "./UnverifiedUsersModal";
 
 export default async function AdminUsersPage({ searchParams }) {
   const session = await auth();
@@ -23,9 +24,12 @@ export default async function AdminUsersPage({ searchParams }) {
 
   return (
     <div className="space-y-8">
-      <div>
-        <h1 className="text-4xl font-extrabold tracking-tight text-[#2c2f30]">Users Management</h1>
-        <p className="mt-2 text-[#595c5d]">Monitor roles and membership growth.</p>
+      <div className="flex flex-col justify-between gap-4 md:flex-row md:items-end">
+        <div>
+          <h1 className="text-4xl font-extrabold tracking-tight text-[#2c2f30]">Users Management</h1>
+          <p className="mt-2 text-[#595c5d]">Monitor roles and membership growth.</p>
+        </div>
+        <UnverifiedUsersModal />
       </div>
 
       <UserClientTable users={users} />

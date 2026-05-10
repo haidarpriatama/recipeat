@@ -19,19 +19,19 @@ async function main() {
   try {
     // Seed dibuat idempotent agar aman dijalankan di device siapa pun tanpa menghapus data user.
     const cat1 = await prisma.category.upsert({
-      where: { name: 'Sarapan' },
+      where: { name: 'Breakfast' },
       update: {},
-      create: { name: 'Sarapan' },
+      create: { name: 'Breakfast' },
     });
     const cat2 = await prisma.category.upsert({
-      where: { name: 'Makan Siang' },
+      where: { name: 'Lunch' },
       update: {},
-      create: { name: 'Makan Siang' },
+      create: { name: 'Lunch' },
     });
     const cat3 = await prisma.category.upsert({
-      where: { name: 'Makan Malam' },
+      where: { name: 'Dinner' },
       update: {},
-      create: { name: 'Makan Malam' },
+      create: { name: 'Dinner' },
     });
 
     // 3. Tambah 20 Resep beserta bahan-bahannya

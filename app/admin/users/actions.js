@@ -2,6 +2,13 @@
 import { auth } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
+import { createClient } from "@supabase/supabase-js";
+
+const supabaseAdmin = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL,
+  process.env.SUPABASE_SERVICE_ROLE_KEY,
+  { auth: { autoRefreshToken: false, persistSession: false } }
+);
 
 export async function deleteUserAction(id) {
   const currentSession = await auth();
@@ -30,4 +37,31 @@ export async function updateUserAction(id, name, role) {
   });
 
   revalidatePath("/admin/users");
+}
+
+export async function getUnverifiedUsersAction() {
+  const session = await auth();
+  if (!session || session.user.role !== "ADMIN") throw new Error("Unauthorized");
+
+  const { data, error } = await supabaseAdmin.auth.admin.listUsers();
+  if (error) throw new Error(error.message);
+
+  const unverified = data.users.filter((u) => !u.email_confirmed_at);
+  
+  return unverified.map((u) => ({
+    id: u.id,
+    email: u.email,
+    created_at: u.created_at,
+    name: u.user_metadata?.name || "Unknown",
+  }));
+}
+
+export async function deleteUnverifiedUserAction(userId) {
+  const session = await auth();
+  if (!session || session.user.role !== "ADMIN") throw new Error("Unauthorized");
+
+  const { error } = await supabaseAdmin.auth.admin.deleteUser(userId);
+  if (error) throw new Error(error.message);
+  
+  return { success: true };
 }

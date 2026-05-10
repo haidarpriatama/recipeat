@@ -33,20 +33,6 @@ const FILTERS = {
   ],
 };
 
-const MEAL_TYPE_LABELS = {
-  Sarapan: "Breakfast",
-  "Makan Siang": "Lunch",
-  "Makan Malam": "Dinner",
-};
-
-function getMealTypeLabel(categoryName) {
-  return MEAL_TYPE_LABELS[categoryName] || categoryName || "Recipe";
-}
-
-function getCategoryNamesForMealType(mealType) {
-  const localName = Object.entries(MEAL_TYPE_LABELS).find(([, label]) => label === mealType)?.[0];
-  return localName ? [mealType, localName] : [mealType];
-}
 
 const RECIPES = [
   {
@@ -277,11 +263,7 @@ export default async function ExplorePage({ searchParams: searchParamsPromise })
         } : {},
         selectedMealTypes.length > 0 ? {
           category: {
-            OR: selectedMealTypes.flatMap((mealType) =>
-              getCategoryNamesForMealType(mealType).map((categoryName) => ({
-                name: { equals: categoryName, mode: 'insensitive' }
-              }))
-            )
+            name: { in: selectedMealTypes, mode: 'insensitive' }
           }
         } : {},
         selectedServingTimes.length > 0 ? {
@@ -335,7 +317,7 @@ export default async function ExplorePage({ searchParams: searchParamsPromise })
         alt: recipe.title,
         time: `${recipe.cookTime}m`,
         calories: "350 kcal",
-        label: getMealTypeLabel(recipe.category?.name),
+        label: recipe.category?.name || "Recipe",
         favorite: recipe.favorites?.length > 0,
       }));
     } else if (!query && !categoryFilter && selectedMealTypes.length === 0 && ingredientsFilter.length === 0) {

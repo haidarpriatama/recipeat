@@ -10,15 +10,6 @@ import FavoriteButton from "@/components/RecipeCard/FavoriteButton";
 import UserRecipeRating from "@/components/RecipeCard/UserRecipeRating";
 import { auth } from "@/lib/auth";
 
-const MEAL_TYPE_LABELS = {
-  Sarapan: "Breakfast",
-  "Makan Siang": "Lunch",
-  "Makan Malam": "Dinner",
-};
-
-function getMealTypeLabel(categoryName) {
-  return MEAL_TYPE_LABELS[categoryName] || categoryName || "Recipe";
-}
 
 const SERVING_TIPS = {
   Sarapan:
@@ -100,7 +91,7 @@ export default async function RecipeDetailPage({ params }) {
                 priority
               />
               <div className="absolute top-6 left-6 rounded-full bg-white/90 px-4 py-1.5 text-xs font-bold uppercase tracking-widest text-[#006941] backdrop-blur">
-                {getMealTypeLabel(recipe.category?.name)}
+                {recipe.category?.name || "Recipe"}
               </div>
             </div>
 
@@ -129,7 +120,7 @@ export default async function RecipeDetailPage({ params }) {
               </div>
 
               <div className="mt-8 flex items-center gap-4">
-                <AddToMealPlanButton recipeId={recipe.id} mealType={getMealTypeLabel(recipe.category?.name)} />
+                <AddToMealPlanButton recipeId={recipe.id} mealType={recipe.category?.name || "Lunch"} />
                 <FavoriteButton recipeId={recipe.id} initialFavorited={recipe.favorites?.length > 0} className="relative !top-auto !right-auto h-[56px] w-[56px] bg-white border border-slate-200 shadow-sm hover:border-[#006941]" />
               </div>
 
