@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Recipeat Admin - Manage Ingredients</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&amp;family=Inter:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "on-error": "#ffefee",
+                    "surface-variant": "#dadddf",
+                    "surface": "#f5f6f7",
+                    "background": "#f5f6f7",
+                    "surface-bright": "#f5f6f7",
+                    "on-secondary-fixed": "#532a00",
+                    "secondary-container": "#ffc69a",
+                    "on-background": "#2c2f30",
+                    "on-tertiary-fixed-variant": "#636c65",
+                    "error-dim": "#9f0519",
+                    "on-tertiary-container": "#58615a",
+                    "inverse-primary": "#7bfeb8",
+                    "on-surface": "#2c2f30",
+                    "on-tertiary-fixed": "#464f49",
+                    "error": "#b31b25",
+                    "surface-container-lowest": "#ffffff",
+                    "error-container": "#fb5151",
+                    "outline-variant": "#abadae",
+                    "inverse-on-surface": "#9b9d9e",
+                    "primary-dim": "#005c38",
+                    "surface-tint": "#006941",
+                    "tertiary-fixed": "#f3fcf3",
+                    "primary-container": "#7bfeb8",
+                    "primary-fixed": "#7bfeb8",
+                    "tertiary": "#555e57",
+                    "on-primary-fixed-variant": "#006b43",
+                    "tertiary-container": "#f3fcf3",
+                    "surface-container-low": "#eff1f2",
+                    "secondary-fixed-dim": "#ffb375",
+                    "primary-fixed-dim": "#6cefab",
+                    "on-primary-container": "#00603b",
+                    "tertiary-dim": "#49524b",
+                    "secondary-fixed": "#ffc69a",
+                    "on-error-container": "#570008",
+                    "surface-container-highest": "#dadddf",
+                    "surface-container": "#e6e8ea",
+                    "on-secondary-fixed-variant": "#7c4100",
+                    "primary": "#006941",
+                    "on-primary-fixed": "#004b2d",
+                    "secondary-dim": "#7b4000",
+                    "on-tertiary": "#ecf5ec",
+                    "surface-container-high": "#e0e3e4",
+                    "outline": "#757778",
+                    "on-surface-variant": "#595c5d",
+                    "on-secondary": "#fff0e7",
+                    "on-primary": "#caffdc",
+                    "secondary": "#8c4a00"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.25rem",
+                    "lg": "0.5rem",
+                    "xl": "0.75rem",
+                    "full": "9999px"
+            },
+            "fontFamily": {
+                    "headline": ["Plus Jakarta Sans"],
+                    "display": ["Plus Jakarta Sans"],
+                    "body": ["Inter"],
+                    "label": ["Inter"]
+            }
+          }
+        }
+      }
+    </script>
+<style>
+      body { font-family: 'Inter', sans-serif; background-color: #f5f6f7; }
+      .font-display { font-family: 'Plus Jakarta Sans', sans-serif; }
+      .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+    </style>
+</head>
+<body class="bg-surface text-on-surface">
+<!-- Sidebar Navigation -->
+<aside class="bg-surface-container-low h-screen w-72 flex flex-col fixed left-0 top-0 p-6 gap-2 z-50">
+<div class="text-xl font-display font-extrabold text-primary mb-8 italic">Recipeat Admin</div>
+<div class="flex items-center gap-4 mb-10 px-2">
+<div class="w-12 h-12 rounded-full overflow-hidden bg-surface-container-high">
+<img alt="Admin User Profile" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBDYmzwMuf5h7xs8X4wqum0iXGTNmfd02AbQpWcYVWQmcr2EZ44d7eZDEOWFS9KTYN8nUBbW5XzDf9QnxSLREILI_hMYILVZn5J--VSuCZgqBDlASxjHszDaw-opIf81QO99hxTuWa4PoaxTHn8UMoN1n_pQExOnOnNa9QfyTsw5G02rFP-2bz9v171Zkmd8-3YcijtOcYGcJq4MxMS5-0nrWy13Q3GPc8W8eZw1YHwdCZroQFF6WOJGIpS0uMr9gp2Ax4L6YtUM4OB"/>
+</div>
+<div>
+<p class="font-body text-label-lg font-bold text-on-surface">Chef Admin</p>
+<p class="text-xs text-on-surface-variant">Culinary Curator</p>
+</div>
+</div>
+<nav class="flex flex-col gap-2 flex-grow">
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-high rounded-xl transition-all duration-300 hover:translate-x-1 font-body text-label-lg font-medium" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+            Dashboard
+        </a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-high rounded-xl transition-all duration-300 hover:translate-x-1 font-body text-label-lg font-medium" href="#">
+<span class="material-symbols-outlined" data-icon="restaurant_menu">restaurant_menu</span>
+            Manage Recipes
+        </a>
+<a class="flex items-center gap-3 px-4 py-3 bg-primary-container text-on-primary-container rounded-xl font-bold shadow-sm transition-all duration-300 hover:translate-x-1 font-body text-label-lg font-medium" href="#">
+<span class="material-symbols-outlined" data-icon="kitchen" style="font-variation-settings: 'FILL' 1;">kitchen</span>
+            Manage Ingredients
+        </a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-high rounded-xl transition-all duration-300 hover:translate-x-1 font-body text-label-lg font-medium" href="#">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+            Settings
+        </a>
+</nav>
+<div class="mt-auto flex flex-col gap-2">
+<button class="w-full bg-gradient-to-r from-primary to-primary-dim text-on-primary py-4 rounded-xl font-bold mb-4 shadow-sm active:scale-95 transition-transform">
+            Create New Recipe
+        </button>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-high rounded-xl transition-all duration-300 font-body text-label-lg font-medium" href="#">
+<span class="material-symbols-outlined" data-icon="help">help</span>
+            Help Center
+        </a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-high rounded-xl transition-all duration-300 font-body text-label-lg font-medium" href="#">
+<span class="material-symbols-outlined" data-icon="logout">logout</span>
+            Logout
+        </a>
+</div>
+</aside>
+<!-- Main Content Canvas -->
+<main class="ml-72 min-h-screen">
+<!-- Top App Bar -->
+<header class="bg-surface/80 backdrop-blur-xl sticky top-0 z-40 flex justify-between items-center px-8 py-4 w-full shadow-[0_32px_64px_rgba(44,47,48,0.06)]">
+<div class="flex items-center gap-6">
+<div class="relative">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant" data-icon="search">search</span>
+<input class="bg-surface-container-lowest border-none rounded-xl pl-10 pr-4 py-2 w-80 focus:ring-2 focus:ring-primary/20 text-on-surface transition-all placeholder:text-outline-variant" placeholder="Search ingredients..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<button class="p-2 text-on-surface-variant hover:bg-surface-container-high rounded-full transition-colors active:scale-95 transition-transform">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+</button>
+<button class="p-2 text-on-surface-variant hover:bg-surface-container-high rounded-full transition-colors active:scale-95 transition-transform">
+<span class="material-symbols-outlined" data-icon="account_circle">account_circle</span>
+</button>
+</div>
+</header>
+<!-- Content Area -->
+<div class="p-10">
+<div class="flex justify-between items-end mb-10">
+<div>
+<h1 class="font-display text-4xl font-extrabold tracking-tight text-on-surface mb-2">Manage Ingredients</h1>
+<p class="text-on-surface-variant text-lg">Detailed overview of your master pantry inventory and stock levels.</p>
+</div>
+<button class="bg-primary text-on-primary px-6 py-3 rounded-xl font-bold flex items-center gap-2 shadow-sm hover:bg-primary-dim transition-colors active:scale-95 transition-transform">
+<span class="material-symbols-outlined" data-icon="add">add</span>
+                Add Ingredient
+            </button>
+</div>
+<!-- Inventory Stats -->
+<div class="grid grid-cols-12 gap-6 mb-10">
+<div class="col-span-12 lg:col-span-9 bg-surface-container-low rounded-2xl p-8 flex flex-wrap gap-12 items-center relative overflow-hidden">
+<div class="relative z-10">
+<h3 class="text-on-surface-variant font-bold uppercase tracking-widest text-xs mb-1">Global Inventory</h3>
+<p class="text-5xl font-display font-black text-primary">1,284</p>
+<p class="text-on-surface mt-1 text-sm font-medium">Ingredients Registered</p>
+</div>
+<div class="flex gap-8 relative z-10">
+<div>
+<div class="flex items-center gap-2 mb-1">
+<span class="material-symbols-outlined text-secondary text-xl" data-icon="eco" style="font-variation-settings: 'FILL' 1;">eco</span>
+<span class="text-2xl font-display font-bold text-on-surface">422</span>
+</div>
+<p class="text-[11px] uppercase font-bold text-on-surface-variant">Organic Items</p>
+</div>
+<div>
+<div class="flex items-center gap-2 mb-1">
+<span class="material-symbols-outlined text-error text-xl" data-icon="inventory_2" style="font-variation-settings: 'FILL' 1;">inventory_2</span>
+<span class="text-2xl font-display font-bold text-on-surface">89</span>
+</div>
+<p class="text-[11px] uppercase font-bold text-on-surface-variant">Critical Stock</p>
+</div>
+<div>
+<div class="flex items-center gap-2 mb-1">
+<span class="material-symbols-outlined text-primary text-xl" data-icon="local_shipping" style="font-variation-settings: 'FILL' 1;">local_shipping</span>
+<span class="text-2xl font-display font-bold text-on-surface">12</span>
+</div>
+<p class="text-[11px] uppercase font-bold text-on-surface-variant">Pending Orders</p>
+</div>
+</div>
+<!-- Abstract Background Shape -->
+<div class="absolute -right-10 -bottom-10 w-64 h-64 bg-primary/5 rounded-full blur-3xl"></div>
+</div>
+<div class="col-span-12 lg:col-span-3 bg-tertiary-container rounded-2xl p-8 flex flex-col justify-center">
+<h3 class="text-on-tertiary-container font-bold text-lg mb-2">Usage Insights</h3>
+<p class="text-on-tertiary-fixed-variant text-sm mb-4">Produce categories represent <span class="font-bold text-primary">45%</span> of your total recipe requirements this month.</p>
+<a class="text-primary font-bold text-sm flex items-center gap-1 hover:underline" href="#">
+                    View Analytics <span class="material-symbols-outlined text-sm" data-icon="arrow_forward">arrow_forward</span>
+</a>
+</div>
+</div>
+<!-- Detailed List (Table View) -->
+<div class="bg-surface-container-lowest rounded-2xl shadow-[0_32px_64px_rgba(44,47,48,0.04)] overflow-hidden">
+<div class="px-8 py-6 flex justify-between items-center border-b border-surface-container-high">
+<div class="flex items-center gap-4">
+<h2 class="font-display text-xl font-bold text-on-surface">Ingredient Inventory</h2>
+<span class="bg-surface-container-high text-on-surface-variant text-xs font-bold px-2 py-1 rounded">1,284 Total</span>
+</div>
+<div class="flex gap-2">
+<div class="flex bg-surface-container-high rounded-lg p-1">
+<button class="px-4 py-1.5 rounded-md text-sm font-bold bg-surface-container-lowest text-on-surface shadow-sm">All</button>
+<button class="px-4 py-1.5 rounded-md text-sm font-bold text-on-surface-variant hover:text-on-surface">Low Stock</button>
+</div>
+<button class="p-2.5 rounded-lg bg-surface-container-high text-on-surface-variant hover:bg-surface-container-highest transition-colors">
+<span class="material-symbols-outlined" data-icon="filter_list">filter_list</span>
+</button>
+<button class="p-2.5 rounded-lg bg-surface-container-high text-on-surface-variant hover:bg-surface-container-highest transition-colors">
+<span class="material-symbols-outlined" data-icon="download">download</span>
+</button>
+</div>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-surface-container-low/50"><th class="px-8 py-4 font-display font-bold text-[11px] uppercase tracking-widest text-on-surface-variant">ID</th><th class="px-8 py-4 font-display font-bold text-[11px] uppercase tracking-widest text-on-surface-variant">Ingredient Name</th><th class="px-8 py-4 font-display font-bold text-[11px] uppercase tracking-widest text-on-surface-variant">Used In</th><th class="px-8 py-4 font-display font-bold text-[11px] uppercase tracking-widest text-on-surface-variant text-right">Actions</th></tr>
+</thead>
+<tbody class="divide-y divide-surface-container-high">
+<tr class="hover:bg-surface-container-low/30 transition-colors group">
+<td class="px-8 py-5 text-on-surface-variant text-sm font-bold">ING-00241</td>
+<td class="px-8 py-5">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 rounded-lg overflow-hidden flex-shrink-0 bg-surface-container-high">
+<img alt="Roma Tomatoes" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuANqfMxcMpjcSzwDZDA7-sDQ7qZntT9fJ9umAY9MNynjhEudw7Y6eehYUV7yUXrxWrhQJ0RCORbCwP7SkDc2TudsL_P-zl73imKNO-ETMD5b-X2uKwZYbWvF3Zr-3w0OceC69dYB65FrtWodQWo1ph_foLOLWh5FavQ_N9pBvvhHF4gM_Hrs4lAbBVStOlN_vjY94-RIm1Ad-ksfggVTBDJoiwBVOHAurXUQHtjoepFyZt2uAUeO9eckMZrb5jK9JmIrPokZb7em83P"/>
+</div>
+<div class="font-bold text-on-surface">Roma Tomatoes</div>
+</div>
+</td>
+<td class="px-8 py-5 text-on-surface-variant text-sm font-medium">12 Recipes</td>
+<td class="px-8 py-5 text-right">
+<div class="flex justify-end gap-2">
+<button class="p-2 text-on-surface-variant hover:bg-surface-container-high rounded-lg transition-colors" title="Edit">
+<span class="material-symbols-outlined text-lg" data-icon="edit">edit</span>
+</button>
+<button class="p-2 text-error hover:bg-error/10 rounded-lg transition-colors" title="Delete">
+<span class="material-symbols-outlined text-lg" data-icon="delete">delete</span>
+</button>
+</div>
+</td>
+</tr>
+<tr class="hover:bg-surface-container-low/30 transition-colors group">
+<td class="px-8 py-5 text-on-surface-variant text-sm font-bold">ING-00892</td>
+<td class="px-8 py-5">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 rounded-lg overflow-hidden flex-shrink-0 bg-surface-container-high">
+<img alt="Olive Oil" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBDcGTjFKjOV1K5CzKyGlVpVKiDD2j3pyksOzjwIXs_dm5pt5uVE_hL4bzHzjjO40w80-YE4XQvDnipIm0ddcWcyqEV9wEdTDB1KxZrfAA-CUCadhgKrpIJzqElZz_VSzRvqyIcfrVcpQEynG9KZaE9RxYzcPH4CFXhO5Fa2V9KsbAjHESa0Luq3tPqRP5T6iJCPC2hr_8ZR6rp_xh4suZTqocBsY-KArRZB_PT2IPInj2uGuC39bbNrwxka2q8MeqhTvf2CDqrUfr0"/>
+</div>
+<div class="font-bold text-on-surface">Extra Virgin Olive Oil</div>
+</div>
+</td>
+<td class="px-8 py-5 text-on-surface-variant text-sm font-medium">8 Recipes</td>
+<td class="px-8 py-5 text-right">
+<div class="flex justify-end gap-2">
+<button class="p-2 text-on-surface-variant hover:bg-surface-container-high rounded-lg transition-colors" title="Edit">
+<span class="material-symbols-outlined text-lg" data-icon="edit">edit</span>
+</button>
+<button class="p-2 text-error hover:bg-error/10 rounded-lg transition-colors" title="Delete">
+<span class="material-symbols-outlined text-lg" data-icon="delete">delete</span>
+</button>
+</div>
+</td>
+</tr>
+<tr class="hover:bg-surface-container-low/30 transition-colors group">
+<td class="px-8 py-5 text-on-surface-variant text-sm font-bold">ING-00315</td>
+<td class="px-8 py-5">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 rounded-lg overflow-hidden flex-shrink-0 bg-surface-container-high">
+<img alt="Sweet Basil" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBvsoSLMwO5-Yd8WSUDFq_nJqlerCQxFRa9tyAG_SyenZkogCowImMsL6Clwhl39m30IwInlqDeisZJ-otDK1IJbo13vuNnBqsXcCW3DgfVHL2uCu2U6BB9DTFXPMe6-FrYb95scLL_Qtg5UeiBOfZ7clqgK_lMD4bRleP-sN307CCreuEkrupN4MX51mSCgDIXZdRiCSbioIhApfAddHpMq5mJGwDgw4llRHGtsHjOZgwsam4ugwHYNtwg62bvhrvIkWA-ip1itS40"/>
+</div>
+<div class="font-bold text-on-surface">Sweet Basil</div>
+</div>
+</td>
+<td class="px-8 py-5 text-on-surface-variant text-sm font-medium">15 Recipes</td>
+<td class="px-8 py-5 text-right">
+<div class="flex justify-end gap-2">
+<button class="p-2 text-on-surface-variant hover:bg-surface-container-high rounded-lg transition-colors" title="Edit">
+<span class="material-symbols-outlined text-lg" data-icon="edit">edit</span>
+</button>
+<button class="p-2 text-error hover:bg-error/10 rounded-lg transition-colors" title="Delete">
+<span class="material-symbols-outlined text-lg" data-icon="delete">delete</span>
+</button>
+</div>
+</td>
+</tr>
+<tr class="hover:bg-surface-container-low/30 transition-colors group">
+<td class="px-8 py-5 text-on-surface-variant text-sm font-bold">ING-00104</td>
+<td class="px-8 py-5">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 rounded-lg overflow-hidden flex-shrink-0 bg-surface-container-high">
+<div class="w-full h-full bg-surface-container-high flex items-center justify-center text-on-surface-variant">
+<span class="material-symbols-outlined">image</span>
+</div>
+</div>
+<div class="font-bold text-on-surface">Red Bell Pepper</div>
+</div>
+</td>
+<td class="px-8 py-5 text-on-surface-variant text-sm font-medium">5 Recipes</td>
+<td class="px-8 py-5 text-right">
+<div class="flex justify-end gap-2">
+<button class="p-2 text-on-surface-variant hover:bg-surface-container-high rounded-lg transition-colors" title="Edit">
+<span class="material-symbols-outlined text-lg" data-icon="edit">edit</span>
+</button>
+<button class="p-2 text-error hover:bg-error/10 rounded-lg transition-colors" title="Delete">
+<span class="material-symbols-outlined text-lg" data-icon="delete">delete</span>
+</button>
+</div>
+</td>
+</tr>
+<tr class="hover:bg-surface-container-low/30 transition-colors group">
+<td class="px-8 py-5 text-on-surface-variant text-sm font-bold">ING-00562</td>
+<td class="px-8 py-5">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 rounded-lg overflow-hidden flex-shrink-0 bg-surface-container-high">
+<div class="w-full h-full bg-surface-container-high flex items-center justify-center text-on-surface-variant">
+<span class="material-symbols-outlined">image</span>
+</div>
+</div>
+<div class="font-bold text-on-surface">Whole Milk</div>
+</div>
+</td>
+<td class="px-8 py-5 text-on-surface-variant text-sm font-medium">22 Recipes</td>
+<td class="px-8 py-5 text-right">
+<div class="flex justify-end gap-2">
+<button class="p-2 text-on-surface-variant hover:bg-surface-container-high rounded-lg transition-colors" title="Edit">
+<span class="material-symbols-outlined text-lg" data-icon="edit">edit</span>
+</button>
+<button class="p-2 text-error hover:bg-error/10 rounded-lg transition-colors" title="Delete">
+<span class="material-symbols-outlined text-lg" data-icon="delete">delete</span>
+</button>
+</div>
+</td>
+</tr>
+<tr class="hover:bg-surface-container-low/30 transition-colors group">
+<td class="px-8 py-5 text-on-surface-variant text-sm font-bold">ING-00211</td>
+<td class="px-8 py-5">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 rounded-lg overflow-hidden flex-shrink-0 bg-surface-container-high">
+<div class="w-full h-full bg-surface-container-high flex items-center justify-center text-on-surface-variant">
+<span class="material-symbols-outlined">image</span>
+</div>
+</div>
+<div class="font-bold text-on-surface">All-Purpose Flour</div>
+</div>
+</td>
+<td class="px-8 py-5 text-on-surface-variant text-sm font-medium">18 Recipes</td>
+<td class="px-8 py-5 text-right">
+<div class="flex justify-end gap-2">
+<button class="p-2 text-on-surface-variant hover:bg-surface-container-high rounded-lg transition-colors" title="Edit">
+<span class="material-symbols-outlined text-lg" data-icon="edit">edit</span>
+</button>
+<button class="p-2 text-error hover:bg-error/10 rounded-lg transition-colors" title="Delete">
+<span class="material-symbols-outlined text-lg" data-icon="delete">delete</span>
+</button>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="px-8 py-6 bg-surface-container-low flex justify-between items-center border-t border-surface-container-high">
+<span class="text-[11px] font-bold text-on-surface-variant uppercase tracking-widest">Showing 1-10 of 1,284 entries</span>
+<div class="flex gap-2">
+<button class="px-5 py-2 bg-surface-container-high hover:bg-surface-container-highest rounded-xl text-on-surface text-xs font-bold transition-colors">Previous</button>
+<button class="px-5 py-2 bg-primary text-on-primary rounded-xl text-xs font-bold shadow-sm hover:bg-primary-dim transition-colors">Next</button>
+</div>
+</div>
+</div>
+</div>
+</main>
+</body></html>

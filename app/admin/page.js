@@ -47,12 +47,15 @@ export default async function AdminDashboardPage() {
       <div className="bg-white rounded-2xl shadow-sm border border-slate-100 p-8">
         <h2 className="text-xl font-bold text-slate-900 mb-4">Quick Actions</h2>
         <p className="text-slate-600 mb-6">Manage the application from the sidebar or use these quick links.</p>
-        <div className="flex gap-4">
+        <div className="flex flex-wrap gap-4">
           <a href="/admin/users" className="px-6 py-3 bg-slate-900 text-white rounded-xl font-semibold hover:bg-slate-800 transition-colors">
             Manage Users
           </a>
           <a href="/admin/recipes" className="px-6 py-3 bg-[#006941] text-white rounded-xl font-semibold hover:bg-[#004b2d] transition-colors">
             Manage Recipes
+          </a>
+          <a href="/admin/ingredients" className="px-6 py-3 bg-[#eff1f2] text-[#2c2f30] rounded-xl font-semibold hover:bg-[#dadddf] transition-colors">
+            Manage Ingredients
           </a>
         </div>
       </div>

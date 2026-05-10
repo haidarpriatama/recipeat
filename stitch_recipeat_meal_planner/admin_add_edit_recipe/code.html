@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Recipeat Admin - Create New Recipe</title>
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,200..800;1,200..800&amp;family=Inter:wght@100..900&amp;display=swap" rel="stylesheet"/>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "on-surface-variant": "#595c5d",
+                        "on-secondary": "#fff0e7",
+                        "surface": "#f5f6f7",
+                        "error-dim": "#9f0519",
+                        "on-primary": "#caffdc",
+                        "secondary-fixed-dim": "#ffb375",
+                        "secondary-container": "#ffc69a",
+                        "on-tertiary": "#ecf5ec",
+                        "secondary-dim": "#7b4000",
+                        "on-error-container": "#570008",
+                        "outline-variant": "#abadae",
+                        "surface-container-highest": "#dadddf",
+                        "on-primary-fixed": "#004b2d",
+                        "on-secondary-container": "#6f3a00",
+                        "surface-variant": "#dadddf",
+                        "surface-container": "#e6e8ea",
+                        "on-secondary-fixed": "#532a00",
+                        "primary": "#006941",
+                        "surface-container-lowest": "#ffffff",
+                        "surface-bright": "#f5f6f7",
+                        "tertiary-dim": "#49524b",
+                        "on-tertiary-fixed-variant": "#636c65",
+                        "inverse-on-surface": "#9b9d9e",
+                        "secondary": "#8c4a00",
+                        "on-surface": "#2c2f30",
+                        "on-tertiary-container": "#58615a",
+                        "on-secondary-fixed-variant": "#7c4100",
+                        "primary-dim": "#005c38",
+                        "outline": "#757778",
+                        "secondary-fixed": "#ffc69a",
+                        "inverse-surface": "#0c0f10",
+                        "on-primary-fixed-variant": "#006b43",
+                        "error-container": "#fb5151",
+                        "tertiary": "#555e57",
+                        "surface-tint": "#006941",
+                        "primary-container": "#7bfeb8",
+                        "surface-container-high": "#e0e3e4",
+                        "tertiary-container": "#f3fcf3",
+                        "error": "#b31b25",
+                        "on-background": "#2c2f30",
+                        "inverse-primary": "#7bfeb8",
+                        "on-tertiary-fixed": "#464f49",
+                        "background": "#f5f6f7",
+                        "primary-fixed": "#7bfeb8",
+                        "on-error": "#ffefee",
+                        "primary-fixed-dim": "#6cefab",
+                        "tertiary-fixed-dim": "#e4ede5",
+                        "surface-container-low": "#eff1f2",
+                        "on-primary-container": "#00603b",
+                        "surface-dim": "#d1d5d7",
+                        "tertiary-fixed": "#f3fcf3"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "full": "9999px"
+                    },
+                    "fontFamily": {
+                        "headline": ["Plus Jakarta Sans"],
+                        "display": ["Plus Jakarta Sans"],
+                        "body": ["Inter"],
+                        "label": ["Inter"]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .glass-panel {
+            background: rgba(245, 246, 247, 0.7);
+            backdrop-filter: blur(20px);
+        }
+        .ambient-shadow {
+            box-shadow: 0 32px 64px rgba(44, 47, 48, 0.06);
+        }
+        .inset-field {
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.02);
+        }
+    </style>
+</head>
+<body class="bg-surface font-body text-on-surface">
+<!-- SideNavBar Shell -->
+<aside class="h-screen w-72 flex-col fixed left-0 top-0 bg-surface-container-low flex p-6 gap-2 z-50">
+<div class="text-xl font-display font-extrabold text-primary mb-8">Recipeat Admin</div>
+<div class="flex items-center gap-3 mb-8 px-2">
+<div class="w-10 h-10 rounded-full bg-primary-container flex items-center justify-center overflow-hidden">
+<img alt="Admin User Profile" class="w-full h-full object-cover" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCq4MA8gFsu73aW9NwkFB_nxdHDYvJQOE7ekZcqo9DM6EulRh-ilvYH8jcrE3ttGRCqoQuYE0BWeC3cxadIsAgQDRDegA-wDCjwW8GJePaba2LS0FjlIRKazpWTt_pgBMHa_T8aiSp3k8wTeRLMSrJoZfAMkQZtNexH2WBf5pDWEkBrFdHwaVGsJ0IoryNBZh1WxhhGdsm5gi89aANWsRGNKZkaKixAb09czeGD-DfNB6rNl0ra7avKEghPjmpDC__5HsPTPS2Noy6w"/>
+</div>
+<div>
+<div class="font-display text-label-lg font-bold text-on-surface">Chef Admin</div>
+<div class="text-xs text-on-surface-variant">Culinary Curator</div>
+</div>
+</div>
+<nav class="flex-1 flex flex-col gap-1">
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-high rounded-xl transition-all duration-300" href="#">
+<span class="material-symbols-outlined">dashboard</span>
+<span class="font-medium">Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 bg-primary-container text-on-primary-container rounded-xl font-bold shadow-sm" href="#">
+<span class="material-symbols-outlined">restaurant_menu</span>
+<span class="font-medium">Manage Recipes</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-high rounded-xl transition-all duration-300" href="#">
+<span class="material-symbols-outlined">kitchen</span>
+<span class="font-medium">Manage Ingredients</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-high rounded-xl transition-all duration-300" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="font-medium">Settings</span>
+</a>
+</nav>
+<div class="mt-auto flex flex-col gap-1 border-t border-outline-variant/10 pt-4">
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-high rounded-xl transition-all duration-300" href="#">
+<span class="material-symbols-outlined">help</span>
+<span class="font-medium">Help Center</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-high rounded-xl transition-all duration-300" href="#">
+<span class="material-symbols-outlined">logout</span>
+<span class="font-medium">Logout</span>
+</a>
+</div>
+</aside>
+<!-- Main Canvas -->
+<main class="ml-72 min-h-screen relative">
+<!-- TopAppBar -->
+<header class="bg-surface/80 backdrop-blur-xl docked full-width top-0 sticky z-40 flex justify-between items-center px-8 py-4 w-full shadow-[0_32px_64px_rgba(44,47,48,0.06)]">
+<div class="flex items-center gap-4">
+<h1 class="font-display text-headline-sm font-bold tracking-tight text-primary">Manage Recipes</h1>
+<span class="text-outline-variant">/</span>
+<span class="text-on-surface-variant font-medium">Create New Recipe</span>
+</div>
+<div class="flex items-center gap-4">
+<button class="p-2 text-on-surface-variant hover:bg-surface-container-high rounded-full transition-colors active:scale-95">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+<button class="p-2 text-on-surface-variant hover:bg-surface-container-high rounded-full transition-colors active:scale-95">
+<span class="material-symbols-outlined">account_circle</span>
+</button>
+</div>
+</header>
+<!-- Content Area -->
+<div class="p-10 max-w-6xl mx-auto">
+<form class="grid grid-cols-12 gap-8">
+<!-- Left Column: Details & Instructions -->
+<div class="col-span-8 flex flex-col gap-8">
+<!-- Basic Information Card -->
+<section class="bg-surface-container-lowest rounded-xl p-8 ambient-shadow border border-outline-variant/5">
+<h2 class="font-display text-xl font-bold text-on-surface mb-6">Recipe Essentials</h2>
+<div class="space-y-6">
+<div class="flex flex-col gap-2">
+<label class="text-label-lg font-bold text-on-surface-variant px-1">Recipe Title</label>
+<input class="w-full bg-surface-container-low border-none rounded-xl py-4 px-5 inset-field focus:ring-2 focus:ring-primary/20 transition-all font-display text-title-lg text-on-surface" placeholder="e.g., Pan-Seared Salmon with Asparagus" type="text"/>
+</div>
+<div class="flex flex-col gap-2">
+<label class="text-label-lg font-bold text-on-surface-variant px-1">Description</label>
+<textarea class="w-full bg-surface-container-low border-none rounded-xl py-4 px-5 inset-field focus:ring-2 focus:ring-primary/20 transition-all text-body-large text-on-surface" placeholder="Describe the flavors, textures, and why this dish is special..." rows="3"></textarea>
+</div>
+<div class="grid grid-cols-3 gap-4">
+<div class="flex flex-col gap-2">
+<label class="text-label-lg font-bold text-on-surface-variant px-1">Category</label>
+<select class="w-full bg-surface-container-low border-none rounded-xl py-4 px-5 inset-field focus:ring-2 focus:ring-primary/20 transition-all appearance-none cursor-pointer">
+<option>Main Course</option>
+<option>Appetizer</option>
+<option>Dessert</option>
+<option>Breakfast</option>
+</select>
+</div>
+<div class="flex flex-col gap-2">
+<label class="text-label-lg font-bold text-on-surface-variant px-1">Prep Time (Min)</label>
+<input class="w-full bg-surface-container-low border-none rounded-xl py-4 px-5 inset-field focus:ring-2 focus:ring-primary/20 transition-all" placeholder="30" type="number"/>
+</div>
+<div class="flex flex-col gap-2">
+<label class="text-label-lg font-bold text-on-surface-variant px-1">Difficulty</label>
+<select class="w-full bg-surface-container-low border-none rounded-xl py-4 px-5 inset-field focus:ring-2 focus:ring-primary/20 transition-all appearance-none cursor-pointer">
+<option>Beginner</option>
+<option>Intermediate</option>
+<option>Advanced</option>
+</select>
+</div>
+</div>
+</div>
+</section>
+<!-- Instructions Stepper -->
+<section class="bg-surface-container-lowest rounded-xl p-8 ambient-shadow border border-outline-variant/5">
+<div class="flex justify-between items-center mb-6">
+<h2 class="font-display text-xl font-bold text-on-surface">Cooking Steps</h2>
+<button class="text-primary font-bold flex items-center gap-2 hover:bg-primary-container/20 px-4 py-2 rounded-full transition-all" type="button">
+<span class="material-symbols-outlined">add_circle</span>
+                                Add Step
+                            </button>
+</div>
+<div class="space-y-8">
+<!-- Step 1 -->
+<div class="flex gap-6">
+<div class="flex flex-col items-center">
+<div class="w-10 h-10 rounded-full bg-primary text-on-primary flex items-center justify-center font-bold font-display">1</div>
+<div class="w-0.5 h-full bg-primary-container mt-2"></div>
+</div>
+<div class="flex-1 pb-4">
+<textarea class="w-full bg-surface-container-low border-none rounded-xl py-4 px-5 inset-field focus:ring-2 focus:ring-primary/20 transition-all text-on-surface" placeholder="Preheat oven to 400°F (200°C) and line a baking sheet with parchment paper..."></textarea>
+</div>
+</div>
+<!-- Step 2 -->
+<div class="flex gap-6">
+<div class="flex flex-col items-center">
+<div class="w-10 h-10 rounded-full bg-primary text-on-primary flex items-center justify-center font-bold font-display">2</div>
+<div class="w-0.5 h-full bg-primary-container mt-2"></div>
+</div>
+<div class="flex-1 pb-4">
+<textarea class="w-full bg-surface-container-low border-none rounded-xl py-4 px-5 inset-field focus:ring-2 focus:ring-primary/20 transition-all text-on-surface" placeholder="Season the salmon fillets with salt, pepper, and olive oil. Place them skin-side down on the prepared sheet."></textarea>
+</div>
+</div>
+<!-- Step 3 (Active) -->
+<div class="flex gap-6">
+<div class="flex flex-col items-center">
+<div class="w-10 h-10 rounded-full bg-primary-container text-on-primary-container flex items-center justify-center font-bold font-display">3</div>
+</div>
+<div class="flex-1">
+<textarea class="w-full bg-surface-container-low border-none rounded-xl py-4 px-5 inset-field focus:ring-2 focus:ring-primary/20 transition-all text-on-surface" placeholder="Add next step instructions here..."></textarea>
+</div>
+</div>
+</div>
+</section>
+</div>
+<!-- Right Column: Media & Ingredients -->
+<div class="col-span-4 flex flex-col gap-8">
+<!-- Image Upload Area -->
+<section class="bg-surface-container-lowest rounded-xl p-8 ambient-shadow border border-outline-variant/5">
+<h2 class="font-display text-lg font-bold text-on-surface mb-4">Recipe Cover</h2>
+<div class="aspect-video w-full rounded-lg bg-surface-container-high border-2 border-dashed border-outline-variant/30 flex flex-col items-center justify-center gap-4 cursor-pointer hover:bg-surface-container-highest transition-all group overflow-hidden relative">
+<img class="absolute inset-0 w-full h-full object-cover opacity-20 group-hover:opacity-10 transition-opacity" data-alt="A gourmet food photography shot of a vibrant plated dish with fresh microgreens and vibrant sauces, captured with high-end editorial lighting in a minimalist, light-filled kitchen studio. The composition is clean and modern, following the Garden Fresh aesthetic with deep greens and natural wooden textures. The focus is sharp on the food texture, creating a premium and appetizing feel." src="https://lh3.googleusercontent.com/aida-public/AB6AXuBWOWQPEzeujpnzZIeTzKugWhIPQPELr6xgNgsKpHp2-0PdA7Y6YyuYjDMsT08pNKRpDcAlwn9yj8VQlXnQS-UpestauAto7Y06c4uEAhQ3pumT_TpynfR84ioUOY9aegnhv0nGjQKo26raPCBs9jOAkvYcPwuOXiaq8bkxLANKddIvVA6v6cBxlTEk7krJRa3UIJQeUyz-I2QqrAj92six-csYOWPAEMShnCMAUwcTKajkqW6c4h3QtNV3AMU24V26RsyPX8G7tRA4"/>
+<span class="material-symbols-outlined text-4xl text-primary/60 group-hover:scale-110 transition-transform">cloud_upload</span>
+<div class="text-center">
+<p class="text-sm font-bold text-on-surface">Click to upload image</p>
+<p class="text-xs text-on-surface-variant">Recommended: 1200 x 800px</p>
+</div>
+</div>
+</section>
+<!-- Ingredients List -->
+<section class="bg-surface-container-lowest rounded-xl p-8 ambient-shadow border border-outline-variant/5">
+<div class="flex justify-between items-center mb-4">
+<h2 class="font-display text-lg font-bold text-on-surface">Ingredients</h2>
+<button class="text-primary font-bold text-sm flex items-center gap-1 hover:underline" type="button">
+<span class="material-symbols-outlined text-base">add</span> Add
+                            </button>
+</div>
+<div class="space-y-3">
+<div class="flex items-center gap-2">
+<div class="flex-1 bg-surface-container-low rounded-xl px-4 py-2 text-sm text-on-surface">2 Fresh Salmon Fillets</div>
+<button class="text-error opacity-50 hover:opacity-100 transition-opacity" type="button">
+<span class="material-symbols-outlined text-lg">delete</span>
+</button>
+</div>
+<div class="flex items-center gap-2">
+<div class="flex-1 bg-surface-container-low rounded-xl px-4 py-2 text-sm text-on-surface">1 bunch Asparagus</div>
+<button class="text-error opacity-50 hover:opacity-100 transition-opacity" type="button">
+<span class="material-symbols-outlined text-lg">delete</span>
+</button>
+</div>
+<div class="flex items-center gap-2">
+<div class="flex-1 bg-surface-container-low rounded-xl px-4 py-2 text-sm text-on-surface">3 tbsp Extra Virgin Olive Oil</div>
+<button class="text-error opacity-50 hover:opacity-100 transition-opacity" type="button">
+<span class="material-symbols-outlined text-lg">delete</span>
+</button>
+</div>
+<div class="flex items-center gap-2">
+<div class="flex-1 bg-surface-container-low rounded-xl px-4 py-2 text-sm text-on-surface border-2 border-primary/20 bg-primary-container/10">
+<input class="w-full bg-transparent border-none p-0 focus:ring-0 text-sm" placeholder="Quantity &amp; Ingredient..." type="text"/>
+</div>
+<button class="text-secondary" type="button">
+<span class="material-symbols-outlined text-lg">check_circle</span>
+</button>
+</div>
+</div>
+</section>
+<!-- Dietary Tags -->
+<section class="bg-surface-container-lowest rounded-xl p-8 ambient-shadow border border-outline-variant/5">
+<h2 class="font-display text-lg font-bold text-on-surface mb-4">Dietary Tags</h2>
+<div class="flex flex-wrap gap-2">
+<span class="px-4 py-1.5 rounded-full bg-tertiary-container text-on-tertiary-container text-xs font-bold border border-primary/10">High Protein</span>
+<span class="px-4 py-1.5 rounded-full bg-tertiary-container text-on-tertiary-container text-xs font-bold border border-primary/10">Gluten-Free</span>
+<span class="px-4 py-1.5 rounded-full bg-surface-container-high text-on-surface-variant text-xs font-bold hover:bg-tertiary-container cursor-pointer transition-colors">Low Carb</span>
+<span class="px-4 py-1.5 rounded-full bg-surface-container-high text-on-surface-variant text-xs font-bold hover:bg-tertiary-container cursor-pointer transition-colors">Vegan</span>
+<span class="px-4 py-1.5 rounded-full bg-surface-container-high text-on-surface-variant text-xs font-bold hover:bg-tertiary-container cursor-pointer transition-colors">Dairy-Free</span>
+</div>
+</section>
+</div>
+<!-- Sticky Bottom Bar -->
+<div class="col-span-12 fixed bottom-0 right-0 left-72 bg-surface/80 backdrop-blur-xl border-t border-outline-variant/10 p-6 z-50">
+<div class="max-w-6xl mx-auto flex justify-between items-center px-10">
+<button class="text-on-surface-variant font-bold hover:text-on-surface transition-colors flex items-center gap-2" type="button">
+<span class="material-symbols-outlined">close</span>
+                            Cancel
+                        </button>
+<div class="flex gap-4">
+<button class="px-8 py-3 rounded-xl font-bold text-primary hover:bg-primary-container/20 transition-all active:scale-95" type="button">
+                                Save Draft
+                            </button>
+<button class="px-10 py-4 rounded-xl bg-gradient-to-r from-primary to-primary-dim text-on-primary font-display font-extrabold shadow-lg shadow-primary/20 hover:shadow-xl transition-all active:scale-95 flex items-center gap-3" type="submit">
+                                Publish Recipe
+                                <span class="material-symbols-outlined">rocket_launch</span>
+</button>
+</div>
+</div>
+</div>
+<!-- Spacer for sticky bar -->
+<div class="col-span-12 h-32"></div>
+</form>
+</div>
+</main>
+</body></html>

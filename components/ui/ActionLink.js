@@ -12,7 +12,7 @@ const variantClasses = {
     "rounded-xl bg-[#006941] text-white shadow-xl shadow-[#006941]/20 hover:scale-105",
   secondary: "rounded-xl bg-[#e0e3e4] text-[#2c2f30] hover:bg-[#dadddf]",
   accent:
-    "rounded-full bg-[#7bfeb8] text-[#00603b] hover:scale-105 focus-visible:outline-none",
+    "rounded-full bg-[#006941] text-white hover:bg-[#004b2d] hover:scale-105 focus-visible:outline-none",
   header:
     "rounded-full bg-[#006941] text-white shadow-lg shadow-[#006941]/20 hover:scale-105",
 };

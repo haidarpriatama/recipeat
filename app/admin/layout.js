@@ -1,7 +1,7 @@
 import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import Link from "next/link";
-import { LayoutDashboard, Users, UtensilsCrossed, LogOut, Home } from "lucide-react";
+import { LayoutDashboard, Users, UtensilsCrossed, Home, Carrot } from "lucide-react";
 
 export default async function AdminLayout({ children }) {
   const session = await auth();
@@ -32,6 +32,10 @@ export default async function AdminLayout({ children }) {
           <Link href="/admin/recipes" className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-slate-800 hover:text-[#00E58F] transition-all font-semibold">
             <UtensilsCrossed size={20} />
             <span>Recipes</span>
+          </Link>
+          <Link href="/admin/ingredients" className="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-slate-800 hover:text-[#00E58F] transition-all font-semibold">
+            <Carrot size={20} />
+            <span>Ingredients</span>
           </Link>
         </nav>
 

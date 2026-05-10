@@ -105,7 +105,7 @@ export default function AuthNav() {
           setDropdownOpen((open) => !open);
           setNotificationsOpen(false);
         }}
-        className="relative flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-full border-2 border-[#7bfeb8] bg-[#7bfeb8] text-[#004b2d] shadow-sm"
+        className="relative flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-full border-2 border-[#7bfeb8] bg-[#006941] text-white shadow-sm"
         aria-label="Open user menu"
         aria-expanded={dropdownOpen}
       >
@@ -163,6 +163,16 @@ export default function AuthNav() {
             <User size={15} />
             My Profile
           </Link>
+          {session?.user?.role === "ADMIN" && (
+            <Link
+              href="/admin"
+              onClick={() => setDropdownOpen(false)}
+              className="flex items-center gap-3 px-4 py-2.5 text-sm font-medium text-slate-700 transition-colors hover:bg-[#f3fcf3] hover:text-[#006941]"
+            >
+              <span className="text-xs font-bold">AD</span>
+              Admin
+            </Link>
+          )}
           <hr className="my-1 border-slate-100" />
           <button
             onClick={handleLogout}
