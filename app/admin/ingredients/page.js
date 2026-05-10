@@ -2,6 +2,7 @@ import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import prisma from "@/lib/prisma";
 import IngredientClientTable from "./IngredientClientTable";
+import AddIngredientButton from "./AddIngredientButton";
 
 export default async function AdminIngredientsPage() {
   const session = await auth();
@@ -9,6 +10,13 @@ export default async function AdminIngredientsPage() {
 
   const ingredients = await prisma.ingredient.findMany({
     include: {
+      recipes: {
+        include: {
+          recipe: {
+            select: { title: true }
+          }
+        }
+      },
       _count: {
         select: { recipes: true },
       },
@@ -27,9 +35,7 @@ export default async function AdminIngredientsPage() {
           <h1 className="text-4xl font-extrabold tracking-tight text-[#2c2f30]">Manage Ingredients</h1>
           <p className="mt-2 text-[#595c5d]">Detailed overview of your master pantry inventory.</p>
         </div>
-        <button className="rounded-xl bg-[#006941] px-6 py-3 font-bold text-white transition-colors hover:bg-[#005c38]">
-          Add Ingredient
-        </button>
+        <AddIngredientButton />
       </div>
 
       <div className="grid grid-cols-1 gap-4 md:grid-cols-3">

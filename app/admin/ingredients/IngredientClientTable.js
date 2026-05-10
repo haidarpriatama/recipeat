@@ -1,11 +1,12 @@
 "use client";
 import { useState } from "react";
-import { Pencil, Trash2, X } from "lucide-react";
+import { Pencil, Trash2, X, Eye } from "lucide-react";
 import { deleteIngredientAction, updateIngredientAction } from "./actions";
 
 export default function IngredientClientTable({ ingredients }) {
   const [editItem, setEditItem] = useState(null);
   const [deleteItem, setDeleteItem] = useState(null);
+  const [showRecipesItem, setShowRecipesItem] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleEditSubmit = async (e) => {
@@ -47,12 +48,24 @@ export default function IngredientClientTable({ ingredients }) {
                 <tr key={ingredient.id} className="transition-colors hover:bg-[#f5f6f7]">
                   <td className="px-6 py-4 text-sm font-semibold text-[#595c5d]">ING-{String(ingredient.id).padStart(5, "0")}</td>
                   <td className="px-6 py-4 font-semibold text-[#2c2f30]">{ingredient.name}</td>
-                  <td className="px-6 py-4 text-sm text-[#595c5d]">{ingredient._count.recipes} recipes</td>
+                  <td className="px-6 py-4 text-sm text-[#595c5d]">
+                    {ingredient._count.recipes} recipes
+                  </td>
                   <td className="px-6 py-4">
                     <div className="flex items-center justify-end gap-2">
+                      {ingredient._count.recipes > 0 && (
+                        <button
+                          onClick={() => setShowRecipesItem(ingredient)}
+                          className="inline-flex h-9 w-9 items-center justify-center rounded-lg text-[#006941] transition-colors hover:bg-[#f3fcf3]"
+                          title="View recipes"
+                        >
+                          <Eye className="h-4 w-4" />
+                        </button>
+                      )}
                       <button
                         onClick={() => setEditItem(ingredient)}
                         className="inline-flex h-9 w-9 items-center justify-center rounded-lg text-[#006941] transition-colors hover:bg-[#f3fcf3]"
+                        title="Edit ingredient"
                       >
                         <Pencil className="h-4 w-4" />
                       </button>
@@ -151,6 +164,41 @@ export default function IngredientClientTable({ ingredients }) {
               </button>
             </div>
           </div>
+        </div>
+      )}
+
+      {/* Show Recipes Modal */}
+      {showRecipesItem && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4 backdrop-blur-sm">
+           <div className="w-full max-w-md overflow-hidden rounded-3xl bg-white shadow-2xl">
+             <div className="flex items-center justify-between border-b border-[#eff1f2] px-6 py-4">
+               <h3 className="text-lg font-extrabold text-[#2c2f30]">Used In Recipes</h3>
+               <button onClick={() => setShowRecipesItem(null)} className="text-[#595c5d] hover:text-[#2c2f30]">
+                 <X className="h-5 w-5" />
+               </button>
+             </div>
+             <div className="p-6 max-h-96 overflow-y-auto">
+               <ul className="space-y-2">
+                 {showRecipesItem.recipes.map((r, i) => (
+                   <li key={i} className="text-sm font-semibold text-[#2c2f30] bg-[#f5f6f7] p-3 rounded-xl border border-[#eff1f2]">
+                     {r.recipe.title}
+                   </li>
+                 ))}
+                 {showRecipesItem.recipes.length === 0 && (
+                   <li className="text-sm text-[#595c5d]">Not used in any recipes yet.</li>
+                 )}
+               </ul>
+             </div>
+             <div className="bg-[#eff1f2]/50 px-6 py-4 flex justify-end">
+                <button
+                  type="button"
+                  onClick={() => setShowRecipesItem(null)}
+                  className="rounded-xl bg-[#006941] px-5 py-2.5 text-sm font-bold text-white shadow-md hover:bg-[#005c38]"
+                >
+                  Close
+                </button>
+             </div>
+           </div>
         </div>
       )}
     </>

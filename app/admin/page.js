@@ -5,14 +5,7 @@ import { Users, UtensilsCrossed, Heart, Carrot } from "lucide-react";
 
 export default async function AdminDashboardPage() {
   const session = await auth();
-<<<<<<< HEAD
-  if (!session?.user?.email) redirect('/');
-
-  const dbUser = await prisma.user.findUnique({ where: { email: session.user.email } });
-  if (!dbUser || dbUser.role !== 'ADMIN') redirect('/');
-=======
   if (!session || session.user.role !== "ADMIN") redirect("/");
->>>>>>> 416fcadfdc4fa53c55fbd3cb9f3b5b5926888a2f
 
   const [totalUsers, totalRecipes, totalFavorites, totalIngredients] = await Promise.all([
     prisma.user.count(),

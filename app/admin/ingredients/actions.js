@@ -26,3 +26,18 @@ export async function updateIngredientAction(id, name) {
 
   revalidatePath("/admin/ingredients");
 }
+
+export async function createIngredientAction(name) {
+  const currentSession = await auth();
+  if (!currentSession || currentSession.user.role !== "ADMIN") throw new Error("Unauthorized");
+  if (!name) throw new Error("Name required");
+
+  const normalizedName = name.trim().toLowerCase();
+  const existing = await prisma.ingredient.findUnique({ where: { name: normalizedName } });
+  if (!existing) {
+    await prisma.ingredient.create({
+      data: { name: normalizedName },
+    });
+    revalidatePath("/admin/ingredients");
+  }
+}
