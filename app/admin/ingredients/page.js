@@ -4,11 +4,16 @@ import prisma from "@/lib/prisma";
 import IngredientClientTable from "./IngredientClientTable";
 import AddIngredientButton from "./AddIngredientButton";
 
-export default async function AdminIngredientsPage() {
+export default async function AdminIngredientsPage({ searchParams }) {
   const session = await auth();
   if (!session || session.user.role !== "ADMIN") redirect("/");
 
+  const q = searchParams?.q || "";
+
   const ingredients = await prisma.ingredient.findMany({
+    where: q
+      ? { name: { contains: q, mode: "insensitive" } }
+      : undefined,
     include: {
       recipes: {
         include: {

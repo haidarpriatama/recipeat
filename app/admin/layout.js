@@ -1,7 +1,8 @@
 import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import Link from "next/link";
-import { LayoutDashboard, Users, UtensilsCrossed, Home, Carrot, Search, Bell, CircleUserRound } from "lucide-react";
+import { LayoutDashboard, Users, UtensilsCrossed, Home, Carrot, Bell, CircleUserRound } from "lucide-react";
+import AdminSearchBar from "@/components/admin/AdminSearchBar";
 
 export default async function AdminLayout({ children }) {
   const session = await auth();
@@ -44,14 +45,7 @@ export default async function AdminLayout({ children }) {
 
       <main className="ml-72 min-h-screen">
         <header className="sticky top-0 z-30 flex items-center justify-between bg-[#f5f6f7]/85 px-8 py-4 backdrop-blur-xl shadow-[0_20px_40px_-24px_rgba(44,47,48,0.25)]">
-          <div className="relative w-full max-w-xl">
-            <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-[#757778]" />
-            <input
-              type="text"
-              placeholder="Search recipes, ingredients, or users..."
-              className="w-full rounded-xl bg-white py-3 pl-11 pr-4 text-sm text-[#2c2f30] outline-none ring-[#006941]/20 transition focus:ring-2"
-            />
-          </div>
+          <AdminSearchBar />
 
           <div className="ml-6 flex items-center gap-2">
             <div className="inline-flex items-center gap-2 rounded-full bg-white px-3 py-2">

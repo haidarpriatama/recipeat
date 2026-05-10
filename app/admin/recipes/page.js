@@ -6,11 +6,16 @@ import Image from "next/image";
 import { Pencil, Trash2, PlusCircle } from "lucide-react";
 import { revalidatePath } from "next/cache";
 
-export default async function AdminRecipesPage() {
+export default async function AdminRecipesPage({ searchParams }) {
   const session = await auth();
   if (!session || session.user.role !== "ADMIN") redirect("/");
 
+  const q = searchParams?.q || "";
+
   const recipes = await prisma.recipe.findMany({
+    where: q
+      ? { title: { contains: q, mode: "insensitive" } }
+      : undefined,
     include: {
       category: true,
       _count: {

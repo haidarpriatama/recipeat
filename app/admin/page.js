@@ -1,11 +1,104 @@
 import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import prisma from "@/lib/prisma";
+import Link from "next/link";
 import { Users, UtensilsCrossed, Heart, Carrot } from "lucide-react";
 
-export default async function AdminDashboardPage() {
+export default async function AdminDashboardPage({ searchParams }) {
   const session = await auth();
   if (!session || session.user.role !== "ADMIN") redirect("/");
+
+  const q = searchParams?.q || "";
+
+  if (q) {
+    const [matchedRecipes, matchedUsers, matchedIngredients] = await Promise.all([
+      prisma.recipe.findMany({
+        where: { title: { contains: q, mode: "insensitive" } },
+        take: 5,
+        include: { category: true },
+      }),
+      prisma.user.findMany({
+        where: {
+          OR: [
+            { name: { contains: q, mode: "insensitive" } },
+            { email: { contains: q, mode: "insensitive" } },
+          ],
+        },
+        take: 5,
+      }),
+      prisma.ingredient.findMany({
+        where: { name: { contains: q, mode: "insensitive" } },
+        take: 5,
+      }),
+    ]);
+
+    return (
+      <div className="space-y-8">
+        <div>
+          <h1 className="text-4xl font-extrabold tracking-tight text-[#2c2f30]">Search Results</h1>
+          <p className="mt-2 text-[#595c5d]">Showing top matches for <span className="font-bold">"{q}"</span> across the platform.</p>
+        </div>
+
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+          <section className="rounded-3xl bg-white p-6 shadow-[0_20px_50px_-30px_rgba(44,47,48,0.25)]">
+            <h2 className="mb-4 flex items-center gap-2 text-lg font-extrabold text-[#2c2f30]">
+              <Users className="h-5 w-5 text-[#006941]"/> Users ({matchedUsers.length})
+            </h2>
+            {matchedUsers.length > 0 ? (
+               <ul className="divide-y divide-[#eff1f2]">
+                 {matchedUsers.map(u => (
+                   <li key={u.id} className="flex items-center justify-between py-3">
+                     <div>
+                       <p className="font-semibold text-[#2c2f30]">{u.name}</p>
+                       <p className="text-xs text-[#595c5d]">{u.email}</p>
+                     </div>
+                     <Link href="/admin/users" className="text-xs font-bold text-[#006941] hover:underline">Manage</Link>
+                   </li>
+                 ))}
+               </ul>
+            ) : <p className="text-sm text-[#595c5d]">No users found.</p>}
+          </section>
+
+          <section className="rounded-3xl bg-white p-6 shadow-[0_20px_50px_-30px_rgba(44,47,48,0.25)]">
+            <h2 className="mb-4 flex items-center gap-2 text-lg font-extrabold text-[#2c2f30]">
+              <UtensilsCrossed className="h-5 w-5 text-[#006941]"/> Recipes ({matchedRecipes.length})
+            </h2>
+            {matchedRecipes.length > 0 ? (
+               <ul className="divide-y divide-[#eff1f2]">
+                 {matchedRecipes.map(r => (
+                   <li key={r.id} className="flex items-center justify-between py-3">
+                     <div>
+                       <p className="font-semibold text-[#2c2f30]">{r.title}</p>
+                       <p className="text-xs text-[#595c5d]">{r.category?.name || "Uncategorized"}</p>
+                     </div>
+                     <Link href={`/admin/recipes/${r.id}/edit`} className="text-xs font-bold text-[#006941] hover:underline">Edit</Link>
+                   </li>
+                 ))}
+               </ul>
+            ) : <p className="text-sm text-[#595c5d]">No recipes found.</p>}
+          </section>
+
+          <section className="rounded-3xl bg-white p-6 shadow-[0_20px_50px_-30px_rgba(44,47,48,0.25)]">
+            <h2 className="mb-4 flex items-center gap-2 text-lg font-extrabold text-[#2c2f30]">
+              <Carrot className="h-5 w-5 text-[#006941]"/> Ingredients ({matchedIngredients.length})
+            </h2>
+            {matchedIngredients.length > 0 ? (
+               <ul className="divide-y divide-[#eff1f2]">
+                 {matchedIngredients.map(i => (
+                   <li key={i.id} className="flex items-center justify-between py-3">
+                     <div>
+                       <p className="font-semibold text-[#2c2f30]">{i.name}</p>
+                     </div>
+                     <Link href="/admin/ingredients" className="text-xs font-bold text-[#006941] hover:underline">Manage</Link>
+                   </li>
+                 ))}
+               </ul>
+            ) : <p className="text-sm text-[#595c5d]">No ingredients found.</p>}
+          </section>
+        </div>
+      </div>
+    );
+  }
 
   const [totalUsers, totalRecipes, totalFavorites, totalIngredients] = await Promise.all([
     prisma.user.count(),
