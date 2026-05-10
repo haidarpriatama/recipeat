@@ -9,7 +9,10 @@ export default async function AdminNewRecipePage() {
   const session = await auth();
   if (!session || session.user.role !== "ADMIN") redirect("/");
 
-  const categories = await prisma.category.findMany({ orderBy: { name: "asc" } });
+  const [categories, allIngredients] = await Promise.all([
+    prisma.category.findMany({ orderBy: { name: "asc" } }),
+    prisma.ingredient.findMany({ orderBy: { name: "asc" } })
+  ]);
 
   async function createRecipeAction(formData) {
     "use server";
@@ -116,7 +119,7 @@ export default async function AdminNewRecipePage() {
           </div>
           
           <div className="pt-2">
-            <RecipeIngredientManager />
+            <RecipeIngredientManager availableIngredients={allIngredients} />
           </div>
         </section>
 

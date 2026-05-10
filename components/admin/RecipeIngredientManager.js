@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { Plus, Trash2 } from "lucide-react";
 
-export default function RecipeIngredientManager({ initialIngredients = [] }) {
+export default function RecipeIngredientManager({ initialIngredients = [], availableIngredients = [] }) {
   const [ingredients, setIngredients] = useState(
     initialIngredients.length > 0 ? initialIngredients : [{ name: "", quantity: "" }]
   );
@@ -32,9 +32,9 @@ export default function RecipeIngredientManager({ initialIngredients = [] }) {
         <button
           type="button"
           onClick={addIngredient}
-          className="flex items-center gap-1 rounded-lg bg-[#eff1f2] px-3 py-1.5 text-xs font-semibold text-[#006941] hover:bg-[#dadddf] transition-colors"
+          className="flex items-center gap-2 rounded-xl bg-[#006941] px-4 py-2 text-sm font-bold text-white hover:opacity-90 transition-opacity"
         >
-          <Plus size={14} /> Add Row
+          <Plus size={16} /> Add Ingredient
         </button>
       </div>
 
@@ -44,13 +44,26 @@ export default function RecipeIngredientManager({ initialIngredients = [] }) {
         <div className="space-y-3">
           {ingredients.map((ing, idx) => (
             <div key={idx} className="flex gap-3 items-center">
-              <input
-                type="text"
-                placeholder="Ingredient (e.g. Olive Oil)"
-                value={ing.name}
-                onChange={(e) => handleIngredientChange(idx, "name", e.target.value)}
-                className="flex-1 rounded-xl bg-[#eff1f2] px-4 py-3 outline-none ring-[#006941] transition focus:ring-2 text-sm"
-              />
+              {availableIngredients.length > 0 ? (
+                <select
+                  value={ing.name}
+                  onChange={(e) => handleIngredientChange(idx, "name", e.target.value)}
+                  className="flex-1 rounded-xl bg-[#eff1f2] px-4 py-3 outline-none ring-[#006941] transition focus:ring-2 text-sm"
+                >
+                  <option value="">Select an ingredient...</option>
+                  {availableIngredients.map((ai) => (
+                    <option key={ai.id} value={ai.name}>{ai.name}</option>
+                  ))}
+                </select>
+              ) : (
+                <input
+                  type="text"
+                  placeholder="Ingredient (e.g. Olive Oil)"
+                  value={ing.name}
+                  onChange={(e) => handleIngredientChange(idx, "name", e.target.value)}
+                  className="flex-1 rounded-xl bg-[#eff1f2] px-4 py-3 outline-none ring-[#006941] transition focus:ring-2 text-sm"
+                />
+              )}
               <input
                 type="text"
                 placeholder="Quantity (e.g. 2 tbsp)"
@@ -62,6 +75,7 @@ export default function RecipeIngredientManager({ initialIngredients = [] }) {
                 type="button"
                 onClick={() => removeIngredient(idx)}
                 className="p-3 text-slate-400 hover:text-red-500 hover:bg-red-50 rounded-xl transition-colors"
+                title="Remove ingredient"
               >
                 <Trash2 size={18} />
               </button>

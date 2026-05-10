@@ -14,7 +14,7 @@ export default async function AdminEditRecipePage({ params }) {
 
   if (!recipeId) redirect("/admin/recipes");
 
-  const [recipe, categories] = await Promise.all([
+  const [recipe, categories, allIngredients] = await Promise.all([
     prisma.recipe.findUnique({ 
       where: { id: recipeId },
       include: {
@@ -26,6 +26,7 @@ export default async function AdminEditRecipePage({ params }) {
       }
     }),
     prisma.category.findMany({ orderBy: { name: "asc" } }),
+    prisma.ingredient.findMany({ orderBy: { name: "asc" } }),
   ]);
 
   if (!recipe) redirect("/admin/recipes");
@@ -145,7 +146,7 @@ export default async function AdminEditRecipePage({ params }) {
           </div>
           
           <div className="pt-2">
-            <RecipeIngredientManager initialIngredients={initialIngredients} />
+            <RecipeIngredientManager initialIngredients={initialIngredients} availableIngredients={allIngredients} />
           </div>
         </section>
 
