@@ -4,6 +4,7 @@ import prisma from "@/lib/prisma";
 import Link from "next/link";
 import { revalidatePath } from "next/cache";
 import RecipeIngredientManager from "@/components/admin/RecipeIngredientManager";
+import { ExternalLink } from "lucide-react";
 
 export default async function AdminEditRecipePage({ params }) {
   const session = await auth();
@@ -106,9 +107,18 @@ export default async function AdminEditRecipePage({ params }) {
 
   return (
     <div className="space-y-8">
-      <div>
-        <h1 className="text-3xl font-extrabold tracking-tight text-[#006941]">Edit Recipe</h1>
-        <p className="mt-2 text-[#595c5d]">Update recipe details and keep content consistent.</p>
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div>
+          <h1 className="text-3xl font-extrabold tracking-tight text-[#006941]">Edit Recipe</h1>
+          <p className="mt-2 text-[#595c5d]">Update recipe details and keep content consistent.</p>
+        </div>
+        <Link 
+          href={`/recipes/${recipe.id}`}
+          target="_blank"
+          className="flex items-center gap-2 rounded-xl bg-[#eff1f2] px-4 py-2.5 text-sm font-bold text-[#006941] hover:bg-[#dadddf] transition-colors self-start sm:self-auto"
+        >
+          View Recipe <ExternalLink size={16} />
+        </Link>
       </div>
 
       <form action={updateRecipeAction} className="grid grid-cols-1 gap-8 xl:grid-cols-3">
