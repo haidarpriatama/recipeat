@@ -4,6 +4,7 @@ import prisma from "@/lib/prisma";
 import Link from "next/link";
 import { revalidatePath } from "next/cache";
 import RecipeIngredientManager from "@/components/admin/RecipeIngredientManager";
+import { HelpCircle } from "lucide-react";
 
 export default async function AdminNewRecipePage() {
   const session = await auth();
@@ -109,7 +110,18 @@ export default async function AdminNewRecipePage() {
           </div>
 
           <div>
-            <label className="mb-2 block text-sm font-bold text-[#595c5d]">Instructions</label>
+            <div className="mb-2 flex items-center gap-1.5">
+              <label className="block text-sm font-bold text-[#595c5d]">Instructions</label>
+              <div className="group relative flex items-center">
+                <HelpCircle className="h-4 w-4 cursor-help text-[#595c5d] transition-colors hover:text-[#006941]" />
+                <div className="pointer-events-none absolute bottom-full left-1/2 z-10 mb-2 w-56 -translate-x-1/2 rounded-xl bg-[#2c2f30] px-3 py-2.5 text-xs font-semibold leading-relaxed text-white opacity-0 shadow-xl transition-opacity group-hover:opacity-100">
+                  Please format as a numbered list: <br />
+                  1. First step... <br />
+                  2. Second step...
+                  <div className="absolute -bottom-1 left-1/2 h-2 w-2 -translate-x-1/2 rotate-45 bg-[#2c2f30]"></div>
+                </div>
+              </div>
+            </div>
             <textarea
               name="instructions"
               rows={8}
