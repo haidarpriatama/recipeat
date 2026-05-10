@@ -29,7 +29,6 @@ export default function FavoriteButton({ recipeId, initialFavorited = false, cla
       if (res.ok) {
         const data = await res.json();
         setIsFavorited(data.favorited);
-        router.refresh(); // Refresh server components to update favorite state elsewhere
       }
     } catch (error) {
       console.error('Error toggling favorite:', error);

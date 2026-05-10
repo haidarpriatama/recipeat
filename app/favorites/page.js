@@ -96,7 +96,8 @@ export default async function FavoritesPage({ searchParams: searchParamsPromise 
             </div>
             <Link 
               href="/explore" 
-              className="px-6 py-3 bg-[#006941] text-white rounded-xl font-bold hover:opacity-90 transition-opacity"
+              style={{ color: "white" }}
+              className="px-6 py-3 bg-[#006941] rounded-xl font-bold hover:opacity-90 transition-opacity"
             >
               Start Exploring
             </Link>

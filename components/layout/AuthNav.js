@@ -3,20 +3,17 @@
 import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
-import { Bell, LogOut, User } from "lucide-react";
-import { signOut, useSession } from "next-auth/react";
+import { Bell, LogOut, User, LayoutDashboard } from "lucide-react";
+import { signOut } from "next-auth/react";
 
 /**
  * AuthNav — rendered inside SiteHeader.
  * Shows Login + Sign Up when logged out; profile avatar + logout when logged in.
  */
-export default function AuthNav() {
-  const router = useRouter();
-  const { data: session, status } = useSession();
+export default function AuthNav({ initialSession }) {
   const [notificationsOpen, setNotificationsOpen] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
-  const user = session?.user;
+  const user = initialSession?.user;
 
   const notifications = [
     {
@@ -45,14 +42,10 @@ export default function AuthNav() {
   const handleLogout = async () => {
     await signOut({ redirect: false });
     setDropdownOpen(false);
-    router.push("/");
-    router.refresh();
+    window.location.href = "/";
   };
 
-  if (status === "loading") {
-    // Render a placeholder to avoid layout shift
-    return <div className="h-10 w-24 rounded-full bg-slate-200 animate-pulse" />;
-  }
+
 
   if (!user) {
     return (
@@ -105,7 +98,7 @@ export default function AuthNav() {
           setDropdownOpen((open) => !open);
           setNotificationsOpen(false);
         }}
-        className="relative flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-full border-2 border-[#7bfeb8] bg-[#7bfeb8] text-[#004b2d] shadow-sm"
+        className="relative flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-full border-2 border-[#7bfeb8] bg-[#006941] text-white shadow-sm"
         aria-label="Open user menu"
         aria-expanded={dropdownOpen}
       >
@@ -163,6 +156,16 @@ export default function AuthNav() {
             <User size={15} />
             My Profile
           </Link>
+          {user?.role === "ADMIN" && (
+            <Link
+              href="/admin"
+              onClick={() => setDropdownOpen(false)}
+              className="flex items-center gap-3 px-4 py-2.5 text-sm font-medium text-slate-700 transition-colors hover:bg-[#f3fcf3] hover:text-[#006941]"
+            >
+              <LayoutDashboard size={15} />
+              Admin
+            </Link>
+          )}
           <hr className="my-1 border-slate-100" />
           <button
             onClick={handleLogout}

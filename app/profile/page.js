@@ -1,6 +1,7 @@
 import ProfileContent from "./ProfileContent";
 import { auth } from "@/lib/auth";
 import prisma from "@/lib/prisma";
+import { redirect } from "next/navigation";
 
 export const metadata = {
   title: "Profile – Recipeat",
@@ -9,9 +10,12 @@ export const metadata = {
 
 export default async function ProfilePage() {
   const session = await auth();
-  const userId = session?.user?.id;
+  if (!session) {
+    redirect("/login");
+  }
+  const userId = session.user.id;
 
-  const [favorites, favoriteCount] = userId ? await Promise.all([
+  const [favorites, favoriteCount] = await Promise.all([
     prisma.favorite.findMany({
       where: { userId },
       include: {
@@ -23,7 +27,7 @@ export default async function ProfilePage() {
       take: 3,
     }),
     prisma.favorite.count({ where: { userId } }),
-  ]) : [[], 0];
+  ]);
   const favoriteRecipes = favorites.map((fav) => ({
     id: fav.recipe.id,
     title: fav.recipe.title,
@@ -33,5 +37,5 @@ export default async function ProfilePage() {
     tags: [fav.recipe.category?.name || "Recipe"],
   }));
 
-  return <ProfileContent favorites={favoriteRecipes} favoriteCount={favoriteCount} />;
+  return <ProfileContent favorites={favoriteRecipes} favoriteCount={favoriteCount} user={session.user} />;
 }

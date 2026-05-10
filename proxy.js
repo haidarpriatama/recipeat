@@ -13,7 +13,9 @@ export function proxy(request) {
     // Cek apakah ada session cookie dari next-auth
     const sessionToken = 
       request.cookies.get('__Secure-next-auth.session-token')?.value ||
-      request.cookies.get('next-auth.session-token')?.value;
+      request.cookies.get('next-auth.session-token')?.value ||
+      request.cookies.get('__Secure-authjs.session-token')?.value ||
+      request.cookies.get('authjs.session-token')?.value;
 
     if (!sessionToken) {
       const loginUrl = new URL('/login', request.nextUrl);

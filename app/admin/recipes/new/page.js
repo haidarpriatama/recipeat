@@ -1,0 +1,182 @@
+import { auth } from "@/lib/auth";
+import { redirect } from "next/navigation";
+import prisma from "@/lib/prisma";
+import Link from "next/link";
+import { revalidatePath } from "next/cache";
+import RecipeIngredientManager from "@/components/admin/RecipeIngredientManager";
+
+export default async function AdminNewRecipePage() {
+  const session = await auth();
+  if (!session || session.user.role !== "ADMIN") redirect("/");
+
+  const [categories, allIngredients] = await Promise.all([
+    prisma.category.findMany({ orderBy: { name: "asc" } }),
+    prisma.ingredient.findMany({ orderBy: { name: "asc" } })
+  ]);
+
+  async function createRecipeAction(formData) {
+    "use server";
+
+    const currentSession = await auth();
+    if (!currentSession || currentSession.user.role !== "ADMIN") redirect("/");
+
+    const title = String(formData.get("title") || "").trim();
+    const description = String(formData.get("description") || "").trim();
+    const instructions = String(formData.get("instructions") || "").trim();
+    const imageUrl = String(formData.get("imageUrl") || "").trim();
+    const cookTime = Number(formData.get("cookTime"));
+    const categoryId = Number(formData.get("categoryId"));
+
+    const ingredientsData = formData.get("ingredientsData");
+    let parsedIngredients = [];
+    if (ingredientsData) {
+      try {
+        parsedIngredients = JSON.parse(ingredientsData);
+        parsedIngredients = parsedIngredients.filter(i => i.name.trim() !== "");
+      } catch (e) {}
+    }
+
+    if (!title || !cookTime || !categoryId) {
+      return;
+    }
+
+    const recipeIngredientsToCreate = [];
+    for (const item of parsedIngredients) {
+      const name = item.name.trim();
+      const quantity = item.quantity.trim() || "As needed";
+      
+      let ingredientRecord = await prisma.ingredient.findUnique({
+        where: { name: name.toLowerCase() }
+      });
+      
+      if (!ingredientRecord) {
+        ingredientRecord = await prisma.ingredient.create({
+          data: { name: name.toLowerCase() }
+        });
+      }
+      
+      recipeIngredientsToCreate.push({
+        ingredientId: ingredientRecord.id,
+        quantity: quantity
+      });
+    }
+
+    await prisma.recipe.create({
+      data: {
+        title,
+        description: description || null,
+        instructions: instructions || null,
+        imageUrl: imageUrl || null,
+        cookTime,
+        categoryId,
+        ingredients: {
+          create: recipeIngredientsToCreate
+        }
+      },
+    });
+
+    revalidatePath("/admin/recipes");
+    redirect("/admin/recipes");
+  }
+
+  return (
+    <div className="space-y-8">
+      <div>
+        <h1 className="text-3xl font-extrabold tracking-tight text-[#006941]">Create New Recipe</h1>
+        <p className="mt-2 text-[#595c5d]">Add a new recipe to your curated collection.</p>
+      </div>
+
+      <form action={createRecipeAction} className="grid grid-cols-1 gap-8 xl:grid-cols-3">
+        <section className="space-y-6 rounded-2xl bg-white p-6 shadow-sm xl:col-span-2">
+          <div>
+            <label className="mb-2 block text-sm font-bold text-[#595c5d]">Recipe Title</label>
+            <input
+              name="title"
+              required
+              className="w-full rounded-xl bg-[#eff1f2] px-4 py-3 outline-none ring-[#006941] transition focus:ring-2"
+              placeholder="e.g. Pan-Seared Salmon with Asparagus"
+            />
+          </div>
+
+          <div>
+            <label className="mb-2 block text-sm font-bold text-[#595c5d]">Description</label>
+            <textarea
+              name="description"
+              rows={4}
+              className="w-full rounded-xl bg-[#eff1f2] px-4 py-3 outline-none ring-[#006941] transition focus:ring-2"
+              placeholder="Short recipe description"
+            />
+          </div>
+
+          <div>
+            <label className="mb-2 block text-sm font-bold text-[#595c5d]">Instructions</label>
+            <textarea
+              name="instructions"
+              rows={8}
+              className="w-full rounded-xl bg-[#eff1f2] px-4 py-3 outline-none ring-[#006941] transition focus:ring-2"
+              placeholder="Step-by-step cooking instructions"
+            />
+          </div>
+          
+          <div className="pt-2">
+            <RecipeIngredientManager availableIngredients={allIngredients} />
+          </div>
+        </section>
+
+        <section className="space-y-6 rounded-2xl bg-white p-6 shadow-sm">
+          <div>
+            <label className="mb-2 block text-sm font-bold text-[#595c5d]">Category</label>
+            <select
+              name="categoryId"
+              required
+              className="w-full rounded-xl bg-[#eff1f2] px-4 py-3 outline-none ring-[#006941] transition focus:ring-2"
+            >
+              <option value="">Select category</option>
+              {categories.map((category) => (
+                <option key={category.id} value={category.id}>
+                  {category.name}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div>
+            <label className="mb-2 block text-sm font-bold text-[#595c5d]">Cook Time (minutes)</label>
+            <input
+              name="cookTime"
+              type="number"
+              required
+              min={1}
+              className="w-full rounded-xl bg-[#eff1f2] px-4 py-3 outline-none ring-[#006941] transition focus:ring-2"
+            />
+          </div>
+
+          <div>
+            <label className="mb-2 block text-sm font-bold text-[#595c5d]">Image URL</label>
+            <input
+              name="imageUrl"
+              type="url"
+              className="w-full rounded-xl bg-[#eff1f2] px-4 py-3 outline-none ring-[#006941] transition focus:ring-2"
+              placeholder="https://..."
+            />
+          </div>
+
+          <div className="flex flex-col gap-3 pt-2">
+            <button
+              type="submit"
+              className="rounded-xl bg-gradient-to-r from-[#006941] to-[#005c38] px-5 py-3 font-bold text-white transition-opacity hover:opacity-90"
+            >
+              Publish Recipe
+            </button>
+            <Link
+              href="/admin/recipes"
+              className="rounded-xl bg-[#eff1f2] px-5 py-3 text-center font-semibold text-[#2c2f30] transition-colors hover:bg-[#dadddf]"
+            >
+              Cancel
+            </Link>
+          </div>
+        </section>
+      </form>
+    </div>
+  );
+}

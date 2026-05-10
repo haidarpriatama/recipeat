@@ -9,12 +9,12 @@ const sizeClasses = {
 
 const variantClasses = {
   primary:
-    "rounded-xl bg-[#006941] text-white shadow-xl shadow-[#006941]/20 hover:scale-105",
+    "rounded-xl bg-[#006941] shadow-xl shadow-[#006941]/20 hover:scale-105",
   secondary: "rounded-xl bg-[#e0e3e4] text-[#2c2f30] hover:bg-[#dadddf]",
   accent:
-    "rounded-full bg-[#7bfeb8] text-[#00603b] hover:scale-105 focus-visible:outline-none",
+    "rounded-full bg-[#006941] hover:bg-[#004b2d] hover:scale-105 focus-visible:outline-none",
   header:
-    "rounded-full bg-[#006941] text-white shadow-lg shadow-[#006941]/20 hover:scale-105",
+    "rounded-full bg-[#006941] shadow-lg shadow-[#006941]/20 hover:scale-105",
 };
 
 export default function ActionLink({
@@ -26,10 +26,13 @@ export default function ActionLink({
 }) {
   const resolvedSize = sizeClasses[size] ?? sizeClasses.md;
   const resolvedVariant = variantClasses[variant] ?? variantClasses.primary;
+  
+  const isWhiteText = ["primary", "accent", "header"].includes(variant);
 
   return (
     <a
       className={`${baseClasses} ${resolvedSize} ${resolvedVariant} ${className}`.trim()}
+      style={isWhiteText ? { color: "white" } : {}}
       href={href}
     >
       {children}
