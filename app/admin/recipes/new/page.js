@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import prisma from "@/lib/prisma";
 import Link from "next/link";
 import { revalidatePath } from "next/cache";
+import RecipeIngredientManager from "@/components/admin/RecipeIngredientManager";
 
 export default async function AdminNewRecipePage() {
   const session = await auth();
@@ -23,8 +24,38 @@ export default async function AdminNewRecipePage() {
     const cookTime = Number(formData.get("cookTime"));
     const categoryId = Number(formData.get("categoryId"));
 
+    const ingredientsData = formData.get("ingredientsData");
+    let parsedIngredients = [];
+    if (ingredientsData) {
+      try {
+        parsedIngredients = JSON.parse(ingredientsData);
+        parsedIngredients = parsedIngredients.filter(i => i.name.trim() !== "");
+      } catch (e) {}
+    }
+
     if (!title || !cookTime || !categoryId) {
       return;
+    }
+
+    const recipeIngredientsToCreate = [];
+    for (const item of parsedIngredients) {
+      const name = item.name.trim();
+      const quantity = item.quantity.trim() || "As needed";
+      
+      let ingredientRecord = await prisma.ingredient.findUnique({
+        where: { name: name.toLowerCase() }
+      });
+      
+      if (!ingredientRecord) {
+        ingredientRecord = await prisma.ingredient.create({
+          data: { name: name.toLowerCase() }
+        });
+      }
+      
+      recipeIngredientsToCreate.push({
+        ingredientId: ingredientRecord.id,
+        quantity: quantity
+      });
     }
 
     await prisma.recipe.create({
@@ -35,6 +66,9 @@ export default async function AdminNewRecipePage() {
         imageUrl: imageUrl || null,
         cookTime,
         categoryId,
+        ingredients: {
+          create: recipeIngredientsToCreate
+        }
       },
     });
 
@@ -79,6 +113,10 @@ export default async function AdminNewRecipePage() {
               className="w-full rounded-xl bg-[#eff1f2] px-4 py-3 outline-none ring-[#006941] transition focus:ring-2"
               placeholder="Step-by-step cooking instructions"
             />
+          </div>
+          
+          <div className="pt-2">
+            <RecipeIngredientManager />
           </div>
         </section>
 

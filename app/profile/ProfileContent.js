@@ -19,40 +19,15 @@ import { supabase } from "@/lib/supabaseClient";
 const AVATAR_URL =
   "https://lh3.googleusercontent.com/aida-public/AB6AXuBBgil31kVK_AuFTC6fWU7FOCH9iz0_hqgfgxzAhxE3o5I0k0JqTIqHmew7S3xoYB7v9wibwNlmoJYF5guu-vFSGLCTed_U1D3PHURjtR5BGHtWXEOG2Yfx7G64dvQfHEdEL51afvX5Ikbq2FnLN_DcEa9OklYAo5ELC35jEDdWA_unZywmpNKxS6TT_QcLSSikv77IZQwyLLEvYfNAV6l1UP5NtN_xt9Uud_0PbVOn01WSCuf4yrYkuR_1RQwsB1acoCOybIYQviQI";
 
-export default function ProfileContent({ favorites = [], favoriteCount = 0 }) {
-  const router = useRouter();
-
-  // ── Auth guard: redirect to login if not logged in ──
-  const [authChecked, setAuthChecked] = useState(false);
-  const [user, setUser] = useState(null);
-
+export default function ProfileContent({ favorites = [], favoriteCount = 0, user }) {
   // Form state
   const [formData, setFormData] = useState({
-    username: "sarahcooks",
-    fullName: "Sarah Jenkins",
-    email: "sarah.jenkins@example.com",
+    username: user?.name?.split(" ")[0]?.toLowerCase() || "chef",
+    fullName: user?.name || "Guest",
+    email: user?.email || "",
     bio: "Culinary enthusiast and amateur food photographer. Believes that every meal should be an occasion.",
   });
   const [saved, setSaved] = useState(false);
-
-  useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      if (!session) {
-        router.replace("/login");
-      } else {
-        setUser(session.user);
-        setAuthChecked(true);
-        // Prefill name + email from Supabase user
-        const meta = session.user.user_metadata;
-        setFormData((prev) => ({
-          ...prev,
-          fullName: meta?.name || meta?.full_name || prev.fullName,
-          email: session.user.email || prev.email,
-        }));
-      }
-    });
-  }, [router]);
-
 
   const handleChange = (e) => {
     setFormData((prev) => ({ ...prev, [e.target.id]: e.target.value }));
@@ -63,15 +38,7 @@ export default function ProfileContent({ favorites = [], favoriteCount = 0 }) {
     setTimeout(() => setSaved(false), 2000);
   };
 
-  if (!authChecked) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-[#f5f6f7]">
-        <div className="animate-spin rounded-full h-8 w-8 border-4 border-[#006941] border-t-transparent" />
-      </div>
-    );
-  }
-
-  const avatarUrl = user?.user_metadata?.avatar_url || AVATAR_URL;
+  const avatarUrl = user?.image || AVATAR_URL;
 
   return (
     <>

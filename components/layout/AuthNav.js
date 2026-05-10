@@ -3,20 +3,17 @@
 import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
 import { Bell, LogOut, User, LayoutDashboard } from "lucide-react";
-import { signOut, useSession } from "next-auth/react";
+import { signOut } from "next-auth/react";
 
 /**
  * AuthNav — rendered inside SiteHeader.
  * Shows Login + Sign Up when logged out; profile avatar + logout when logged in.
  */
-export default function AuthNav() {
-  const router = useRouter();
-  const { data: session, status } = useSession();
+export default function AuthNav({ initialSession }) {
   const [notificationsOpen, setNotificationsOpen] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
-  const user = session?.user;
+  const user = initialSession?.user;
 
   const notifications = [
     {
@@ -45,14 +42,10 @@ export default function AuthNav() {
   const handleLogout = async () => {
     await signOut({ redirect: false });
     setDropdownOpen(false);
-    router.push("/");
-    router.refresh();
+    window.location.href = "/";
   };
 
-  if (status === "loading") {
-    // Render a placeholder to avoid layout shift
-    return <div className="h-10 w-24 rounded-full bg-slate-200 animate-pulse" />;
-  }
+
 
   if (!user) {
     return (
@@ -163,7 +156,7 @@ export default function AuthNav() {
             <User size={15} />
             My Profile
           </Link>
-          {session?.user?.role === "ADMIN" && (
+          {user?.role === "ADMIN" && (
             <Link
               href="/admin"
               onClick={() => setDropdownOpen(false)}

@@ -52,7 +52,6 @@ function LoginForm() {
         : '/explore';
 
       router.push(redirectTo);
-      router.refresh();
     } catch (err) {
       setError('An unexpected error occurred');
     } finally {

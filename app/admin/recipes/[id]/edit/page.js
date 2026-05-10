@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import prisma from "@/lib/prisma";
 import Link from "next/link";
 import { revalidatePath } from "next/cache";
+import RecipeIngredientManager from "@/components/admin/RecipeIngredientManager";
 
 export default async function AdminEditRecipePage({ params }) {
   const session = await auth();
@@ -14,11 +15,25 @@ export default async function AdminEditRecipePage({ params }) {
   if (!recipeId) redirect("/admin/recipes");
 
   const [recipe, categories] = await Promise.all([
-    prisma.recipe.findUnique({ where: { id: recipeId } }),
+    prisma.recipe.findUnique({ 
+      where: { id: recipeId },
+      include: {
+        ingredients: {
+          include: {
+            ingredient: true
+          }
+        }
+      }
+    }),
     prisma.category.findMany({ orderBy: { name: "asc" } }),
   ]);
 
   if (!recipe) redirect("/admin/recipes");
+
+  const initialIngredients = recipe.ingredients.map(ri => ({
+    name: ri.ingredient.name,
+    quantity: ri.quantity
+  }));
 
   async function updateRecipeAction(formData) {
     "use server";
@@ -34,8 +49,38 @@ export default async function AdminEditRecipePage({ params }) {
     const cookTime = Number(formData.get("cookTime"));
     const categoryId = Number(formData.get("categoryId"));
 
+    const ingredientsData = formData.get("ingredientsData");
+    let parsedIngredients = [];
+    if (ingredientsData) {
+      try {
+        parsedIngredients = JSON.parse(ingredientsData);
+        parsedIngredients = parsedIngredients.filter(i => i.name.trim() !== "");
+      } catch (e) {}
+    }
+
     if (!id || !title || !cookTime || !categoryId) {
       return;
+    }
+
+    const recipeIngredientsToCreate = [];
+    for (const item of parsedIngredients) {
+      const name = item.name.trim();
+      const quantity = item.quantity.trim() || "As needed";
+      
+      let ingredientRecord = await prisma.ingredient.findUnique({
+        where: { name: name.toLowerCase() }
+      });
+      
+      if (!ingredientRecord) {
+        ingredientRecord = await prisma.ingredient.create({
+          data: { name: name.toLowerCase() }
+        });
+      }
+      
+      recipeIngredientsToCreate.push({
+        ingredientId: ingredientRecord.id,
+        quantity: quantity
+      });
     }
 
     await prisma.recipe.update({
@@ -47,6 +92,10 @@ export default async function AdminEditRecipePage({ params }) {
         imageUrl: imageUrl || null,
         cookTime,
         categoryId,
+        ingredients: {
+          deleteMany: {},
+          create: recipeIngredientsToCreate
+        }
       },
     });
 
@@ -93,6 +142,10 @@ export default async function AdminEditRecipePage({ params }) {
               defaultValue={recipe.instructions || ""}
               className="w-full rounded-xl bg-[#eff1f2] px-4 py-3 outline-none ring-[#006941] transition focus:ring-2"
             />
+          </div>
+          
+          <div className="pt-2">
+            <RecipeIngredientManager initialIngredients={initialIngredients} />
           </div>
         </section>
 

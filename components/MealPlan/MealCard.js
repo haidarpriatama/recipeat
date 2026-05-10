@@ -27,6 +27,7 @@ export default function MealCard({ meal, compact = false }) {
       });
 
       if (res.ok) {
+        // router.refresh() dipertahankan di sini agar list Server Component langsung terupdate tanpa mengubah parent menjadi Client Component.
         router.refresh();
       } else {
         alert("Failed to delete meal.");
