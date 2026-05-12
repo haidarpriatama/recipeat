@@ -11,33 +11,8 @@ import { signOut } from "next-auth/react";
  * Shows Login + Sign Up when logged out; profile avatar + logout when logged in.
  */
 export default function AuthNav({ initialSession }) {
-  const [notificationsOpen, setNotificationsOpen] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const user = initialSession?.user;
-
-  const notifications = [
-    {
-      id: 1,
-      title: "Meal plan ready",
-      description: "Your weekly plan for this week is ready.",
-      time: "2m ago",
-      unread: true,
-    },
-    {
-      id: 2,
-      title: "Low stock alert",
-      description: "Spinach and eggs are running low.",
-      time: "1h ago",
-      unread: true,
-    },
-    {
-      id: 3,
-      title: "New recipe saved",
-      description: "Honey Glazed Salmon was added to favorites.",
-      time: "Yesterday",
-      unread: false,
-    },
-  ];
 
   const handleLogout = async () => {
     await signOut({ redirect: false });
@@ -81,22 +56,7 @@ export default function AuthNav({ initialSession }) {
       <button
         type="button"
         onClick={() => {
-          setNotificationsOpen((open) => !open);
-          setDropdownOpen(false);
-        }}
-        aria-label="Open notifications"
-        aria-expanded={notificationsOpen}
-        className="relative inline-flex h-10 w-10 items-center justify-center rounded-full border border-[#d2d9d5] bg-white text-[#595c5d] transition-colors hover:text-[#006941]"
-      >
-        <Bell className="h-5 w-5" />
-        <span className="absolute right-2.5 top-2.5 h-2 w-2 rounded-full bg-[#8c4a00]" />
-      </button>
-
-      <button
-        type="button"
-        onClick={() => {
           setDropdownOpen((open) => !open);
-          setNotificationsOpen(false);
         }}
         className="relative flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden rounded-full border-2 border-[#7bfeb8] bg-[#006941] text-white shadow-sm"
         aria-label="Open user menu"
@@ -115,35 +75,13 @@ export default function AuthNav({ initialSession }) {
         )}
       </button>
 
-      {(dropdownOpen || notificationsOpen) && (
+      {dropdownOpen && (
         <div
           className="fixed inset-0 z-40"
           onClick={() => {
             setDropdownOpen(false);
-            setNotificationsOpen(false);
           }}
         />
-      )}
-
-      {notificationsOpen && (
-        <div className="absolute right-12 top-12 z-50 w-80 overflow-hidden rounded-2xl border border-slate-100 bg-white shadow-xl shadow-black/10">
-          <div className="flex items-center justify-between border-b border-slate-100 px-4 py-3">
-            <p className="text-sm font-bold text-[#2c2f30]">Notifications</p>
-            <span className="text-xs font-semibold text-[#595c5d]">{notifications.length} items</span>
-          </div>
-          <div className="max-h-72 overflow-y-auto">
-            {notifications.map((item) => (
-              <div key={item.id} className="border-b border-slate-100 px-4 py-3 last:border-b-0">
-                <div className="mb-1 flex items-start justify-between gap-3">
-                  <p className="text-sm font-semibold text-[#2c2f30]">{item.title}</p>
-                  {item.unread && <span className="mt-1 h-2 w-2 shrink-0 rounded-full bg-[#006941]" />}
-                </div>
-                <p className="text-xs text-[#595c5d]">{item.description}</p>
-                <p className="mt-1 text-[11px] font-medium text-[#8d9092]">{item.time}</p>
-              </div>
-            ))}
-          </div>
-        </div>
       )}
 
       {dropdownOpen && (

@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import Image from "next/image";
 import Link from "next/link";
-import { Timer, UtensilsCrossed, Flame, Trash2, Loader2 } from "lucide-react";
+import { Timer, Star, Trash2, Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 
 export default function MealCard({ meal, compact = false }) {
@@ -68,8 +68,10 @@ export default function MealCard({ meal, compact = false }) {
           </div>
           <div className="mt-4 flex flex-wrap items-center gap-5 text-xs font-semibold text-[#595c5d]">
             <span className="inline-flex items-center gap-1.5"><Timer className="h-4 w-4 text-[#006941]" />{meal.prepTime}</span>
-            <span className="inline-flex items-center gap-1.5"><UtensilsCrossed className="h-4 w-4 text-[#006941]" />{meal.difficulty}</span>
-            <span className="inline-flex items-center gap-1.5"><Flame className="h-4 w-4 text-[#006941]" />{meal.calories}</span>
+            <span className="inline-flex items-center gap-1.5">
+              <Star className="h-4 w-4 fill-[#ffb800] text-[#ffb800]" />
+              {meal.rating || "0.0"}
+            </span>
           </div>
         </div>
       </div>

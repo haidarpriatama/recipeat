@@ -25,7 +25,6 @@ export default function ProfileContent({ favorites = [], favoriteCount = 0, user
     username: user?.name?.split(" ")[0]?.toLowerCase() || "chef",
     fullName: user?.name || "Guest",
     email: user?.email || "",
-    bio: "Culinary enthusiast and amateur food photographer. Believes that every meal should be an occasion.",
   });
   const [saved, setSaved] = useState(false);
 
@@ -43,13 +42,13 @@ export default function ProfileContent({ favorites = [], favoriteCount = 0, user
   return (
     <>
       <div className="min-h-screen bg-[#f5f6f7] pt-8 pb-12">
-        <main className="max-w-7xl mx-auto px-4 md:px-6 flex flex-col gap-12 lg:gap-16">
+        <main className="max-w-7xl mx-auto px-4 md:px-6 flex flex-col gap-8 lg:gap-10">
 
           {/* ── Hero Grid: Profile Card + Settings Form ── */}
-          <section className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+          <section className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-stretch">
 
             {/* Profile Card */}
-            <div className="lg:col-span-4 bg-white rounded-[2rem] shadow-sm border border-slate-100 p-8 flex flex-col items-center text-center relative overflow-hidden group transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
+            <div className="lg:col-span-4 bg-white rounded-[2rem] shadow-sm border border-slate-100 p-8 flex flex-col items-center text-center relative overflow-hidden group transition-all duration-300 hover:shadow-xl hover:-translate-y-1 h-full">
               <div className="absolute inset-0 bg-gradient-to-br from-[#006941]/5 to-transparent pointer-events-none rounded-[2rem]" />
 
               {/* Avatar */}
@@ -66,15 +65,12 @@ export default function ProfileContent({ favorites = [], favoriteCount = 0, user
               <h1 className="font-headline text-2xl font-bold text-[#2c2f30] mb-1 z-10">
                 {formData.fullName}
               </h1>
-              <p className="text-slate-500 mb-4 z-10 font-medium">
+              <p className="text-slate-500 mb-6 z-10 font-medium">
                 @{formData.username}
-              </p>
-              <p className="text-sm text-slate-500 leading-relaxed mb-6 z-10">
-                {formData.bio}
               </p>
 
               {/* Stats */}
-              <div className="flex gap-4 w-full z-10">
+              <div className="flex gap-4 w-full z-10 mt-auto">
                 <div className="flex-1 bg-[#eff1f2] rounded-xl p-3">
                   <p className="font-headline font-bold text-[#006941] text-xl">42</p>
                   <p className="text-xs text-slate-500 uppercase tracking-wider font-semibold mt-0.5">
@@ -91,13 +87,13 @@ export default function ProfileContent({ favorites = [], favoriteCount = 0, user
             </div>
 
             {/* Account Settings Form */}
-            <div className="lg:col-span-8 bg-[#e6e8ea] rounded-[2rem] p-8 lg:p-10">
+            <div className="lg:col-span-8 bg-[#e6e8ea] rounded-[2rem] p-8 lg:p-10 h-full flex flex-col">
               <h2 className="font-headline text-2xl font-extrabold tracking-tight text-[#2c2f30] mb-8">
                 Account Settings
               </h2>
 
               <form
-                className="space-y-6"
+                className="space-y-6 flex flex-col flex-1"
                 onSubmit={(e) => {
                   e.preventDefault();
                   handleSave();
@@ -152,22 +148,8 @@ export default function ProfileContent({ favorites = [], favoriteCount = 0, user
                   </div>
                 </div>
 
-                {/* Bio */}
-                <div className="space-y-2">
-                  <label className="text-sm font-semibold text-[#2c2f30]" htmlFor="bio">
-                    Bio
-                  </label>
-                  <textarea
-                    id="bio"
-                    rows={3}
-                    value={formData.bio}
-                    onChange={handleChange}
-                    className="w-full bg-white rounded-xl border-none py-3 px-4 text-[#2c2f30] shadow-[inset_0_2px_4px_rgba(0,0,0,0.02)] focus:ring-2 focus:ring-[#7bfeb8] outline-none font-body text-sm resize-none transition-all"
-                  />
-                </div>
-
                 {/* Save button */}
-                <div className="pt-2 flex justify-end">
+                <div className="mt-auto pt-6 flex justify-end">
                   <button
                     type="submit"
                     className="flex items-center gap-2 bg-[#006941] text-white font-headline font-bold py-3.5 px-8 rounded-xl shadow-lg hover:bg-[#005c38] hover:shadow-xl transition-all duration-300 active:scale-95"

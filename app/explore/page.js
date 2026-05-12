@@ -258,7 +258,19 @@ export default async function ExplorePage({ searchParams: searchParamsPromise })
   let displayRecipes = [];
   let availableIngredients = [];
   let totalRecipesCount = 0;
+  let specialRecipeData = {
+    id: "",
+    title: "Seasonal Harvest Buddha Bowl with Miso Dressing",
+    description: "Experience a symphony of textures and earthy flavors curated by Chef Julian. Freshly picked root vegetables meets silky fermented dressing.",
+    image: "https://lh3.googleusercontent.com/aida-public/AB6AXuBTW3Cl9bj3m4KQymVuSqGCTkb_DiqKPFjNvng-3EOw10Ry8VXeNfQAC256wM3To0X6I9RqMZYUpVsp60bjXVlQlGcZCvGoDaJe0UKixOotAoazzHY4m6xXIdfjRI5agMytUlSCyetnVc1CxEw3-ql2pv3ZUM0rWEF2UE3gseIdsRdnpPN79o89TuOZl0GnwiCnoa2n8MSvuoMvoCuqRyExSjJySVR5QHDDUmvuqgHub2oJqxzSO1Xdl74HxWblhELbhINlMOu8h4uX",
+    time: "25 mins",
+    rating: "5.0",
+  };
+
   try {
+    const totalAllRecipesCount = await prisma.recipe.count();
+    const randomSkip = totalAllRecipesCount > 0 ? Math.floor(Math.random() * totalAllRecipesCount) : 0;
+
     // Build the Prisma query filter
     const where = {
       AND: [
@@ -299,7 +311,7 @@ export default async function ExplorePage({ searchParams: searchParamsPromise })
       ]
     };
 
-    const [dbRecipes, dbIngredients, count] = await Promise.all([
+    const [dbRecipes, dbIngredients, count, randomRecipe] = await Promise.all([
       prisma.recipe.findMany({
         where,
         skip,
@@ -314,11 +326,30 @@ export default async function ExplorePage({ searchParams: searchParamsPromise })
       prisma.ingredient.findMany({
         select: { name: true },
       }),
-      prisma.recipe.count({ where })
+      prisma.recipe.count({ where }),
+      totalAllRecipesCount > 0 ? prisma.recipe.findFirst({
+        skip: randomSkip,
+        include: { category: true, ratings: true }
+      }) : null
     ]);
     totalRecipesCount = count;
 
     availableIngredients = dbIngredients.map((ingredient) => ingredient.name);
+
+    if (randomRecipe) {
+      const specialRating = randomRecipe.ratings && randomRecipe.ratings.length > 0
+        ? (randomRecipe.ratings.reduce((acc, curr) => acc + curr.score, 0) / randomRecipe.ratings.length).toFixed(1)
+        : "0.0";
+
+      specialRecipeData = {
+        id: randomRecipe.id,
+        title: randomRecipe.title,
+        description: randomRecipe.description || "Experience a symphony of textures and earthy flavors.",
+        image: randomRecipe.imageUrl || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=800&q=80',
+        time: `${randomRecipe.cookTime || 0} mins`,
+        rating: specialRating,
+      };
+    }
 
     if (dbRecipes.length > 0) {
       displayRecipes = dbRecipes.map((recipe) => {
@@ -349,45 +380,51 @@ export default async function ExplorePage({ searchParams: searchParamsPromise })
   return (
     <div className="min-h-screen bg-[#f5f6f7] text-[#2c2f30]">
       <main className="mx-auto w-full max-w-screen-2xl px-6 py-8 md:px-12">
-        <section className="group relative mb-12 h-[400px] w-full overflow-hidden rounded-xl shadow-[0_32px_64px_-12px_rgba(0,105,65,0.08)]">
+        <section className="group relative mb-12 h-[450px] md:h-[500px] w-full overflow-hidden rounded-xl shadow-[0_32px_64px_-12px_rgba(0,105,65,0.08)]">
           <Image
-            src="https://lh3.googleusercontent.com/aida-public/AB6AXuBTW3Cl9bj3m4KQymVuSqGCTkb_DiqKPFjNvng-3EOw10Ry8VXeNfQAC256wM3To0X6I9RqMZYUpVsp60bjXVlQlGcZCvGoDaJe0UKixOotAoazzHY4m6xXIdfjRI5agMytUlSCyetnVc1CxEw3-ql2pv3ZUM0rWEF2UE3gseIdsRdnpPN79o89TuOZl0GnwiCnoa2n8MSvuoMvoCuqRyExSjJySVR5QHDDUmvuqgHub2oJqxzSO1Xdl74HxWblhELbhINlMOu8h4uX"
-            alt="Seasonal Harvest Buddha Bowl"
+            src={specialRecipeData.image}
+            alt={specialRecipeData.title}
             fill
             className="object-cover transition-transform duration-700 group-hover:scale-105"
             priority
             sizes="100vw"
           />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
 
-          <div className="absolute bottom-0 left-0 max-w-2xl p-10 text-white">
-            <span className="mb-4 inline-block rounded-full bg-[#006941] px-4 py-1 text-xs font-bold uppercase tracking-widest">
-              Today&apos;s Special
-            </span>
-            <h1 className="mb-4 text-4xl font-extrabold leading-tight md:text-5xl">
-              Seasonal Harvest Buddha Bowl with Miso Dressing
+          <div className="absolute bottom-0 left-0 max-w-2xl p-8 md:p-10 text-white">
+            <h1 className="mb-4 text-3xl md:text-4xl lg:text-5xl font-extrabold leading-tight line-clamp-2">
+              {specialRecipeData.title}
             </h1>
-            <p className="mb-6 text-lg text-stone-200">
-              Experience a symphony of textures and earthy flavors curated by Chef Julian. Freshly picked
-              root vegetables meets silky fermented dressing.
+            <p className="mb-6 text-base md:text-lg text-stone-200 line-clamp-2 md:line-clamp-3">
+              {specialRecipeData.description}
             </p>
             <div className="flex flex-wrap items-center gap-6">
-              <button
-                type="button"
-                className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-[#006941] to-[#005c38] px-8 py-3 font-bold text-[#caffdc] transition-all hover:opacity-90"
-              >
-                View Recipe
-                <ArrowRight className="h-4 w-4" />
-              </button>
+              {specialRecipeData.id ? (
+                <Link
+                  href={`/recipes/${specialRecipeData.id}`}
+                  className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-[#006941] to-[#005c38] px-6 py-3 md:px-8 font-bold text-[#caffdc] transition-all hover:opacity-90"
+                >
+                  View Recipe
+                  <ArrowRight className="h-4 w-4" />
+                </Link>
+              ) : (
+                <button
+                  type="button"
+                  className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-[#006941] to-[#005c38] px-6 py-3 md:px-8 font-bold text-[#caffdc] transition-all hover:opacity-90"
+                >
+                  View Recipe
+                  <ArrowRight className="h-4 w-4" />
+                </button>
+              )}
 
               <div className="flex items-center gap-4 text-sm font-medium">
                 <span className="inline-flex items-center gap-1">
                   <Clock3 className="h-4 w-4" />
-                  25 mins
+                  {specialRecipeData.time}
                 </span>
                 <span className="inline-flex items-center gap-1">
-                  <Flame className="h-4 w-4" />
-                  420 kcal
+                  <Star className="h-4 w-4 fill-[#ffb800] text-[#ffb800]" />
+                  {specialRecipeData.rating}
                 </span>
               </div>
             </div>

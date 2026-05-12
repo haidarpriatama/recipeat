@@ -1,14 +1,12 @@
 export const dynamic = "force-dynamic";
 
 import {
-  ctaContent,
   featuresContent,
   footerContent,
   heroContent,
   recipesContent,
 } from "@/components/content/landingContent";
 import SiteFooter from "@/components/layout/SiteFooter";
-import CtaSection from "@/components/sections/CtaSection";
 import FeaturesSection from "@/components/sections/FeaturesSection";
 import HeroSection from "@/components/sections/HeroSection";
 import RecipesSection from "@/components/sections/RecipesSection";
@@ -45,13 +43,11 @@ export default async function HomePage() {
     <>
       <main className="bg-[#f5f6f7] text-[#2c2f30]">
         <HeroSection
-          badge={heroContent.badge}
           title={heroContent.title}
           description={heroContent.description}
           primaryAction={isLoggedIn ? { label: "Explore Now", href: "/explore" } : heroContent.primaryAction}
           secondaryAction={heroContent.secondaryAction}
           heroImage={heroContent.heroImage}
-          tracker={heroContent.tracker}
         />
 
         <FeaturesSection
@@ -65,13 +61,6 @@ export default async function HomePage() {
           description={recipesContent.description}
           browseAction={recipesContent.browseAction}
           cards={dynamicRecipeCards}
-        />
-
-        <CtaSection
-          title={ctaContent.title}
-          description={ctaContent.description}
-          action={ctaContent.action}
-          note={ctaContent.note}
         />
       </main>
 

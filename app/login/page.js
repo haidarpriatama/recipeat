@@ -59,7 +59,7 @@ function LoginForm() {
     }
   };
   return (
-    <div className="-mt-20 bg-[#f5f6f7] font-body text-on-surface antialiased overflow-x-hidden min-h-screen flex flex-col relative">
+    <div className="bg-[#f5f6f7] font-body text-on-surface antialiased overflow-x-hidden min-h-screen flex flex-col relative">
   
       <header className="absolute top-0 left-0 w-full z-50 flex justify-between items-center px-8 md:px-12 py-8 pointer-events-none">
         {/* Logo Kiri - Berwarna Hijau #006941 */}

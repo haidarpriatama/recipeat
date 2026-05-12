@@ -69,7 +69,7 @@ export default async function MealPlansPage({ searchParams }) {
         where: { userId: dbUser.id, weekStart },
       include: {
         recipes: {
-          include: { recipe: { include: { category: true } } }
+          include: { recipe: { include: { category: true, ratings: true } } }
         }
       }
     });
@@ -95,8 +95,9 @@ export default async function MealPlansPage({ searchParams }) {
       image: mealRecord.recipe.imageUrl || "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=800&q=80",
       imageAlt: mealRecord.recipe.title,
       prepTime: `${mealRecord.recipe.cookTime} min`,
-      difficulty: "Medium",
-      calories: "N/A",
+      rating: mealRecord.recipe.ratings && mealRecord.recipe.ratings.length > 0 
+        ? (mealRecord.recipe.ratings.reduce((acc, curr) => acc + curr.score, 0) / mealRecord.recipe.ratings.length).toFixed(1)
+        : "0.0",
       id: mealRecord.recipe.id,
       mealPlanId: mealPlan.id,
       dayOfWeek: mealRecord.dayOfWeek
@@ -125,7 +126,7 @@ export default async function MealPlansPage({ searchParams }) {
   return (
     <AuthGuard>
     <>
-      <div className="bg-[#f5f6f7] text-[#2c2f30] pt-20">
+      <div className="min-h-screen bg-[#f5f6f7] text-[#2c2f30]">
         <div className="mx-auto grid max-w-screen-2xl grid-cols-1 gap-8 px-6 py-8 lg:grid-cols-12 lg:px-10">
           <aside className="space-y-6 lg:col-span-3">
             <Suspense fallback={<div className="h-[300px] rounded-2xl bg-white p-6 shadow-sm">Loading calendar...</div>}>
@@ -145,35 +146,10 @@ export default async function MealPlansPage({ searchParams }) {
               </div>
 
               <div className="flex flex-wrap items-center gap-2">
-                <button
-                  type="button"
-                  aria-label="Notifications"
-                  className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-[#abadae]/25 bg-white text-[#595c5d] transition-colors hover:text-[#006941]"
-                >
-                  <Bell className="h-5 w-5" />
-                </button>
-
                 <ActionLink href={`/explore?date=${dateParam || formattedToday}`} size="sm" className="rounded-xl !text-white hover:!text-white">
                   Add Recipes
                 </ActionLink>
               </div>
-            </div>
-
-            <div className="inline-flex items-center gap-2 rounded-full bg-white p-2 shadow-sm shadow-[#2c2f30]/10">
-              <button
-                type="button"
-                className="rounded-full bg-[#006941] px-4 py-1.5 text-xs font-bold text-white"
-                aria-pressed="true"
-              >
-                Daily View
-              </button>
-              <button
-                type="button"
-                className="rounded-full px-4 py-1.5 text-xs font-bold text-[#595c5d] transition-colors hover:bg-[#eff1f2]"
-                aria-pressed="false"
-              >
-                Weekly View
-              </button>
             </div>
 
             <div className="relative space-y-12 before:absolute before:bottom-4 before:left-6 before:top-4 before:w-0.5 before:bg-[#7bfeb8]">

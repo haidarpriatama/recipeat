@@ -46,34 +46,34 @@ export const heroContent = {
 };
 
 export const featuresContent = {
-  title: "The Modern Chef's Toolset",
+  title: "Recipeat Features",
   description: "Everything you need to transform your relationship with food.",
   cards: [
     {
-      variant: "time",
-      icon: "clock3",
-      title: "Save Time",
-      description:
-        "Automated grocery lists and 15-minute meal plans designed for busy lives. Stop scrolling, start eating.",
-    },
-    {
       variant: "waste",
       icon: "package",
-      title: "Reduce Waste",
+      title: "Smart Ingredient Search",
       description:
-        "Our smart pantry tracker remembers what you have so nothing ends up in the bin. Save up to $1,500/year on groceries.",
+        "Search recipes based on ingredients you have, reducing food waste and making the most of your pantry.",
+    },
+    {
+      variant: "time",
+      icon: "clock3",
+      title: "Flexible Meal Planning",
+      description:
+        "Choose specific days and dates to easily organize your meals ahead of time for a stress-free week.",
     },
     {
       variant: "health",
       icon: "heart",
-      title: "Eat Healthier",
+      title: "Save Favorite Recipes",
       description:
-        "Nutritionist-approved recipes tailored to your goals. Real food, real results, no restrictive diets.",
+        "Keep all your favorite recipes securely stored for quick and easy access whenever you need them.",
     },
     {
       variant: "community",
-      value: "50k+",
-      label: "Home Chefs",
+      value: "50+",
+      label: "Recipes",
     },
   ],
 };

@@ -48,7 +48,7 @@ export default async function FavoritesPage({ searchParams: searchParamsPromise 
   return (
     <AuthGuard>
     <>
-      <div className="min-h-screen bg-[#f5f6f7] pt-24 pb-12 font-body">
+      <div className="min-h-screen bg-[#f5f6f7] pt-8 pb-12 font-body">
         <main className="max-w-7xl mx-auto px-6 md:px-12 space-y-10">
         
         {/* --- SECTION 1: HEADER BANNER & SEARCH --- */}
