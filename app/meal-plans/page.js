@@ -20,6 +20,8 @@ import prisma from "@/lib/prisma";
 import { auth } from "@/lib/auth";
 import Link from "next/link";
 import MealCard from "@/components/MealPlan/MealCard";
+import CalendarCardClient from "@/components/MealPlan/CalendarCardClient";
+import { Suspense } from "react";
 
 export const metadata = {
   title: "Meal Plans – Recipeat",
@@ -29,10 +31,25 @@ export const metadata = {
 // Helper to get day name
 const DAYS = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 
-export default async function MealPlansPage() {
+export default async function MealPlansPage({ searchParams }) {
+  const resolvedSearchParams = await searchParams;
+  const dateParam = resolvedSearchParams?.date;
+
   const session = await auth();
   const userId = session?.user?.id;
-  const today = new Date();
+  
+  let today = new Date();
+  if (dateParam) {
+    const parsed = new Date(dateParam);
+    if (!isNaN(parsed)) {
+      const [y, m, d] = dateParam.split('-');
+      if (y && m && d) {
+        today = new Date(parseInt(y), parseInt(m) - 1, parseInt(d));
+      }
+    }
+  }
+  
+  const formattedToday = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
   const dayName = DAYS[today.getDay()];
 
   let mealPlan = null;
@@ -42,15 +59,19 @@ export default async function MealPlansPage() {
   if (userId) {
     const dbUser = await prisma.user.findUnique({ where: { email: session.user.email } });
     if (dbUser) {
-      // Find the latest meal plan for this user
+      // Normalize to Monday 00:00:00 for the week start
+      const weekStart = new Date(today);
+      weekStart.setDate(today.getDate() - (today.getDay() === 0 ? 6 : today.getDay() - 1));
+      weekStart.setHours(0, 0, 0, 0);
+
+      // Find the meal plan for this user for the specific week
       mealPlan = await prisma.mealPlan.findFirst({
-        where: { userId: dbUser.id },
+        where: { userId: dbUser.id, weekStart },
       include: {
         recipes: {
           include: { recipe: { include: { category: true } } }
         }
-      },
-      orderBy: { weekStart: 'desc' }
+      }
     });
 
       if (mealPlan) {
@@ -107,7 +128,9 @@ export default async function MealPlansPage() {
       <div className="bg-[#f5f6f7] text-[#2c2f30] pt-20">
         <div className="mx-auto grid max-w-screen-2xl grid-cols-1 gap-8 px-6 py-8 lg:grid-cols-12 lg:px-10">
           <aside className="space-y-6 lg:col-span-3">
-            <CalendarCard />
+            <Suspense fallback={<div className="h-[300px] rounded-2xl bg-white p-6 shadow-sm">Loading calendar...</div>}>
+              <CalendarCardClient />
+            </Suspense>
           </aside>
 
           <section className="space-y-8 lg:col-span-6">
@@ -130,7 +153,7 @@ export default async function MealPlansPage() {
                   <Bell className="h-5 w-5" />
                 </button>
 
-                <ActionLink href="/explore" size="sm" className="rounded-xl !text-white hover:!text-white">
+                <ActionLink href={`/explore?date=${dateParam || formattedToday}`} size="sm" className="rounded-xl !text-white hover:!text-white">
                   Add Recipes
                 </ActionLink>
               </div>
@@ -155,7 +178,7 @@ export default async function MealPlansPage() {
 
             <div className="relative space-y-12 before:absolute before:bottom-4 before:left-6 before:top-4 before:w-0.5 before:bg-[#7bfeb8]">
               {timelineMeals.map((group) => (
-                <TimelineItem key={group.slot} group={group} />
+                <TimelineItem key={group.slot} group={group} dateStr={dateParam || formattedToday} />
               ))}
             </div>
           </section>
@@ -173,53 +196,9 @@ export default async function MealPlansPage() {
   );
 }
 
-const CALENDAR_DAYS = [
-  { label: 28, muted: true },
-  { label: 29, muted: true },
-  { label: 30, muted: true },
-  { label: 1 },
-  { label: 2 },
-  { label: 3 },
-  { label: 4 },
-  { label: 5 },
-  { label: 6, active: true },
-  { label: 7 },
-  { label: 8 },
-  { label: 9 },
-  { label: 10 },
-  { label: 11 },
-  { label: 12 },
-];
 
-const DAILY_NUTRITION = [
-  { label: "Protein", current: 85, target: 120, unit: "g", track: "bg-[#dadddf]", fill: "bg-[#006941]" },
-  { label: "Carbs", current: 180, target: 250, unit: "g", track: "bg-[#dadddf]", fill: "bg-[#8c4a00]" },
-  { label: "Fats", current: 45, target: 65, unit: "g", track: "bg-[#dadddf]", fill: "bg-[#555e57]" },
-];
 
-function CalendarCard() {
-  return (
-    <section className="rounded-2xl bg-white p-6 shadow-[0_24px_48px_-12px_rgba(0,105,65,0.08)]">
-      <div className="mb-6 flex items-center justify-between">
-        <h3 className="text-lg font-bold">May 2026</h3>
-        <div className="flex items-center gap-1 text-[#595c5d]">
-          <button type="button" className="rounded-full p-1 transition-colors hover:bg-[#eff1f2] hover:text-[#006941]"><ChevronLeft className="h-5 w-5" /></button>
-          <button type="button" className="rounded-full p-1 transition-colors hover:bg-[#eff1f2] hover:text-[#006941]"><ChevronRight className="h-5 w-5" /></button>
-        </div>
-      </div>
-      <div className="grid grid-cols-7 gap-y-4 text-center text-xs font-semibold text-[#595c5d]">
-        {"MTWTFSS".split("").map((day, index) => (<span key={`${day}-${index}`} className="uppercase">{day}</span>))}
-        {CALENDAR_DAYS.map((day) => (
-          <button key={day.label} className={`mx-auto flex h-8 w-8 items-center justify-center rounded-lg transition-colors ${day.active ? "bg-[#006941] font-bold text-white shadow-lg shadow-[#006941]/20" : day.muted ? "text-[#abadae]" : "hover:bg-[#eff1f2]"}`}>
-            {day.label}
-          </button>
-        ))}
-      </div>
-    </section>
-  );
-}
-
-function TimelineItem({ group }) {
+function TimelineItem({ group, dateStr }) {
   return (
     <article className="group relative pl-16">
       <div className="absolute left-4 top-1 z-10 h-4 w-4 rounded-full bg-[#006941] ring-4 ring-[#caffdc]" />
@@ -234,7 +213,7 @@ function TimelineItem({ group }) {
         ))}
 
         {group.remaining > 0 && (
-          <Link href={`/explore?slot=${group.slot}`} className="flex w-full flex-col items-center justify-center rounded-2xl border-2 border-dashed border-[#abadae] bg-white/60 p-8 text-center transition-all hover:border-[#006941] hover:bg-[#f3fcf3]">
+          <Link href={`/explore?slot=${group.slot}&date=${dateStr}`} className="flex w-full flex-col items-center justify-center rounded-2xl border-2 border-dashed border-[#abadae] bg-white/60 p-8 text-center transition-all hover:border-[#006941] hover:bg-[#f3fcf3]">
             <PlusCircle className="mb-2 h-9 w-9 text-[#757778] transition-colors group-hover:text-[#006941]" />
             <span className="text-sm font-bold text-[#757778] transition-colors group-hover:text-[#006941]">Plan your {group.slot.toLowerCase()}</span>
             <span className="mt-1 text-xs font-medium text-[#959798]">{group.remaining} slot{group.remaining === 1 ? "" : "s"} left</span>

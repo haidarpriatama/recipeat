@@ -18,7 +18,19 @@ export default function AddToMealPlanButton({ recipeId, mealType }) {
       setWarning("");
       const intendedSlot = mealType || searchParams.get('slot') || "Lunch";
 
-      const today = new Date();
+      const dateParam = searchParams.get('date');
+      let today = new Date();
+      
+      if (dateParam) {
+        const parsed = new Date(dateParam);
+        if (!isNaN(parsed)) {
+          const [y, m, d] = dateParam.split('-');
+          if (y && m && d) {
+            today = new Date(parseInt(y), parseInt(m) - 1, parseInt(d));
+          }
+        }
+      }
+
       const DAYS = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
       const currentDay = DAYS[today.getDay()];
       
@@ -54,7 +66,11 @@ export default function AddToMealPlanButton({ recipeId, mealType }) {
       if (res.ok) {
         setIsSuccess(true);
         setTimeout(() => setIsSuccess(false), 2000);
-        router.push('/meal-plans');
+        if (dateParam) {
+          router.push(`/meal-plans?date=${dateParam}`);
+        } else {
+          router.push('/meal-plans');
+        }
       }
     } catch (error) {
       console.error('Error adding to meal plan:', error);

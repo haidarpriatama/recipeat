@@ -18,6 +18,7 @@ import {
   Heart,
   PlusCircle,
   Search,
+  Star,
 } from "lucide-react";
 
 export const metadata = {
@@ -41,7 +42,7 @@ const RECIPES = [
       "https://lh3.googleusercontent.com/aida-public/AB6AXuBaqVMxGkC0J2mMGTLfPuHneMbwXl55gvYVI9y7VFC9mLP7bH38-Wh37yzYSmGVfFlZJiye9_XeDVZr1sB2MNnmDX8z2z2b_yAiLgKfx-Bc6Omrd5bwDFgaz07F7Vi22mFTW9RDS1bVFmMggx2B3rqqiSoHTcT8ZrOOTr1rAKql1IfAPTVgBsN6FzA2h8KlS65S0zQqPhP-nX7kYL4TXPjLTacWEdXFca8bCd6FCwxxDNb4zln8tGJbBMIuVfmP7EXBT0mMIiQEdNHb",
     alt: "Pan-seared salmon with asparagus",
     time: "20m",
-    calories: "340 kcal",
+    rating: 5,
     label: "Dinner",
     favorite: true,
   },
@@ -51,7 +52,7 @@ const RECIPES = [
       "https://lh3.googleusercontent.com/aida-public/AB6AXuDBkBXJj6V96CEHMlp-1HUE2bxX0skyARsVwVphmo2K8ISdGnQjrQ7weSbo6x4193qtGX_JpOcbpH9XBirr6ewndl_StgWH9QljvLhcLbgTeORdSUV6oQhwFFFOvD2wZAeP6YsndOwQcqYK95cG53gVCqAv6u1Vw7k45Rg36lxTytzPnF3nwfkgGbCYHB9HzFdgc686tffbqrINN2SnUkiTTcV5KPRBJ-aXJGBKjyWu6WEGw_HBHLGE74n34huLrKzf6OAAYM8bUW3G",
     alt: "Kale and chickpea salad bowl",
     time: "15m",
-    calories: "280 kcal",
+    rating: 4,
     label: "Vegan",
   },
   {
@@ -60,7 +61,7 @@ const RECIPES = [
       "https://lh3.googleusercontent.com/aida-public/AB6AXuANYdMcxH-k1Q9iqnxguwllBhZ__yqv7d8xOzulcXOx5Hn-Z2VUXQDLKdgvxVeW71UazftYmiK7M54HOgZSVAj7ExUA_53ZYAUJpL6_nbJPlANsvq4Ph8U803QLC4TM75H3tHa8BO3U0Qi6Y5sS4rbDUSFuKZiJ7RaWTJwRDSvAgmhVgUv-yq3ZI_Wiro6meyQ-Son_sFkXll9XQ8Fb0PSrkmZjdk5WsWj7f1vVoM4WVPxL9clV-v62cEFeAZSho_QBjhBMZ7A-bHhv",
     alt: "Margherita pizza with basil",
     time: "45m",
-    calories: "520 kcal",
+    rating: 5,
     label: "Italian",
   },
   {
@@ -69,7 +70,7 @@ const RECIPES = [
       "https://lh3.googleusercontent.com/aida-public/AB6AXuBfj2KjEGeI4Wi4nSWKkKKc78boclluhCKxNsXguJDHuizDAeN0xK0TIj5ehYcRgx0RYRgCeiDGMXi_1lFDju3u36xzwekfqHOM5AKJuVkmmzRMjDteZwbSxon2d1-Ye1DL-Jmm06UocYWvw32OWFGbuqxdMiBvLMLZUue4D_MAYZiPR3Y_LFPjYhA6Q67xHcpyiMN5C203c65enGmIsubEqpKHQCQDGAnVa8YDS9muxBKiYPeV0m10Ys26OIBW5bXnCsBi8IHXMhyj",
     alt: "Colorful tofu and vegetable fusion bowl",
     time: "10m",
-    calories: "310 kcal",
+    rating: 0,
     label: "Lunch",
   },
   {
@@ -78,7 +79,7 @@ const RECIPES = [
       "https://lh3.googleusercontent.com/aida-public/AB6AXuB9OB9DnbxggOSs4TxSOV_-SKhrVNKA-KRrYxLTs8t0aH7bvB6bR2vtAUANnOKO4rQtiItfLpJ7nWhqQoU9IxdY4-0B2tBqqWAmKBMQ-fAa36YkDg3A72DcN9E3O7EwK2HCiF_mgJo4aZslMgOy5dyHnVboWLdyoOILtmuMe5AFkUe5RK4CvzIbEp5fJVdBIafGoCMYEv9DkF5VqWpjgDBAtZvDZ9YL6xikEB3GFRqVEAf4WSTo9U8ksmnKz5uviIUfGdQxKlepUYvp",
     alt: "Roasted chicken with vegetables",
     time: "50m",
-    calories: "480 kcal",
+    rating: 5,
     label: "Dinner",
     favorite: true,
   },
@@ -88,7 +89,7 @@ const RECIPES = [
       "https://lh3.googleusercontent.com/aida-public/AB6AXuBzQndvPz-Q0UhK6-mEb7xKuz3XmROc6OK_W6PM9J010EbtOGI28cU20QwPG5mpwh2yGWwIq5PAR5Nbe5mWn9VfqWpQGBKmXq2bQMrW9paTKXKmDhMJhEjgKA-f_I49953dbNsAcP2TmXMSeLxjEr4ALzAWmaJXM7I6ifLHfm9uznwbsAfPQ3CQArzazEmIZzQob29aUtly4MaeDdMZOLKMZq0jks171DkkgGh1XVthsuKyO5FggHdUfNxgA8OFw_tzyANdFDrGgpeK",
     alt: "Vegetable appetizers assortment",
     time: "35m",
-    calories: "190 kcal",
+    rating: 0,
     label: "Snack",
   },
 ];
@@ -174,8 +175,12 @@ function FilterSidebar({ selectedMealTypes = [], selectedServingTimes = [], sear
   );
 }
 
-function RecipeCard({ recipe, slot }) {
-  const destination = slot ? `/recipes/${recipe.id}?slot=${encodeURIComponent(slot)}` : `/recipes/${recipe.id}`;
+function RecipeCard({ recipe, slot, dateStr }) {
+  const params = new URLSearchParams();
+  if (slot) params.set('slot', slot);
+  if (dateStr) params.set('date', dateStr);
+  const qs = params.toString();
+  const destination = qs ? `/recipes/${recipe.id}?${qs}` : `/recipes/${recipe.id}`;
   const cardContent = (
     <article className="h-full group flex cursor-pointer flex-col overflow-hidden rounded-xl border border-transparent bg-white shadow-[0_32px_64px_-12px_rgba(0,105,65,0.08)] transition-all hover:border-[#006941]/10">
       <div className="relative h-56">
@@ -211,9 +216,13 @@ function RecipeCard({ recipe, slot }) {
               <Clock3 className="h-3.5 w-3.5" />
               {recipe.time}
             </span>
-            <span className="inline-flex items-center gap-1">
-              <Flame className="h-3.5 w-3.5" />
-              {recipe.calories}
+            <span className="inline-flex items-center gap-0.5">
+              {Array.from({ length: 5 }).map((_, i) => (
+                <Star
+                  key={i}
+                  className={`h-3.5 w-3.5 ${i < (recipe.rating || 0) ? "fill-[#ffb800] text-[#ffb800]" : "text-[#abadae]"}`}
+                />
+              ))}
             </span>
           </div>
 
@@ -237,6 +246,7 @@ export default async function ExplorePage({ searchParams: searchParamsPromise })
   const query = searchParams?.q || "";
   const categoryFilter = searchParams?.category || "";
   const slotFilter = searchParams?.slot || "";
+  const dateFilter = searchParams?.date || "";
   const selectedMealTypes = searchParams?.mealTypes ? searchParams.mealTypes.split(",").filter(Boolean) : [];
   const selectedServingTimes = searchParams?.servingTimes ? searchParams.servingTimes.split(",").filter(Boolean) : [];
   const ingredientsFilter = searchParams?.ingredients ? searchParams.ingredients.split(",") : [];
@@ -296,7 +306,8 @@ export default async function ExplorePage({ searchParams: searchParamsPromise })
         take: pageSize,
         include: { 
           category: true,
-          favorites: userId ? { where: { userId } } : false
+          favorites: userId ? { where: { userId } } : false,
+          ratings: userId ? { where: { userId } } : false
         },
         orderBy: { createdAt: 'desc' }
       }),
@@ -310,16 +321,22 @@ export default async function ExplorePage({ searchParams: searchParamsPromise })
     availableIngredients = dbIngredients.map((ingredient) => ingredient.name);
 
     if (dbRecipes.length > 0) {
-      displayRecipes = dbRecipes.map((recipe) => ({
-        id: recipe.id,
-        title: recipe.title,
-        image: recipe.imageUrl || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=800&q=80',
-        alt: recipe.title,
-        time: `${recipe.cookTime}m`,
-        calories: "350 kcal",
-        label: recipe.category?.name || "Recipe",
-        favorite: recipe.favorites?.length > 0,
-      }));
+      displayRecipes = dbRecipes.map((recipe) => {
+        const userRating = recipe.ratings && recipe.ratings.length > 0
+          ? recipe.ratings[0].score
+          : 0;
+          
+        return {
+          id: recipe.id,
+          title: recipe.title,
+          image: recipe.imageUrl || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=800&q=80',
+          alt: recipe.title,
+          time: `${recipe.cookTime}m`,
+          rating: userRating,
+          label: recipe.category?.name || "Recipe",
+          favorite: recipe.favorites?.length > 0,
+        };
+      });
     } else if (!query && !categoryFilter && selectedMealTypes.length === 0 && ingredientsFilter.length === 0) {
       // Fallback to static data only if no search/filter is applied and DB is empty
       displayRecipes = RECIPES;
@@ -401,7 +418,7 @@ export default async function ExplorePage({ searchParams: searchParamsPromise })
 
             <div className="grid grid-cols-1 gap-8 md:grid-cols-2 xl:grid-cols-3">
               {displayRecipes.map((recipe) => (
-                <RecipeCard key={recipe.title} recipe={recipe} slot={slotFilter} />
+                <RecipeCard key={recipe.title} recipe={recipe} slot={slotFilter} dateStr={dateFilter} />
               ))}
             </div>
 
