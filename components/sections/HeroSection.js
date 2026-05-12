@@ -13,7 +13,7 @@ export default function HeroSection({
   return (
     <section className="relative flex min-h-[870px] items-center overflow-hidden bg-[#f5f6f7]">
       <div className="relative z-10 mx-auto grid w-full max-w-7xl grid-cols-1 items-center gap-12 px-8 lg:grid-cols-2">
-        <div className="space-y-8">
+        <div className="space-y-8 -mt-12 lg:-mt-24">
           <h1 className="text-6xl font-extrabold leading-[1.1] tracking-tighter md:text-7xl">
             {title.lead} <span className="text-[#006941]">{title.highlight}</span>
           </h1>
