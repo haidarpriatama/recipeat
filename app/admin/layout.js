@@ -1,7 +1,7 @@
 import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import Link from "next/link";
-import { Home, Bell, CircleUserRound } from "lucide-react";
+import { Home, CircleUserRound } from "lucide-react";
 import AdminSearchBar from "@/components/admin/AdminSearchBar";
 import AdminSidebarNav from "@/components/admin/AdminSidebarNav";
 
@@ -34,12 +34,12 @@ export default async function AdminLayout({ children }) {
             className="flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-semibold text-[#595c5d] transition-colors hover:bg-[#e0e3e4] hover:text-[#2c2f30]"
           >
             <Home size={18} />
-            Back to App
+            Back to Home
           </Link>
         </div>
       </aside>
 
-      <main className="ml-72 min-h-screen">
+      <main className="ml-72 min-h-screen relative">
         <header className="sticky top-0 z-30 flex items-center justify-between bg-[#f5f6f7]/85 px-8 py-4 backdrop-blur-xl shadow-[0_20px_40px_-24px_rgba(44,47,48,0.25)]">
           <AdminSearchBar />
 
@@ -52,9 +52,8 @@ export default async function AdminLayout({ children }) {
         </header>
 
         <div className="px-8 pb-10 pt-8">{children}</div>
+
       </main>
     </div>
   );
 }
-
-

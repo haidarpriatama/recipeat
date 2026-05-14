@@ -42,6 +42,7 @@ Command tersebut akan:
 - Generate Prisma client ke folder `generated/prisma`.
 - Sinkronkan schema Prisma ke database.
 - Isi data awal resep dan ingredient secara aman/idempotent.
+- Reset sequence autoincrement agar insert baru tidak bentrok dengan data lama yang pernah diimport.
 
 Jika hanya butuh menjalankan sebagian proses:
 ```bash
