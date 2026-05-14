@@ -1,4 +1,4 @@
-export const dynamic = "force-dynamic";
+// dynamic is automatically set by Next.js because this page uses searchParams
 
 import Image from "next/image";
 import SafeImage from "@/components/ui/SafeImage";
@@ -327,6 +327,8 @@ export default async function ExplorePage({ searchParams: searchParamsPromise })
       }),
       prisma.ingredient.findMany({
         select: { name: true },
+        take: 200,
+        orderBy: { name: 'asc' },
       }),
       prisma.recipe.count({ where }),
       totalAllRecipesCount > 0 ? prisma.recipe.findFirst({
