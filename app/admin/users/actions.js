@@ -2,18 +2,15 @@
 import { auth } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
-import { createClient } from "@supabase/supabase-js";
-
-const supabaseAdmin = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL,
-  process.env.SUPABASE_SERVICE_ROLE_KEY,
-  { auth: { autoRefreshToken: false, persistSession: false } }
-);
+import { supabaseAdmin } from "@/lib/supabaseAdmin";
 
 export async function deleteUserAction(id) {
   const currentSession = await auth();
   if (!currentSession || currentSession.user.role !== "ADMIN") throw new Error("Unauthorized");
   if (!id) throw new Error("ID required");
+
+  const { error: authDeleteError } = await supabaseAdmin.auth.admin.deleteUser(id);
+  if (authDeleteError) throw new Error(authDeleteError.message);
 
   // Must delete related records before deleting user
   await prisma.$transaction([

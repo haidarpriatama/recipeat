@@ -2,42 +2,61 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
-import {
-  ArrowRight,
-  Clock,
-  Mail,
-  Save,
-  User,
-} from "lucide-react";
+import { ArrowRight, Clock, Mail, Save, User } from "lucide-react";
 import FavoriteButton from "@/components/RecipeCard/FavoriteButton";
 import SiteFooter from "@/components/layout/SiteFooter";
 import { footerContent } from "@/components/content/landingContent";
-import { supabase } from "@/lib/supabaseClient";
+import { updateProfileAction } from "./actions";
 
-const AVATAR_URL =
-  "https://lh3.googleusercontent.com/aida-public/AB6AXuBBgil31kVK_AuFTC6fWU7FOCH9iz0_hqgfgxzAhxE3o5I0k0JqTIqHmew7S3xoYB7v9wibwNlmoJYF5guu-vFSGLCTed_U1D3PHURjtR5BGHtWXEOG2Yfx7G64dvQfHEdEL51afvX5Ikbq2FnLN_DcEa9OklYAo5ELC35jEDdWA_unZywmpNKxS6TT_QcLSSikv77IZQwyLLEvYfNAV6l1UP5NtN_xt9Uud_0PbVOn01WSCuf4yrYkuR_1RQwsB1acoCOybIYQviQI";
+export default function ProfileContent({ favorites = [], favoriteCount = 0, ratingCount = 0, user }) {
+  const router = useRouter();
+  const displayName = user?.name || user?.email || "Guest";
+  const username = user?.username || displayName.split(" ")[0]?.toLowerCase() || "guest";
+  const avatarUrl = user?.image || null;
+  const initials = displayName
+    .split(" ")
+    .map((part) => part[0])
+    .filter(Boolean)
+    .join("")
+    .slice(0, 2)
+    .toUpperCase();
 
-export default function ProfileContent({ favorites = [], favoriteCount = 0, user }) {
-  // Form state
   const [formData, setFormData] = useState({
-    username: user?.name?.split(" ")[0]?.toLowerCase() || "chef",
-    fullName: user?.name || "Guest",
+    username,
+    fullName: displayName,
     email: user?.email || "",
   });
   const [saved, setSaved] = useState(false);
+  const [saveError, setSaveError] = useState("");
+  const [isSaving, setIsSaving] = useState(false);
 
   const handleChange = (e) => {
     setFormData((prev) => ({ ...prev, [e.target.id]: e.target.value }));
   };
 
-  const handleSave = () => {
-    setSaved(true);
-    setTimeout(() => setSaved(false), 2000);
-  };
+  const handleSave = async (e) => {
+    e.preventDefault();
+    if (isSaving) return;
 
-  const avatarUrl = user?.image || AVATAR_URL;
+    setIsSaving(true);
+    setSaveError("");
+
+    try {
+      await updateProfileAction({
+        username: formData.username,
+        fullName: formData.fullName,
+      });
+      setSaved(true);
+      router.refresh();
+      setTimeout(() => setSaved(false), 2000);
+    } catch (error) {
+      setSaveError(error?.message || "Failed to save profile");
+    } finally {
+      setIsSaving(false);
+    }
+  };
 
   return (
     <>
@@ -52,14 +71,18 @@ export default function ProfileContent({ favorites = [], favoriteCount = 0, user
               <div className="absolute inset-0 bg-gradient-to-br from-[#006941]/5 to-transparent pointer-events-none rounded-[2rem]" />
 
               {/* Avatar */}
-              <div className="relative w-32 h-32 rounded-full overflow-hidden mb-6 border-4 border-white shadow-lg z-10">
-                <Image
-                  src={avatarUrl}
-                  alt="Profile avatar"
-                  fill
-                  sizes="128px"
-                  className="object-cover"
-                />
+              <div className="relative mb-6 flex h-32 w-32 items-center justify-center overflow-hidden rounded-full border-4 border-white bg-[#006941] text-white shadow-lg z-10">
+                {avatarUrl ? (
+                  <Image
+                    src={avatarUrl}
+                    alt="Profile avatar"
+                    fill
+                    sizes="128px"
+                    className="object-cover"
+                  />
+                ) : (
+                  <span className="text-3xl font-bold">{initials}</span>
+                )}
               </div>
 
               <h1 className="font-headline text-2xl font-bold text-[#2c2f30] mb-1 z-10">
@@ -72,9 +95,9 @@ export default function ProfileContent({ favorites = [], favoriteCount = 0, user
               {/* Stats */}
               <div className="flex gap-4 w-full z-10 mt-auto">
                 <div className="flex-1 bg-[#eff1f2] rounded-xl p-3">
-                  <p className="font-headline font-bold text-[#006941] text-xl">42</p>
+                  <p className="font-headline font-bold text-[#006941] text-xl">{ratingCount}</p>
                   <p className="text-xs text-slate-500 uppercase tracking-wider font-semibold mt-0.5">
-                    Recipes
+                    Ratings
                   </p>
                 </div>
                 <div className="flex-1 bg-[#eff1f2] rounded-xl p-3">
@@ -94,10 +117,7 @@ export default function ProfileContent({ favorites = [], favoriteCount = 0, user
 
               <form
                 className="space-y-6 flex flex-col flex-1"
-                onSubmit={(e) => {
-                  e.preventDefault();
-                  handleSave();
-                }}
+                onSubmit={handleSave}
               >
                 {/* Username + Full Name row */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -142,7 +162,7 @@ export default function ProfileContent({ favorites = [], favoriteCount = 0, user
                       id="email"
                       type="email"
                       value={formData.email}
-                      onChange={handleChange}
+                      readOnly
                       className="w-full bg-white rounded-xl border-none py-3 pl-11 pr-4 text-[#2c2f30] shadow-[inset_0_2px_4px_rgba(0,0,0,0.02)] focus:ring-2 focus:ring-[#7bfeb8] outline-none font-body text-sm transition-all"
                     />
                   </div>
@@ -152,12 +172,14 @@ export default function ProfileContent({ favorites = [], favoriteCount = 0, user
                 <div className="mt-auto pt-6 flex justify-end">
                   <button
                     type="submit"
+                    disabled={isSaving}
                     className="flex items-center gap-2 bg-[#006941] text-white font-headline font-bold py-3.5 px-8 rounded-xl shadow-lg hover:bg-[#005c38] hover:shadow-xl transition-all duration-300 active:scale-95"
                   >
                     <Save size={16} />
-                    {saved ? "Saved!" : "Save Changes"}
+                    {isSaving ? "Saving..." : saved ? "Saved!" : "Save Changes"}
                   </button>
                 </div>
+                {saveError ? <p className="text-sm font-medium text-[#b31b25]">{saveError}</p> : null}
               </form>
             </div>
           </section>

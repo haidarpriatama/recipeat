@@ -15,7 +15,7 @@ export default async function ProfilePage() {
   }
   const userId = session.user.id;
 
-  const [favorites, favoriteCount] = await Promise.all([
+  const [favorites, favoriteCount, ratingCount] = await Promise.all([
     prisma.favorite.findMany({
       where: { userId },
       include: {
@@ -27,6 +27,7 @@ export default async function ProfilePage() {
       take: 3,
     }),
     prisma.favorite.count({ where: { userId } }),
+    prisma.rating.count({ where: { userId } }),
   ]);
   const favoriteRecipes = favorites.map((fav) => ({
     id: fav.recipe.id,
@@ -37,5 +38,12 @@ export default async function ProfilePage() {
     tags: [fav.recipe.category?.name || "Recipe"],
   }));
 
-  return <ProfileContent favorites={favoriteRecipes} favoriteCount={favoriteCount} user={session.user} />;
+  return (
+    <ProfileContent
+      favorites={favoriteRecipes}
+      favoriteCount={favoriteCount}
+      ratingCount={ratingCount}
+      user={session.user}
+    />
+  );
 }

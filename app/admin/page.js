@@ -36,7 +36,7 @@ export default async function AdminDashboardPage({ searchParams }) {
       <div className="space-y-8">
         <div>
           <h1 className="text-4xl font-extrabold tracking-tight text-[#2c2f30]">Search Results</h1>
-          <p className="mt-2 text-[#595c5d]">Showing top matches for <span className="font-bold">"{q}"</span> across the platform.</p>
+          <p className="mt-2 text-[#595c5d]">Showing top matches for <span className="font-bold">&quot;{q}&quot;</span> across the platform.</p>
         </div>
 
         <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">

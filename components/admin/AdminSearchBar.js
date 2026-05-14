@@ -35,11 +35,6 @@ export default function AdminSearchBar() {
     return () => clearTimeout(timer);
   }, [query, pathname, router, searchParams]);
 
-  // Sync state if URL changes externally
-  useEffect(() => {
-    setQuery(searchParams.get("q") || "");
-  }, [searchParams]);
-
   return (
     <div className="relative w-full max-w-xl">
       <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-[#757778]" />

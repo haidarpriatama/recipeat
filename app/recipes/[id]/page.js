@@ -12,11 +12,11 @@ import { auth } from "@/lib/auth";
 
 
 const SERVING_TIPS = {
-  Sarapan:
+  Breakfast:
     "Sajikan dalam mangkuk atau piring cantik sambil masih hangat. Tambahkan potongan buah segar atau yogurt rendah lemak untuk menu sarapan sehat.",
-  "Makan Siang":
+  Lunch:
     "Atur piring dengan makanan utama di tengah, sayuran segar di sisi, dan tambahkan irisan jeruk nipis atau saus rendah kalori untuk presentasi yang rapi.",
-  "Makan Malam":
+  Dinner:
     "Sajikan hangat di atas piring lebar, beri hiasan daun kemangi atau seledri, dan gunakan porsi kecil untuk menjaga menu malam tetap ringan.",
   Snack:
     "Sajikan sebagai camilan sehat di atas piring kecil dengan beberapa potongan sayur atau buah sebagai pelengkap.",
