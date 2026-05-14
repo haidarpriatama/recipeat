@@ -10,7 +10,7 @@ export default async function AdminRecipesPage({ searchParams }) {
   const session = await auth();
   if (!session || session.user.role !== "ADMIN") redirect("/");
 
-  const q = searchParams?.q || "";
+  const { q = "" } = await searchParams;
 
   const recipes = await prisma.recipe.findMany({
     where: q
@@ -99,7 +99,7 @@ export default async function AdminRecipesPage({ searchParams }) {
                     <td className="px-6 py-4">
                       <div className="relative h-12 w-16 overflow-hidden rounded-lg bg-[#eff1f2]">
                         <Image
-                          src={recipe.imageUrl || "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=320&q=80"}
+                          src={recipe.imageUrl || "https://images.unsplash.com/photo-1547592166-23ac45744acd?auto=format&fit=crop&w=800&q=80"}
                           alt={recipe.title}
                           fill
                           className="object-cover"

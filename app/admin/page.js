@@ -8,7 +8,7 @@ export default async function AdminDashboardPage({ searchParams }) {
   const session = await auth();
   if (!session || session.user.role !== "ADMIN") redirect("/");
 
-  const q = searchParams?.q || "";
+  const { q = "" } = await searchParams;
 
   if (q) {
     const [matchedRecipes, matchedUsers, matchedIngredients] = await Promise.all([

@@ -51,6 +51,7 @@ function LoginForm() {
         ? callbackUrl
         : '/explore';
 
+      router.refresh();
       router.push(redirectTo);
     } catch (err) {
       setError('An unexpected error occurred');

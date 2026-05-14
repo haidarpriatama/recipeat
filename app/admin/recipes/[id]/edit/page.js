@@ -50,6 +50,9 @@ export default async function AdminEditRecipePage({ params }) {
     const imageUrl = String(formData.get("imageUrl") || "").trim();
     const cookTime = Number(formData.get("cookTime"));
     const categoryId = Number(formData.get("categoryId"));
+    const protein = Number(formData.get("protein") || 0);
+    const carbs = Number(formData.get("carbs") || 0);
+    const fats = Number(formData.get("fats") || 0);
 
     const ingredientsData = formData.get("ingredientsData");
     let parsedIngredients = [];
@@ -94,6 +97,9 @@ export default async function AdminEditRecipePage({ params }) {
         imageUrl: imageUrl || null,
         cookTime,
         categoryId,
+        protein,
+        carbs,
+        fats,
         ingredients: {
           deleteMany: {},
           create: recipeIngredientsToCreate
@@ -208,6 +214,36 @@ export default async function AdminEditRecipePage({ params }) {
               defaultValue={recipe.imageUrl || ""}
               className="w-full rounded-xl bg-[#eff1f2] px-4 py-3 outline-none ring-[#006941] transition focus:ring-2"
             />
+          </div>
+
+          <div className="grid grid-cols-3 gap-4">
+            <div>
+              <label className="mb-2 block text-xs font-bold text-[#595c5d]">Protein (g)</label>
+              <input
+                name="protein"
+                type="number"
+                defaultValue={recipe.protein || 0}
+                className="w-full rounded-xl bg-[#eff1f2] px-3 py-2 text-sm outline-none ring-[#006941] transition focus:ring-2"
+              />
+            </div>
+            <div>
+              <label className="mb-2 block text-xs font-bold text-[#595c5d]">Carbs (g)</label>
+              <input
+                name="carbs"
+                type="number"
+                defaultValue={recipe.carbs || 0}
+                className="w-full rounded-xl bg-[#eff1f2] px-3 py-2 text-sm outline-none ring-[#006941] transition focus:ring-2"
+              />
+            </div>
+            <div>
+              <label className="mb-2 block text-xs font-bold text-[#595c5d]">Fats (g)</label>
+              <input
+                name="fats"
+                type="number"
+                defaultValue={recipe.fats || 0}
+                className="w-full rounded-xl bg-[#eff1f2] px-3 py-2 text-sm outline-none ring-[#006941] transition focus:ring-2"
+              />
+            </div>
           </div>
 
           <div className="flex flex-col gap-3 pt-2">

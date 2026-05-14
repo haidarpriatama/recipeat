@@ -20,7 +20,7 @@ enum Role {
 
 // Model User untuk menyimpan informasi pengguna
 model User {
-  id            String    @id
+  id            String    @id @default(cuid())
   name          String
   email         String    @unique
   emailVerified DateTime?
@@ -85,6 +85,9 @@ model Recipe {
   imageUrl    String?
   cookTime    Int      // Waktu memasak dalam menit
   categoryId  Int
+  protein     Int      @default(0)
+  carbs       Int      @default(0)
+  fats        Int      @default(0)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 

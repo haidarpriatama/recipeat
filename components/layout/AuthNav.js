@@ -4,15 +4,16 @@ import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { Bell, LogOut, User, LayoutDashboard } from "lucide-react";
-import { signOut } from "next-auth/react";
+import { signOut, useSession } from "next-auth/react";
 
 /**
  * AuthNav — rendered inside SiteHeader.
  * Shows Login + Sign Up when logged out; profile avatar + logout when logged in.
  */
 export default function AuthNav({ initialSession }) {
+  const { data: session } = useSession();
   const [dropdownOpen, setDropdownOpen] = useState(false);
-  const user = initialSession?.user;
+  const user = session?.user || initialSession?.user;
 
   const handleLogout = async () => {
     await signOut({ redirect: false });
@@ -42,14 +43,17 @@ export default function AuthNav({ initialSession }) {
   }
 
   // ── Logged-in state ──
-  const displayName = user.name || user.email;
-  const avatarUrl = user.image;
+  const displayName = user?.name || user?.email || "User";
+  const avatarUrl = user?.image;
   const initials = displayName
-    .split(" ")
-    .map((n) => n[0])
-    .join("")
-    .slice(0, 2)
-    .toUpperCase();
+    ? displayName
+        .split(" ")
+        .filter(Boolean)
+        .map((n) => n[0])
+        .join("")
+        .slice(0, 2)
+        .toUpperCase()
+    : "??";
 
   return (
     <div className="relative flex items-center gap-2">
@@ -86,6 +90,14 @@ export default function AuthNav({ initialSession }) {
 
       {dropdownOpen && (
         <div className="absolute right-0 top-12 z-50 w-48 rounded-2xl border border-slate-100 bg-white py-2 shadow-xl shadow-black/10">
+          <Link
+            href="/profile"
+            onClick={() => setDropdownOpen(false)}
+            className="flex items-center gap-3 px-4 py-2.5 text-sm font-medium text-slate-700 transition-colors hover:bg-[#f3fcf3] hover:text-[#006941]"
+          >
+            <LayoutDashboard size={15} />
+            Dashboard
+          </Link>
           <Link
             href="/profile"
             onClick={() => setDropdownOpen(false)}

@@ -345,7 +345,7 @@ export default async function ExplorePage({ searchParams: searchParamsPromise })
         id: randomRecipe.id,
         title: randomRecipe.title,
         description: randomRecipe.description || "Experience a symphony of textures and earthy flavors.",
-        image: randomRecipe.imageUrl || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=800&q=80',
+        image: randomRecipe.imageUrl || 'https://images.unsplash.com/photo-1547592166-23ac45744acd?auto=format&fit=crop&w=800&q=80',
         time: `${randomRecipe.cookTime || 0} mins`,
         rating: specialRating,
       };
@@ -360,7 +360,7 @@ export default async function ExplorePage({ searchParams: searchParamsPromise })
         return {
           id: recipe.id,
           title: recipe.title,
-          image: recipe.imageUrl || 'https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=800&q=80',
+          image: recipe.imageUrl || 'https://images.unsplash.com/photo-1547592166-23ac45744acd?auto=format&fit=crop&w=800&q=80',
           alt: recipe.title,
           time: `${recipe.cookTime}m`,
           rating: userRating,
