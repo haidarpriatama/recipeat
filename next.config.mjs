@@ -4,23 +4,12 @@ const nextConfig = {
     remotePatterns: [
       {
         protocol: "https",
-        hostname: "lh3.googleusercontent.com",
+        hostname: "**",
       },
       {
-        protocol: "https",
-        hostname: "images.unsplash.com",
+        protocol: "http",
+        hostname: "**",
       },
-      // --- Ini bagian yang baru ditambahkan untuk Supabase ---
-      {
-        protocol: "https",
-        hostname: "yrcgxyozneomuikomlgc.supabase.co",
-        pathname: "/storage/v1/object/public/**",
-      },
-      {
-        protocol: "https",
-        hostname: "img-global.cpcdn.com",
-      },
-      // ------------------------------------------------------
     ],
   },
 };
