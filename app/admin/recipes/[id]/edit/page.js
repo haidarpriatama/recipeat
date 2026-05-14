@@ -4,6 +4,7 @@ import prisma from "@/lib/prisma";
 import Link from "next/link";
 import { revalidatePath } from "next/cache";
 import RecipeIngredientManager from "@/components/admin/RecipeIngredientManager";
+import InstructionTextarea from "@/components/admin/InstructionTextarea";
 import { ExternalLink, HelpCircle } from "lucide-react";
 
 export default async function AdminEditRecipePage({ params }) {
@@ -164,11 +165,10 @@ export default async function AdminEditRecipePage({ params }) {
                 </div>
               </div>
             </div>
-            <textarea
+            <InstructionTextarea
               name="instructions"
               rows={8}
               defaultValue={recipe.instructions || ""}
-              className="w-full rounded-xl bg-[#eff1f2] px-4 py-3 outline-none ring-[#006941] transition focus:ring-2"
             />
           </div>
           

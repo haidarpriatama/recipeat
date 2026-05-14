@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Plus, Trash2 } from "lucide-react";
+import { Plus, Trash2, ChevronDown } from "lucide-react";
 
 export default function RecipeIngredientManager({ initialIngredients = [], availableIngredients = [] }) {
   const [ingredients, setIngredients] = useState(
@@ -45,11 +45,11 @@ export default function RecipeIngredientManager({ initialIngredients = [], avail
           {ingredients.map((ing, idx) => (
             <div key={idx} className="flex gap-3 items-center">
               {availableIngredients.length > 0 ? (
-                <div className="flex-1">
+                <div className="flex-1 relative">
                   <select
                     value={ing.name}
                     onChange={(e) => handleIngredientChange(idx, "name", e.target.value)}
-                    className="w-full rounded-xl bg-[#eff1f2] px-4 py-3 outline-none ring-[#006941] transition focus:ring-2 text-sm"
+                    className="w-full appearance-none rounded-xl bg-[#eff1f2] px-4 py-3 pr-10 outline-none ring-[#006941] transition focus:ring-2 text-sm"
                   >
                     <option value="">Select ingredient...</option>
                     {availableIngredients.map((ai) => (
@@ -58,6 +58,7 @@ export default function RecipeIngredientManager({ initialIngredients = [], avail
                       </option>
                     ))}
                   </select>
+                  <ChevronDown className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
                 </div>
               ) : (
                 <input
