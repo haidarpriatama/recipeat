@@ -1,6 +1,7 @@
 export const dynamic = "force-dynamic";
 
 import Image from "next/image";
+import SafeImage from "@/components/ui/SafeImage";
 import prisma from "@/lib/prisma";
 import Link from "next/link";
 import SmartDiscovery from "@/components/SmartDiscovery/SmartDiscovery";
@@ -184,12 +185,12 @@ function RecipeCard({ recipe, slot, dateStr }) {
   const cardContent = (
     <article className="h-full group flex cursor-pointer flex-col overflow-hidden rounded-xl border border-transparent bg-white shadow-[0_32px_64px_-12px_rgba(0,105,65,0.08)] transition-all hover:border-[#006941]/10">
       <div className="relative h-56">
-        <Image
+        <SafeImage
           src={recipe.image}
-          alt={recipe.alt}
+          alt={recipe.title}
           fill
           className="object-cover transition-transform duration-500 group-hover:scale-110"
-          sizes="(min-width: 1280px) 26vw, (min-width: 768px) 40vw, 100vw"
+          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
         />
 
         <FavoriteButton 
@@ -381,7 +382,7 @@ export default async function ExplorePage({ searchParams: searchParamsPromise })
     <div className="min-h-screen bg-[#f5f6f7] text-[#2c2f30]">
       <main className="mx-auto w-full max-w-screen-2xl px-6 py-8 md:px-12">
         <section className="group relative mb-12 h-[450px] md:h-[500px] w-full overflow-hidden rounded-xl shadow-[0_32px_64px_-12px_rgba(0,105,65,0.08)]">
-          <Image
+          <SafeImage
             src={specialRecipeData.image}
             alt={specialRecipeData.title}
             fill

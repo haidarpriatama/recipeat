@@ -2,6 +2,7 @@ export const dynamic = "force-dynamic";
 
 import prisma from "@/lib/prisma";
 import Image from "next/image";
+import SafeImage from "@/components/ui/SafeImage";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Clock3, Flame, ChefHat, ArrowLeft } from "lucide-react";
@@ -82,7 +83,7 @@ export default async function RecipeDetailPage({ params }) {
           <div className="grid grid-cols-1 lg:grid-cols-2">
             {/* Image Section */}
             <div className="relative h-[400px] w-full lg:h-[600px]">
-              <Image
+              <SafeImage
                 src={recipe.imageUrl || "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=800&q=80"}
                 alt={recipe.title}
                 fill
