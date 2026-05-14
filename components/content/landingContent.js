@@ -85,7 +85,7 @@ export const recipesContent = {
   browseAction: {
     label: "Browse Full Catalog",
     icon: "arrowRight",
-    href: "/recipes",
+    href: "/explore",
   },
   cards: [
     {
