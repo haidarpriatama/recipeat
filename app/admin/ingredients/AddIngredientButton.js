@@ -1,6 +1,6 @@
 "use client";
 import { useState } from "react";
-import { X } from "lucide-react";
+import { X, PlusCircle } from "lucide-react";
 import { createIngredientAction } from "./actions";
 
 export default function AddIngredientButton() {
@@ -27,8 +27,10 @@ export default function AddIngredientButton() {
     <>
       <button 
         onClick={() => setIsOpen(true)}
-        className="rounded-xl bg-[#006941] px-6 py-3 font-bold text-white transition-colors hover:bg-[#005c38]"
+        style={{ color: "white" }}
+        className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-[#006941] to-[#005c38] px-6 py-3 font-bold shadow-lg transition-opacity hover:opacity-90"
       >
+        <PlusCircle className="h-5 w-5" />
         Add Ingredient
       </button>
 

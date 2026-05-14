@@ -2,55 +2,58 @@ import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import prisma from "@/lib/prisma";
 import Link from "next/link";
-import Image from "next/image";
-import { Pencil, Trash2, PlusCircle, ExternalLink } from "lucide-react";
-import { revalidatePath } from "next/cache";
+import { PlusCircle } from "lucide-react";
+import RecipesTableClient from "./RecipesTableClient";
 
 export default async function AdminRecipesPage({ searchParams }) {
   const session = await auth();
   if (!session || session.user.role !== "ADMIN") redirect("/");
 
-  const { q = "" } = await searchParams;
+  const resolvedParams = await searchParams;
+  const q = resolvedParams?.q || "";
+  const page = parseInt(resolvedParams?.page || "1", 10);
+  const pageSize = 16;
+  const skip = (page - 1) * pageSize;
 
-  const recipes = await prisma.recipe.findMany({
-    where: q
-      ? { title: { contains: q, mode: "insensitive" } }
-      : undefined,
-    include: {
-      category: true,
-      _count: {
-        select: { favorites: true, ingredients: true },
-      },
-    },
-    orderBy: { createdAt: "desc" },
-  });
+  const whereClause = q
+    ? { title: { contains: q, mode: "insensitive" } }
+    : undefined;
 
   const now = new Date();
   const weekAgo = new Date(now);
   weekAgo.setDate(now.getDate() - 7);
 
-  const totalRecipes = recipes.length;
-  const publishedRecipes = recipes.filter((recipe) => recipe.status === "PUBLISHED").length;
-  const draftRecipes = recipes.filter((recipe) => recipe.status === "DRAFT").length;
-  const newThisWeek = recipes.filter((recipe) => new Date(recipe.createdAt) >= weekAgo).length;
+  const [recipes, totalCount, totalRecipes, publishedRecipes, draftRecipes, newThisWeek] = await Promise.all([
+    prisma.recipe.findMany({
+      where: whereClause,
+      skip,
+      take: pageSize,
+      include: {
+        category: true,
+        _count: { select: { favorites: true, ingredients: true } },
+      },
+      orderBy: { createdAt: "desc" },
+    }),
+    prisma.recipe.count({ where: whereClause }),
+    prisma.recipe.count(),
+    prisma.recipe.count({ where: { status: "PUBLISHED" } }),
+    prisma.recipe.count({ where: { status: "DRAFT" } }),
+    prisma.recipe.count({ where: { createdAt: { gte: weekAgo } } }),
+  ]);
 
-  async function deleteRecipeAction(formData) {
-    "use server";
-    const currentSession = await auth();
-    if (!currentSession || currentSession.user.role !== "ADMIN") redirect("/");
+  const totalPages = Math.ceil(totalCount / pageSize);
 
-    const id = Number(formData.get("id"));
-    if (!id) return;
-
-    await prisma.$transaction([
-      prisma.favorite.deleteMany({ where: { recipeId: id } }),
-      prisma.mealPlanRecipe.deleteMany({ where: { recipeId: id } }),
-      prisma.recipeIngredient.deleteMany({ where: { recipeId: id } }),
-      prisma.recipe.delete({ where: { id } }),
-    ]);
-
-    revalidatePath("/admin/recipes");
-  }
+  // Serialize to plain objects (no Date/Prisma objects) for the client component
+  const serializedRecipes = recipes.map((r) => ({
+    id: r.id,
+    title: r.title,
+    imageUrl: r.imageUrl,
+    cookTime: r.cookTime,
+    status: r.status,
+    categoryName: r.category?.name || null,
+    createdAt: r.createdAt.toISOString(),
+    _count: r._count,
+  }));
 
   return (
     <div className="space-y-8">
@@ -78,101 +81,12 @@ export default async function AdminRecipesPage({ searchParams }) {
         <StatCard label="New This Week" value={newThisWeek} tone="bg-white text-[#2c2f30] border border-[#eff1f2]" />
       </div>
 
-      <div className="overflow-hidden rounded-3xl bg-white shadow-[0_20px_50px_-20px_rgba(0,0,0,0.2)]">
-        <div className="overflow-x-auto">
-          <table className="w-full border-collapse text-left">
-            <thead>
-              <tr className="bg-[#eff1f2]/60">
-                <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-[#595c5d]">Image</th>
-                <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-[#595c5d]">Recipe</th>
-                <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-[#595c5d]">Category</th>
-                <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-[#595c5d]">Date Added</th>
-                <th className="px-6 py-4 text-xs font-bold uppercase tracking-wider text-[#595c5d]">Status</th>
-                <th className="px-6 py-4 text-right text-xs font-bold uppercase tracking-wider text-[#595c5d]">Actions</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-[#eff1f2]">
-              {recipes.map((recipe) => {
-                const published = recipe.status === "PUBLISHED";
-                return (
-                  <tr key={recipe.id} className="transition-colors hover:bg-[#f5f6f7]">
-                    <td className="px-6 py-4">
-                      <div className="relative h-12 w-16 overflow-hidden rounded-lg bg-[#eff1f2]">
-                        <Image
-                          src={recipe.imageUrl || "https://images.unsplash.com/photo-1547592166-23ac45744acd?auto=format&fit=crop&w=800&q=80"}
-                          alt={recipe.title}
-                          fill
-                          className="object-cover"
-                          sizes="64px"
-                        />
-                      </div>
-                    </td>
-                    <td className="px-6 py-4">
-                      <p className="font-semibold text-[#2c2f30]">{recipe.title}</p>
-                      <p className="text-xs text-[#595c5d]">{recipe.cookTime} mins • {recipe._count.favorites} favorites</p>
-                    </td>
-                    <td className="px-6 py-4">
-                      <span className="rounded-full bg-[#f3fcf3] px-3 py-1 text-xs font-bold text-[#58615a]">
-                        {recipe.category?.name || "Uncategorized"}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 text-sm text-[#595c5d]">
-                      {new Date(recipe.createdAt).toLocaleDateString()}
-                    </td>
-                    <td className="px-6 py-4">
-                      <span className={`rounded-full px-3 py-1 text-xs font-bold ${published ? "bg-[#caffdc] text-[#006941]" : "bg-[#ffc69a]/50 text-[#7b4000]"}`}>
-                        {published ? "Published" : "Draft"}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4">
-                      <div className="flex items-center justify-end gap-2">
-                        {published ? (
-                          <Link
-                            href={`/recipes/${recipe.id}`}
-                            target="_blank"
-                            className="inline-flex h-9 w-9 items-center justify-center rounded-lg text-[#006941] transition-colors hover:bg-[#f3fcf3]"
-                          >
-                            <ExternalLink className="h-4 w-4" />
-                          </Link>
-                        ) : (
-                          <span
-                            className="inline-flex h-9 w-9 items-center justify-center rounded-lg text-gray-300 cursor-not-allowed"
-                            title="Draft recipes cannot be viewed externally"
-                          >
-                            <ExternalLink className="h-4 w-4" />
-                          </span>
-                        )}
-                        <Link
-                          href={`/admin/recipes/${recipe.id}/edit`}
-                          className="inline-flex h-9 w-9 items-center justify-center rounded-lg text-[#006941] transition-colors hover:bg-[#f3fcf3]"
-                        >
-                          <Pencil className="h-4 w-4" />
-                        </Link>
-                        <form action={deleteRecipeAction}>
-                          <input type="hidden" name="id" value={recipe.id} />
-                          <button
-                            type="submit"
-                            className="inline-flex h-9 w-9 items-center justify-center rounded-lg text-[#b31b25] transition-colors hover:bg-[#ffefee]"
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </button>
-                        </form>
-                      </div>
-                    </td>
-                  </tr>
-                );
-              })}
-              {recipes.length === 0 && (
-                <tr>
-                  <td colSpan={6} className="px-6 py-12 text-center text-[#595c5d]">
-                    No recipes yet.
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
-        </div>
-      </div>
+      <RecipesTableClient
+        recipes={serializedRecipes}
+        page={page}
+        totalPages={totalPages}
+        q={q}
+      />
     </div>
   );
 }

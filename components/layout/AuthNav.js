@@ -34,6 +34,7 @@ export default function AuthNav({ initialSession }) {
         </Link>
         <Link
           href="/signup"
+          style={{ color: "white" }}
           className="inline-flex items-center justify-center font-bold transition-all duration-300 ease-out active:scale-95 px-6 py-2.5 text-sm rounded-full bg-[#006941] text-white shadow-lg shadow-[#006941]/20 hover:scale-105"
         >
           Sign Up

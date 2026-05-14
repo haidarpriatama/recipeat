@@ -8,29 +8,37 @@ export default async function AdminIngredientsPage({ searchParams }) {
   const session = await auth();
   if (!session || session.user.role !== "ADMIN") redirect("/");
 
-  const { q = "" } = await searchParams;
+  const resolvedParams = await searchParams;
+  const q = resolvedParams?.q || "";
+  const page = parseInt(resolvedParams?.page || "1", 10);
+  const pageSize = 30;
+  const skip = (page - 1) * pageSize;
 
-  const ingredients = await prisma.ingredient.findMany({
-    where: q
-      ? { name: { contains: q, mode: "insensitive" } }
-      : undefined,
-    include: {
-      recipes: {
-        include: {
-          recipe: {
-            select: { title: true }
+  const whereClause = q
+    ? { name: { contains: q, mode: "insensitive" } }
+    : undefined;
+
+  const [ingredients, totalCount, total, active] = await Promise.all([
+    prisma.ingredient.findMany({
+      where: whereClause,
+      skip,
+      take: pageSize,
+      include: {
+        recipes: {
+          include: {
+            recipe: { select: { title: true } }
           }
-        }
+        },
+        _count: { select: { recipes: true } },
       },
-      _count: {
-        select: { recipes: true },
-      },
-    },
-    orderBy: { name: "asc" },
-  });
+      orderBy: { name: "asc" },
+    }),
+    prisma.ingredient.count({ where: whereClause }),
+    prisma.ingredient.count(),
+    prisma.ingredient.count({ where: { recipes: { some: {} } } })
+  ]);
 
-  const total = ingredients.length;
-  const active = ingredients.filter((ingredient) => ingredient._count.recipes > 0).length;
+  const totalPages = Math.ceil(totalCount / pageSize);
   const unused = total - active;
 
   return (
@@ -49,7 +57,12 @@ export default async function AdminIngredientsPage({ searchParams }) {
         <MetricCard label="Unused" value={unused} tone="bg-white text-[#2c2f30] border border-[#eff1f2]" />
       </div>
 
-      <IngredientClientTable ingredients={ingredients} />
+      <IngredientClientTable
+        ingredients={ingredients}
+        page={page}
+        totalPages={totalPages}
+        q={q}
+      />
     </div>
   );
 }

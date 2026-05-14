@@ -1,13 +1,58 @@
 "use client";
-import { useState } from "react";
+import { useState, useTransition } from "react";
+import { useRouter } from "next/navigation";
 import { Pencil, Trash2, X, Eye } from "lucide-react";
 import { deleteIngredientAction, updateIngredientAction } from "./actions";
 
-export default function IngredientClientTable({ ingredients }) {
+function TableSkeleton() {
+  return (
+    <div className="space-y-6 animate-pulse">
+      <div className="overflow-hidden rounded-2xl bg-white shadow-sm">
+        <div className="border-b border-slate-100 px-6 py-4">
+          <div className="h-5 w-44 rounded bg-slate-300" />
+        </div>
+        <div className="grid grid-cols-4 gap-4 bg-slate-50 px-6 py-4">
+          {["w-12", "w-24", "w-16", "w-16"].map((w, i) => (
+            <div key={i} className={`h-3 ${w} rounded bg-slate-300`} />
+          ))}
+        </div>
+        {Array.from({ length: 30 }).map((_, i) => (
+          <div key={i} className="grid grid-cols-4 items-center gap-4 border-t border-slate-100 px-6 py-4">
+            <div className="h-4 w-24 rounded bg-slate-200" />
+            <div className="h-4 w-32 rounded bg-slate-300" />
+            <div className="h-4 w-16 rounded bg-slate-200" />
+            <div className="flex justify-end gap-2">
+              <div className="h-9 w-9 rounded-lg bg-slate-200" />
+              <div className="h-9 w-9 rounded-lg bg-slate-200" />
+            </div>
+          </div>
+        ))}
+      </div>
+      <div className="flex justify-center gap-2">
+        {[1, 2, 3, 4, 5].map((i) => (
+          <div key={i} className="h-10 w-10 rounded-xl bg-slate-200" />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+export default function IngredientClientTable({ ingredients, page = 1, totalPages = 1, q = "" }) {
+  const router = useRouter();
+  const [isPending, startTransition] = useTransition();
   const [editItem, setEditItem] = useState(null);
   const [deleteItem, setDeleteItem] = useState(null);
   const [showRecipesItem, setShowRecipesItem] = useState(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const navigate = (p) => {
+    const params = new URLSearchParams();
+    if (q) params.set("q", q);
+    if (p > 1) params.set("page", String(p));
+    startTransition(() => {
+      router.push(`/admin/ingredients?${params.toString()}`);
+    });
+  };
 
   const handleEditSubmit = async (e) => {
     e.preventDefault();
@@ -29,7 +74,11 @@ export default function IngredientClientTable({ ingredients }) {
 
   return (
     <>
-      <div className="overflow-hidden rounded-2xl bg-white shadow-[0_20px_50px_-20px_rgba(0,0,0,0.2)]">
+      {isPending ? (
+        <TableSkeleton />
+      ) : (
+        <>
+          <div className="overflow-hidden rounded-2xl bg-white shadow-[0_20px_50px_-20px_rgba(0,0,0,0.2)]">
         <div className="border-b border-[#eff1f2] px-6 py-4">
           <h2 className="text-lg font-bold text-[#2c2f30]">Ingredient Inventory</h2>
         </div>
@@ -91,6 +140,30 @@ export default function IngredientClientTable({ ingredients }) {
         </div>
       </div>
 
+          {totalPages > 1 && (
+            <div className="flex justify-center gap-2">
+              {Array.from({ length: totalPages }).map((_, i) => {
+                const p = i + 1;
+                return (
+                  <button
+                    key={p}
+                    onClick={() => navigate(p)}
+                    disabled={isPending}
+                    style={{ color: page === p ? "white" : undefined }}
+                    className={`flex h-10 w-10 items-center justify-center rounded-xl font-bold transition-colors ${
+                      page === p
+                        ? "bg-[#006941] text-white"
+                        : "bg-white text-[#595c5d] hover:bg-[#eff1f2]"
+                    }`}
+                  >
+                    {p}
+                  </button>
+                );
+              })}
+            </div>
+          )}
+        </>
+      )}
       {/* Edit Modal */}
       {editItem && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4 backdrop-blur-sm">
