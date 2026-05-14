@@ -85,6 +85,12 @@ function Calendar({ selectedDate, onDateSelect }) {
           <span key={`h-${i}`} className="uppercase">{day}</span>
         ))}
         {days.map((day, idx) => {
+          const today = new Date();
+          const isToday =
+            !day.muted &&
+            day.date.getDate() === today.getDate() &&
+            day.date.getMonth() === today.getMonth() &&
+            day.date.getFullYear() === today.getFullYear();
           const isSelected =
             day.date.getDate() === selectedDate.getDate() &&
             day.date.getMonth() === selectedDate.getMonth() &&
@@ -96,6 +102,8 @@ function Calendar({ selectedDate, onDateSelect }) {
               className={`mx-auto flex h-8 w-8 items-center justify-center rounded-lg transition-colors ${
                 isSelected
                   ? "bg-[#006941] font-bold text-white shadow-lg shadow-[#006941]/20"
+                  : isToday
+                  ? "font-bold text-[#006941] ring-1 ring-[#006941]/40"
                   : day.muted
                   ? "text-[#abadae]"
                   : "hover:bg-[#eff1f2]"
@@ -243,7 +251,8 @@ export default function MealPlanClient() {
           </div>
           <Link
             href={`/explore?date=${dateStr}`}
-            className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-[#006941] to-[#005c38] px-5 py-2.5 text-sm font-bold text-[#caffdc] transition-all hover:opacity-90"
+            style={{ color: "white" }}
+            className="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-[#006941] to-[#005c38] px-5 py-2.5 text-sm font-bold text-white transition-all hover:opacity-90"
           >
             Add Recipes
           </Link>

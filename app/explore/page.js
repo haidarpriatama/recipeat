@@ -7,6 +7,7 @@ import Link from "next/link";
 import dynamic from "next/dynamic";
 import { auth } from "@/lib/auth";
 import FavoriteButton from "@/components/RecipeCard/FavoriteButton";
+import FilterSidebar from "./FilterSidebar";
 import {
   ArrowRight,
   Bell,
@@ -35,15 +36,6 @@ const SmartDiscovery = dynamic(
     ),
   }
 );
-
-const FILTERS = {
-  mealType: [
-    { label: "Breakfast" },
-    { label: "Lunch" },
-    { label: "Dinner" },
-  ],
-};
-
 
 const RECIPES = [
   {
@@ -104,86 +96,6 @@ const RECIPES = [
   },
 ];
 
-const SERVING_TIMES = [
-  { label: "<15 min", value: "under_15" },
-  { label: "<30 min", value: "under_30" },
-  { label: "<60 min", value: "under_60" },
-  { label: ">90 min", value: "over_90" },
-];
-
-function FilterSidebar({ selectedMealTypes = [], selectedServingTimes = [], searchParams = {} }) {
-  return (
-    <aside className="w-full space-y-10 lg:w-64 lg:flex-shrink-0">
-      <div>
-        <h3 className="mb-6 text-sm font-bold uppercase tracking-widest text-[#006941]">Meal Type</h3>
-        <div className="space-y-3">
-          {FILTERS.mealType.map((item) => {
-            const isSelected = selectedMealTypes.includes(item.label);
-            const nextMealTypes = isSelected
-              ? selectedMealTypes.filter((mealType) => mealType !== item.label)
-              : [...selectedMealTypes, item.label];
-            const params = new URLSearchParams(searchParams);
-
-            if (nextMealTypes.length > 0) {
-              params.set("mealTypes", nextMealTypes.join(","));
-            } else {
-              params.delete("mealTypes");
-            }
-
-            return (
-              <Link key={item.label} href={`/explore?${params.toString()}`} className="group flex cursor-pointer items-center gap-3">
-                <span className={`flex h-5 w-5 items-center justify-center rounded border ${
-                  isSelected ? "border-[#006941] bg-[#006941]" : "border-[#abadae]/30 bg-white"
-                }`}>
-                  {isSelected && <span className="h-2 w-2 rounded-full bg-white" />}
-                </span>
-                <span className="font-medium text-[#595c5d] transition-colors group-hover:text-[#006941]">
-                  {item.label}
-                </span>
-              </Link>
-            );
-          })}
-        </div>
-      </div>
-
-      <div>
-        <h3 className="mb-6 text-sm font-bold uppercase tracking-widest text-[#006941]">Serving Time</h3>
-        <div className="space-y-3">
-          {SERVING_TIMES.map((item) => {
-            const isSelected = selectedServingTimes.includes(item.value);
-            const nextServingTimes = isSelected
-              ? selectedServingTimes.filter((t) => t !== item.value)
-              : [...selectedServingTimes, item.value];
-            
-            const params = new URLSearchParams(searchParams);
-
-            if (nextServingTimes.length > 0) {
-              params.set("servingTimes", nextServingTimes.join(","));
-            } else {
-              params.delete("servingTimes");
-            }
-            
-            // Reset page on filter change
-            params.delete("page");
-
-            return (
-              <Link key={item.label} href={`/explore?${params.toString()}`} className="group flex cursor-pointer items-center gap-3">
-                <span className={`flex h-5 w-5 items-center justify-center rounded border ${
-                  isSelected ? "border-[#006941] bg-[#006941]" : "border-[#abadae]/30 bg-white"
-                }`}>
-                  {isSelected && <span className="h-2 w-2 rounded-full bg-white" />}
-                </span>
-                <span className="font-medium text-[#595c5d] transition-colors group-hover:text-[#006941]">
-                  {item.label}
-                </span>
-              </Link>
-            );
-          })}
-        </div>
-      </div>
-    </aside>
-  );
-}
 
 function RecipeCard({ recipe, slot, dateStr }) {
   const params = new URLSearchParams();
@@ -335,9 +247,9 @@ export default async function ExplorePage({ searchParams: searchParamsPromise })
         orderBy: { createdAt: 'desc' }
       }),
       prisma.ingredient.findMany({
-        select: { name: true },
+        select: { name: true, _count: { select: { recipes: true } } },
         take: 200,
-        orderBy: { name: 'asc' },
+        orderBy: { recipes: { _count: 'desc' } },
       }),
       prisma.recipe.count({ where }),
       totalAllRecipesCount > 0 ? prisma.recipe.findFirst({

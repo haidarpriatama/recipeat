@@ -1,27 +1,25 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState, useTransition } from 'react';
 import { Search, X } from 'lucide-react';
 import { useRouter, useSearchParams } from 'next/navigation';
 
 export default function SmartDiscovery({ initialQuery = "", initialIngredients = [], availableIngredients = [] }) {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const [isPending, startTransition] = useTransition();
 
-  const ingredientOptions = availableIngredients.length > 0 ? availableIngredients : [
-    "Telur", "Bayam", "Tomat", "Bawang Putih", "Bawang Merah", 
-    "Minyak Goreng", "Ayam", "Jamur", "Daging Sapi", "Cabai", "Pasta", "Keju"
-  ];
+  // availableIngredients are already sorted by most-used from the server
+  const ingredientOptions = availableIngredients.length > 0 ? availableIngredients : [];
+
+  // Quick Add: first 8 most-used ingredients
+  const quickAddIngredients = ingredientOptions.slice(0, 8);
 
   const [selectedIngredients, setSelectedIngredients] = useState(initialIngredients);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState(initialQuery);
   const [ingredientSearchQuery, setIngredientSearchQuery] = useState("");
-  const popularIngredients = ["Ayam", "Telur", "Bawang Putih", "Bawang Merah", "Tomat", "Cabai", "Bayam", "Keju"];
-  const quickAddIngredients = [
-    ...popularIngredients.filter((ingredient) => ingredientOptions.includes(ingredient)),
-    ...ingredientOptions.filter((ingredient) => !popularIngredients.includes(ingredient)),
-  ].slice(0, 8);
+
   const customSelectedIngredients = selectedIngredients.filter(
     (ingredient) => !quickAddIngredients.includes(ingredient)
   );
@@ -29,34 +27,40 @@ export default function SmartDiscovery({ initialQuery = "", initialIngredients =
     ingredient.toLowerCase().includes(ingredientSearchQuery.toLowerCase())
   );
 
-  const handleSearch = () => {
+  const buildAndNavigate = (query, ingredients) => {
     const params = new URLSearchParams(searchParams.toString());
-    
-    if (searchQuery) {
-      params.set('q', searchQuery);
+    if (query) {
+      params.set('q', query);
     } else {
       params.delete('q');
     }
-
-    if (selectedIngredients.length > 0) {
-      params.set('ingredients', selectedIngredients.join(','));
+    if (ingredients.length > 0) {
+      params.set('ingredients', ingredients.join(','));
     } else {
       params.delete('ingredients');
     }
+    params.delete('page');
+    startTransition(() => {
+      router.push(`/explore?${params.toString()}`);
+    });
+  };
 
-    router.push(`/explore?${params.toString()}`);
+  const handleSearch = () => {
+    buildAndNavigate(searchQuery, selectedIngredients);
   };
 
   const removeIngredient = (ingredientToRemove) => {
-    setSelectedIngredients(selectedIngredients.filter(item => item !== ingredientToRemove));
+    const next = selectedIngredients.filter(item => item !== ingredientToRemove);
+    setSelectedIngredients(next);
+    buildAndNavigate(searchQuery, next);
   };
 
   const toggleIngredient = (ingredient) => {
-    if (selectedIngredients.includes(ingredient)) {
-      removeIngredient(ingredient);
-    } else {
-      setSelectedIngredients([...selectedIngredients, ingredient]);
-    }
+    const next = selectedIngredients.includes(ingredient)
+      ? selectedIngredients.filter(item => item !== ingredient)
+      : [...selectedIngredients, ingredient];
+    setSelectedIngredients(next);
+    buildAndNavigate(searchQuery, next);
   };
 
   return (
@@ -84,45 +88,49 @@ export default function SmartDiscovery({ initialQuery = "", initialIngredients =
         </div>
         <button 
           onClick={handleSearch}
-          className="bg-[#006941] hover:bg-[#005535] text-white px-8 py-4 rounded-xl font-bold transition-colors flex items-center gap-2 shadow-md"
+          disabled={isPending}
+          className="bg-[#006941] hover:bg-[#005535] text-white px-8 py-4 rounded-xl font-bold transition-colors flex items-center gap-2 shadow-md disabled:opacity-70"
         >
-          Find Recipes <Search size={18} />
+          {isPending ? "Searching..." : <><span>Find Recipes</span> <Search size={18} /></>}
         </button>
       </div>
 
-      <div>
-        <div className="flex items-center justify-between gap-4 mb-4">
-          <span className="text-xs font-bold uppercase tracking-[0.15em] text-[#006941]">
-            Quick Add
-          </span>
-          <button 
-            onClick={() => setIsModalOpen(true)}
-            className="rounded-full border border-[#006941] bg-[#006941] px-4 py-2 text-sm font-medium text-white shadow-md transition-all hover:bg-[#005535]"
-          >
-            Add More
-          </button>
-        </div>
+      {ingredientOptions.length > 0 && (
+        <div>
+          <div className="flex items-center justify-between gap-4 mb-4">
+            <span className="text-xs font-bold uppercase tracking-[0.15em] text-[#006941]">
+              Quick Add
+            </span>
+            <button 
+              onClick={() => setIsModalOpen(true)}
+              className="rounded-full border border-[#006941] bg-[#006941] px-4 py-2 text-sm font-medium text-white shadow-md transition-all hover:bg-[#005535]"
+            >
+              Add More
+            </button>
+          </div>
 
-        <div className="flex flex-wrap gap-3 mb-5">
-          {[...quickAddIngredients, ...customSelectedIngredients].map((item) => {
-            const isSelected = selectedIngredients.includes(item);
-            return (
-              <button
-                key={item}
-                onClick={() => toggleIngredient(item)}
-                className={`group flex items-center gap-1 px-4 py-2 rounded-full text-sm font-medium transition-all border ${
-                  isSelected
-                    ? "bg-[#006941] border-[#006941] text-white shadow-md hover:bg-red-500 hover:border-red-500"
-                    : "bg-transparent border-dashed border-[#006941]/40 text-[#006941] shadow-sm hover:border-solid hover:bg-[#006941] hover:text-white"
-                }`}
-              >
-                <span>{item}</span>
-                {isSelected && <X size={14} className="hidden group-hover:block" />}
-              </button>
-            );
-          })}
+          <div className="flex flex-wrap gap-3 mb-5">
+            {[...quickAddIngredients, ...customSelectedIngredients].map((item) => {
+              const isSelected = selectedIngredients.includes(item);
+              return (
+                <button
+                  key={item}
+                  onClick={() => toggleIngredient(item)}
+                  disabled={isPending}
+                  className={`group flex items-center gap-1 px-4 py-2 rounded-full text-sm font-medium transition-all border disabled:opacity-60 ${
+                    isSelected
+                      ? "bg-[#006941] border-[#006941] text-white shadow-md hover:bg-red-500 hover:border-red-500"
+                      : "bg-transparent border-dashed border-[#006941]/40 text-[#006941] shadow-sm hover:border-solid hover:bg-[#006941] hover:text-white"
+                  }`}
+                >
+                  <span>{item}</span>
+                  {isSelected && <X size={14} className="hidden group-hover:block" />}
+                </button>
+              );
+            })}
+          </div>
         </div>
-      </div>
+      )}
 
       {isModalOpen && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center bg-[#0c0f10]/40 backdrop-blur-sm px-4">
