@@ -3,7 +3,7 @@ import { redirect } from "next/navigation";
 import prisma from "@/lib/prisma";
 import Link from "next/link";
 import Image from "next/image";
-import { Pencil, Trash2, PlusCircle } from "lucide-react";
+import { Pencil, Trash2, PlusCircle, ExternalLink } from "lucide-react";
 import { revalidatePath } from "next/cache";
 
 export default async function AdminRecipesPage({ searchParams }) {
@@ -126,6 +126,22 @@ export default async function AdminRecipesPage({ searchParams }) {
                     </td>
                     <td className="px-6 py-4">
                       <div className="flex items-center justify-end gap-2">
+                        {published ? (
+                          <Link
+                            href={`/recipes/${recipe.id}`}
+                            target="_blank"
+                            className="inline-flex h-9 w-9 items-center justify-center rounded-lg text-[#006941] transition-colors hover:bg-[#f3fcf3]"
+                          >
+                            <ExternalLink className="h-4 w-4" />
+                          </Link>
+                        ) : (
+                          <span
+                            className="inline-flex h-9 w-9 items-center justify-center rounded-lg text-gray-300 cursor-not-allowed"
+                            title="Draft recipes cannot be viewed externally"
+                          >
+                            <ExternalLink className="h-4 w-4" />
+                          </span>
+                        )}
                         <Link
                           href={`/admin/recipes/${recipe.id}/edit`}
                           className="inline-flex h-9 w-9 items-center justify-center rounded-lg text-[#006941] transition-colors hover:bg-[#f3fcf3]"

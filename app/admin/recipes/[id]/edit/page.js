@@ -264,7 +264,7 @@ export default async function AdminEditRecipePage({ params }) {
                 type="submit"
                 name="submitAction"
                 value="draft"
-                className="rounded-xl bg-[#e67e22] px-5 py-3 font-bold text-white transition-opacity hover:bg-[#d35400]"
+                className="rounded-xl border-2 border-[#006941] px-5 py-3 font-bold text-[#006941] transition-colors hover:border-[#e67e22] hover:bg-[#e67e22] hover:text-white"
               >
                 Save Draft
               </button>
