@@ -14,10 +14,6 @@ export default async function SiteHeader({
 }) {
   const session = await auth();
 
-  const links = [...navLinks];
-  if (session) {
-    links.push({ label: "Dashboard", href: "/profile" });
-  }
 
   return (
     <HeaderPathFilter>
@@ -32,7 +28,7 @@ export default async function SiteHeader({
             {brand}
           </Link>
 
-          <NavLinks navLinks={links} />
+          <NavLinks navLinks={navLinks} />
 
           <AuthNav initialSession={session} />
         </div>

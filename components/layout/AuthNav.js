@@ -95,14 +95,6 @@ export default function AuthNav({ initialSession }) {
             onClick={() => setDropdownOpen(false)}
             className="flex items-center gap-3 px-4 py-2.5 text-sm font-medium text-slate-700 transition-colors hover:bg-[#f3fcf3] hover:text-[#006941]"
           >
-            <LayoutDashboard size={15} />
-            Dashboard
-          </Link>
-          <Link
-            href="/profile"
-            onClick={() => setDropdownOpen(false)}
-            className="flex items-center gap-3 px-4 py-2.5 text-sm font-medium text-slate-700 transition-colors hover:bg-[#f3fcf3] hover:text-[#006941]"
-          >
             <User size={15} />
             My Profile
           </Link>
