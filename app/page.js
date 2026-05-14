@@ -17,6 +17,7 @@ export default async function HomePage() {
   let dynamicRecipeCards = recipesContent.cards;
   try {
     const latestRecipes = await prisma.recipe.findMany({
+      where: { status: 'PUBLISHED' },
       take: 3,
       include: { category: true },
       orderBy: { createdAt: 'desc' }

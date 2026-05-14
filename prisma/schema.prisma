@@ -18,6 +18,12 @@ enum Role {
   ADMIN
 }
 
+// Enum RecipeStatus untuk membedakan status resep
+enum RecipeStatus {
+  PUBLISHED
+  DRAFT
+}
+
 // Model User untuk menyimpan informasi pengguna
 model User {
   id            String    @id @default(cuid())
@@ -88,6 +94,7 @@ model Recipe {
   protein     Int      @default(0)
   carbs       Int      @default(0)
   fats        Int      @default(0)
+  status      RecipeStatus @default(PUBLISHED)
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 

@@ -44,6 +44,9 @@ export default async function AdminEditRecipePage({ params }) {
     const currentSession = await auth();
     if (!currentSession || currentSession.user.role !== "ADMIN") redirect("/");
 
+    const submitAction = formData.get("submitAction");
+    const status = submitAction === "draft" ? "DRAFT" : "PUBLISHED";
+
     const id = Number(formData.get("id"));
     const title = String(formData.get("title") || "").trim();
     const description = String(formData.get("description") || "").trim();
@@ -101,6 +104,7 @@ export default async function AdminEditRecipePage({ params }) {
         protein,
         carbs,
         fats,
+        status,
         ingredients: {
           deleteMany: {},
           create: recipeIngredientsToCreate
@@ -249,10 +253,22 @@ export default async function AdminEditRecipePage({ params }) {
           <div className="flex flex-col gap-3 pt-2">
             <button
               type="submit"
+              name="submitAction"
+              value="publish"
               className="rounded-xl bg-gradient-to-r from-[#006941] to-[#005c38] px-5 py-3 font-bold text-white transition-opacity hover:opacity-90"
             >
-              Save Changes
+              {recipe.status === "DRAFT" ? "Publish Recipe" : "Save Changes"}
             </button>
+            {recipe.status === "DRAFT" && (
+              <button
+                type="submit"
+                name="submitAction"
+                value="draft"
+                className="rounded-xl bg-[#e67e22] px-5 py-3 font-bold text-white transition-opacity hover:bg-[#d35400]"
+              >
+                Save Draft
+              </button>
+            )}
             <Link
               href="/admin/recipes"
               className="rounded-xl bg-[#eff1f2] px-5 py-3 text-center font-semibold text-[#2c2f30] transition-colors hover:bg-[#dadddf]"

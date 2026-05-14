@@ -49,6 +49,7 @@ export default async function RecipeDetailPage({ params }) {
 
   const session = await auth();
   let realUserId = null;
+  const isAdmin = session?.user?.role === "ADMIN";
   if (session?.user?.email) {
     const dbUser = await prisma.user.findUnique({ where: { email: session.user.email } });
     if (dbUser) realUserId = dbUser.id;
@@ -63,7 +64,7 @@ export default async function RecipeDetailPage({ params }) {
     },
   });
 
-  if (!recipe) {
+  if (!recipe || (recipe.status === "DRAFT" && !isAdmin)) {
     notFound();
   }
 

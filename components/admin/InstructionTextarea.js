@@ -38,6 +38,60 @@ export default function InstructionTextarea({ name, defaultValue = "", rows = 8,
     }
   };
 
+  const handlePaste = (e) => {
+    e.preventDefault();
+    const pasteData = e.clipboardData.getData("text");
+    if (!pasteData) return;
+
+    const cursorPosition = e.target.selectionStart;
+    const textBeforeCursor = value.substring(0, cursorPosition);
+    const textAfterCursor = value.substring(e.target.selectionEnd);
+
+    const pastedLines = pasteData.split(/\r?\n/).filter(line => line.trim() !== "");
+    
+    let formattedPaste = "";
+    
+    const linesBeforeCursor = textBeforeCursor.split("\n");
+    let currentNumber = linesBeforeCursor.length; 
+    
+    const isLastLineEmptyBullet = textBeforeCursor.match(/(^|\n)(\d+)\.\s*$/);
+
+    for (let i = 0; i < pastedLines.length; i++) {
+      let line = pastedLines[i].trim();
+      line = line.replace(/^\d+[\.\)]\s*/, "");
+
+      if (i === 0) {
+        if (isLastLineEmptyBullet) {
+          formattedPaste += line;
+        } else {
+          if (textBeforeCursor === "") {
+             formattedPaste += `1. ${line}`;
+             currentNumber = 1;
+          } else if (textBeforeCursor.endsWith("\n")) {
+             currentNumber++;
+             formattedPaste += `${currentNumber}. ${line}`;
+          } else {
+             formattedPaste += line;
+          }
+        }
+      } else {
+        currentNumber++;
+        formattedPaste += `\n${currentNumber}. ${line}`;
+      }
+    }
+
+    const newValue = textBeforeCursor + formattedPaste + textAfterCursor;
+    setValue(newValue);
+
+    setTimeout(() => {
+      if (textareaRef.current) {
+        const newPos = textBeforeCursor.length + formattedPaste.length;
+        textareaRef.current.selectionStart = newPos;
+        textareaRef.current.selectionEnd = newPos;
+      }
+    }, 0);
+  };
+
   const handleFocus = () => {
     if (!value.trim()) {
       setValue("1. ");
@@ -52,6 +106,7 @@ export default function InstructionTextarea({ name, defaultValue = "", rows = 8,
       value={value}
       onChange={(e) => setValue(e.target.value)}
       onKeyDown={handleKeyDown}
+      onPaste={handlePaste}
       onFocus={handleFocus}
       className="w-full rounded-xl bg-[#eff1f2] px-4 py-3 outline-none ring-[#006941] transition focus:ring-2"
       placeholder={placeholder}

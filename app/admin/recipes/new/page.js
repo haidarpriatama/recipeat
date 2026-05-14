@@ -22,6 +22,9 @@ export default async function AdminNewRecipePage() {
     const currentSession = await auth();
     if (!currentSession || currentSession.user.role !== "ADMIN") redirect("/");
 
+    const submitAction = formData.get("submitAction");
+    const status = submitAction === "draft" ? "DRAFT" : "PUBLISHED";
+
     const title = String(formData.get("title") || "").trim();
     const description = String(formData.get("description") || "").trim();
     const instructions = String(formData.get("instructions") || "").trim();
@@ -77,6 +80,7 @@ export default async function AdminNewRecipePage() {
         protein,
         carbs,
         fats,
+        status,
         ingredients: {
           create: recipeIngredientsToCreate
         }
@@ -212,9 +216,19 @@ export default async function AdminNewRecipePage() {
           <div className="flex flex-col gap-3 pt-2">
             <button
               type="submit"
+              name="submitAction"
+              value="publish"
               className="rounded-xl bg-gradient-to-r from-[#006941] to-[#005c38] px-5 py-3 font-bold text-white transition-opacity hover:opacity-90"
             >
               Publish Recipe
+            </button>
+            <button
+              type="submit"
+              name="submitAction"
+              value="draft"
+              className="rounded-xl bg-[#e67e22] px-5 py-3 font-bold text-white transition-opacity hover:bg-[#d35400]"
+            >
+              Save Draft
             </button>
             <Link
               href="/admin/recipes"

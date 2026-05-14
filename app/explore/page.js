@@ -274,6 +274,7 @@ export default async function ExplorePage({ searchParams: searchParamsPromise })
 
     // Build the Prisma query filter
     const where = {
+      status: 'PUBLISHED',
       AND: [
         query ? {
           OR: [

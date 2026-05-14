@@ -30,8 +30,8 @@ export default async function AdminRecipesPage({ searchParams }) {
   weekAgo.setDate(now.getDate() - 7);
 
   const totalRecipes = recipes.length;
-  const publishedRecipes = recipes.filter((recipe) => recipe._count.ingredients > 0).length;
-  const draftRecipes = totalRecipes - publishedRecipes;
+  const publishedRecipes = recipes.filter((recipe) => recipe.status === "PUBLISHED").length;
+  const draftRecipes = recipes.filter((recipe) => recipe.status === "DRAFT").length;
   const newThisWeek = recipes.filter((recipe) => new Date(recipe.createdAt) >= weekAgo).length;
 
   async function deleteRecipeAction(formData) {
@@ -93,7 +93,7 @@ export default async function AdminRecipesPage({ searchParams }) {
             </thead>
             <tbody className="divide-y divide-[#eff1f2]">
               {recipes.map((recipe) => {
-                const published = recipe._count.ingredients > 0;
+                const published = recipe.status === "PUBLISHED";
                 return (
                   <tr key={recipe.id} className="transition-colors hover:bg-[#f5f6f7]">
                     <td className="px-6 py-4">

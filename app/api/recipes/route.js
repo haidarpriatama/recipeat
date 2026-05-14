@@ -6,6 +6,7 @@ import { auth } from '@/lib/auth';
 export async function GET() {
   try {
     const recipes = await prisma.recipe.findMany({
+      where: { status: 'PUBLISHED' },
       include: { ingredients: true },
     });
     return Response.json(recipes, { status: 200 });
