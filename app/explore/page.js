@@ -33,7 +33,6 @@ const SmartDiscovery = dynamic(
     loading: () => (
       <div className="mb-6 h-14 w-full animate-pulse rounded-xl bg-[#eff1f2]" />
     ),
-    ssr: false, // SmartDiscovery is interactive-only, skip SSR
   }
 );
 
