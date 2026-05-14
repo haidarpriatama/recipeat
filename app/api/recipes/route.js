@@ -9,7 +9,12 @@ export async function GET() {
       where: { status: 'PUBLISHED' },
       include: { ingredients: true },
     });
-    return Response.json(recipes, { status: 200 });
+    return Response.json(recipes, {
+      status: 200,
+      headers: {
+        'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=300',
+      },
+    });
   } catch (error) {
     console.error('GET /api/recipes error:', error);
     return Response.json({ message: 'Internal server error' }, { status: 500 });

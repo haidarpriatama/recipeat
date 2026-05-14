@@ -4,7 +4,7 @@ import Image from "next/image";
 import SafeImage from "@/components/ui/SafeImage";
 import prisma from "@/lib/prisma";
 import Link from "next/link";
-import SmartDiscovery from "@/components/SmartDiscovery/SmartDiscovery";
+import dynamic from "next/dynamic";
 import { auth } from "@/lib/auth";
 import FavoriteButton from "@/components/RecipeCard/FavoriteButton";
 import {
@@ -26,6 +26,16 @@ export const metadata = {
   title: "Explore – Recipeat",
   description: "Discover new recipes and culinary inspiration.",
 };
+
+const SmartDiscovery = dynamic(
+  () => import("@/components/SmartDiscovery/SmartDiscovery"),
+  {
+    loading: () => (
+      <div className="mb-6 h-14 w-full animate-pulse rounded-xl bg-[#eff1f2]" />
+    ),
+    ssr: false, // SmartDiscovery is interactive-only, skip SSR
+  }
+);
 
 const FILTERS = {
   mealType: [

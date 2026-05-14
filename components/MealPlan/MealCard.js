@@ -6,7 +6,7 @@ import Link from "next/link";
 import { Timer, Star, Trash2, Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
 
-export default function MealCard({ meal, compact = false }) {
+export default function MealCard({ meal, compact = false, onDelete }) {
   const router = useRouter();
   const [isDeleting, setIsDeleting] = useState(false);
 
@@ -27,8 +27,12 @@ export default function MealCard({ meal, compact = false }) {
       });
 
       if (res.ok) {
-        // router.refresh() dipertahankan di sini agar list Server Component langsung terupdate tanpa mengubah parent menjadi Client Component.
-        router.refresh();
+        if (onDelete) {
+          // Notify parent to refetch — no full page reload
+          onDelete();
+        } else {
+          router.refresh();
+        }
       } else {
         alert("Failed to delete meal.");
       }
@@ -38,6 +42,7 @@ export default function MealCard({ meal, compact = false }) {
       setIsDeleting(false);
     }
   };
+
 
   return (
     <article className={compact ? "group relative" : "group relative pl-16"}>
