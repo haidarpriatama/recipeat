@@ -56,12 +56,12 @@ export async function GET(request) {
     }
     
     // Hanya bisa melihat datanya sendiri (atau admin)
-    if (Number(id) !== Number(session.user.id) && session.user.role !== 'ADMIN') {
+    if (id !== session.user.id && session.user.role !== 'ADMIN') {
       return Response.json({ message: 'Forbidden' }, { status: 403 });
     }
 
     const user = await prisma.user.findUnique({
-      where: { id: Number(id) },
+      where: { id: id },
     });
 
     if (!user) {
@@ -85,12 +85,12 @@ export async function PUT(request) {
     const { id, name, email } = await request.json();
 
     // Hanya bisa mengubah datanya sendiri
-    if (Number(id) !== Number(session.user.id) && session.user.role !== 'ADMIN') {
+    if (id !== session.user.id && session.user.role !== 'ADMIN') {
       return Response.json({ message: 'Forbidden' }, { status: 403 });
     }
 
     const updatedUser = await prisma.user.update({
-      where: { id: Number(id) },
+      where: { id: id },
       data: { name, email },
     });
 

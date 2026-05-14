@@ -45,16 +45,20 @@ export default function RecipeIngredientManager({ initialIngredients = [], avail
           {ingredients.map((ing, idx) => (
             <div key={idx} className="flex gap-3 items-center">
               {availableIngredients.length > 0 ? (
-                <select
-                  value={ing.name}
-                  onChange={(e) => handleIngredientChange(idx, "name", e.target.value)}
-                  className="flex-1 rounded-xl bg-[#eff1f2] px-4 py-3 outline-none ring-[#006941] transition focus:ring-2 text-sm"
-                >
-                  <option value="">Select an ingredient...</option>
-                  {availableIngredients.map((ai) => (
-                    <option key={ai.id} value={ai.name}>{ai.name}</option>
-                  ))}
-                </select>
+                <div className="flex-1">
+                  <input
+                    list="ingredient-suggestions"
+                    value={ing.name}
+                    onChange={(e) => handleIngredientChange(idx, "name", e.target.value)}
+                    placeholder="Search or type ingredient..."
+                    className="w-full rounded-xl bg-[#eff1f2] px-4 py-3 outline-none ring-[#006941] transition focus:ring-2 text-sm"
+                  />
+                  <datalist id="ingredient-suggestions">
+                    {availableIngredients.map((ai) => (
+                      <option key={ai.id} value={ai.name} />
+                    ))}
+                  </datalist>
+                </div>
               ) : (
                 <input
                   type="text"

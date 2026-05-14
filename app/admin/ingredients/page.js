@@ -8,7 +8,7 @@ export default async function AdminIngredientsPage({ searchParams }) {
   const session = await auth();
   if (!session || session.user.role !== "ADMIN") redirect("/");
 
-  const q = searchParams?.q || "";
+  const { q = "" } = await searchParams;
 
   const ingredients = await prisma.ingredient.findMany({
     where: q
