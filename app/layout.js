@@ -5,6 +5,7 @@ import { Geist, Plus_Jakarta_Sans } from "next/font/google";
 import SiteHeader from "@/components/layout/SiteHeader";
 import { Providers } from "@/components/Providers";
 import MainContainer from "@/components/layout/MainContainer";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 
 const geist = Geist({
   subsets: ["latin"],
@@ -29,6 +30,9 @@ const fontFamilyMap = {
 export const metadata = {
   title: "Recipeat",
   description: "Smart recipe and meal planning app",
+  icons: {
+    icon: "/logo.png",
+  },
 };
 
 export default function RootLayout({ children }) {
@@ -46,6 +50,8 @@ export default function RootLayout({ children }) {
             {children}
           </MainContainer>
         </Providers>
+
+        <SpeedInsights />
 
         {/* 4. Letakkan Footer di sini nanti */}
         {/* <SiteFooter /> */}
