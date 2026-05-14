@@ -3,21 +3,35 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { Mail, ArrowRight } from 'lucide-react';
+import { supabase } from '@/lib/supabaseClient';
 
 export default function ForgotPasswordPage() {
   const [email, setEmail] = useState('');
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
+    setError('');
     
-    // Simulate API call for password reset
-    setTimeout(() => {
-      setLoading(false);
+    try {
+      const { error: resetError } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: `${window.location.origin}/reset-password`,
+      });
+
+      if (resetError) {
+        throw resetError;
+      }
+
       setIsSubmitted(true);
-    }, 1500);
+    } catch (err) {
+      console.error('Password reset error:', err);
+      setError(err.message || 'Failed to send reset link. Please check your email.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -35,6 +49,12 @@ export default function ForgotPasswordPage() {
                 : "Enter your email address and we'll send you a link to reset your password."}
             </p>
           </div>
+
+          {error && (
+            <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-xl text-red-600 text-sm">
+              {error}
+            </div>
+          )}
 
           {isSubmitted ? (
             <div className="space-y-6">
