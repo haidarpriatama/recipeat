@@ -1,6 +1,22 @@
 "use client";
 
-import { useState, useEffect, useCallback, useTransition } from "react";
+/**
+ * ExploreGrid.js
+ *
+ * Renders the paginated recipe card grid on /explore.
+ *
+ * SSR contract:
+ * - `initialRecipes`, `initialTotal`, `initialPage` are populated by the
+ *   Server Component (page.js) from a server-side Prisma query.
+ * - On first render, state is seeded from these props — no useEffect fetch
+ *   fires. This eliminates the blank grid / skeleton visible on initial load
+ *   and directly improves FCP and LCP.
+ * - After hydration, whenever the user changes filters/page (URL changes),
+ *   useEffect detects the searchParams change and calls /api/explore to
+ *   update the grid client-side (preserving interactive UX).
+ */
+
+import { useState, useEffect, useRef, useCallback, useTransition } from "react";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import SafeImage from "@/components/ui/SafeImage";
@@ -13,7 +29,7 @@ import {
   Star,
 } from "lucide-react";
 
-// ─── Skeleton card ────────────────────────────────────────────────────────────
+// ─── Skeleton card ─────────────────────────────────────────────────────────────
 function SkeletonCard() {
   return (
     <article className="flex h-full flex-col overflow-hidden rounded-xl bg-white border border-slate-100 shadow-sm animate-pulse">
@@ -33,15 +49,13 @@ function SkeletonCard() {
   );
 }
 
-// ─── Recipe card ──────────────────────────────────────────────────────────────
+// ─── Recipe card ───────────────────────────────────────────────────────────────
 function RecipeCard({ recipe, slot, dateStr }) {
   const params = new URLSearchParams();
   if (slot) params.set("slot", slot);
   if (dateStr) params.set("date", dateStr);
   const qs = params.toString();
-  const destination = qs
-    ? `/recipes/${recipe.id}?${qs}`
-    : `/recipes/${recipe.id}`;
+  const destination = qs ? `/recipes/${recipe.id}?${qs}` : `/recipes/${recipe.id}`;
 
   return (
     <Link href={destination} className="block h-full">
@@ -100,35 +114,49 @@ function RecipeCard({ recipe, slot, dateStr }) {
   );
 }
 
-// ─── Main component ───────────────────────────────────────────────────────────
-export default function ExploreGrid({ slot, dateStr }) {
+// ─── Main component ────────────────────────────────────────────────────────────
+export default function ExploreGrid({
+  slot,
+  dateStr,
+  initialRecipes = [],
+  initialTotal = 0,
+  initialPage = 1,
+}) {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
-  const [recipes, setRecipes] = useState([]);
-  const [total, setTotal] = useState(0);
-  const [isLoading, setIsLoading] = useState(true);
+  // Seed state from SSR props — avoids empty grid on first paint.
+  const [recipes, setRecipes] = useState(initialRecipes);
+  const [total, setTotal] = useState(initialTotal);
+  const [isLoading, setIsLoading] = useState(false);
   const [isPending, startTransition] = useTransition();
 
-  const page = parseInt(searchParams.get("page") || "1", 10);
+  // Track whether this is the very first render so we can skip the initial
+  // useEffect fetch (data already comes from SSR props).
+  const isFirstRender = useRef(true);
+
+  const page = parseInt(searchParams.get("page") || String(initialPage), 10);
   const pageSize = 12;
   const totalPages = Math.ceil(total / pageSize);
 
   // Build the API URL from current search params
-  const buildApiUrl = useCallback(
-    (params) => {
-      const url = new URL("/api/explore", window.location.origin);
-      for (const [key, value] of params.entries()) {
-        url.searchParams.set(key, value);
-      }
-      return url.toString();
-    },
-    []
-  );
+  const buildApiUrl = useCallback((params) => {
+    const url = new URL("/api/explore", window.location.origin);
+    for (const [key, value] of params.entries()) {
+      url.searchParams.set(key, value);
+    }
+    return url.toString();
+  }, []);
 
-  // Fetch recipes whenever search params change
+  // Fetch recipes on searchParams change.
+  // Skipped on first render: initial data is already populated from SSR props.
   useEffect(() => {
+    if (isFirstRender.current) {
+      isFirstRender.current = false;
+      return; // ← skip — SSR data is already in state
+    }
+
     let cancelled = false;
     setIsLoading(true);
 

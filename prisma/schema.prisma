@@ -103,6 +103,19 @@ model Recipe {
   favorites   Favorite[]         // Relasi ke Favorite
   mealPlans   MealPlanRecipe[]   // Relasi ke MealPlanRecipe
   ratings     Rating[]           // Relasi ke Rating
+
+  // Indexes for explore page filter/sort performance
+  // status+createdAt: covers default listing (PUBLISHED, order by newest)
+  @@index([status, createdAt(sort: Desc)])
+  // categoryId+status: covers category filter queries
+  @@index([categoryId, status])
+  // cookTime: covers serving-time range filter (<15, <30, <60, >90)
+  @@index([cookTime])
+  // TODO: For title/description full-text search, add a GIN trigram index
+  // via a raw SQL migration (not expressible in Prisma schema):
+  //   CREATE EXTENSION IF NOT EXISTS pg_trgm;
+  //   CREATE INDEX CONCURRENTLY idx_recipe_title_trgm
+  //     ON "Recipe" USING GIN (title gin_trgm_ops);
 }
 
 // Model Category untuk menyimpan kategori resep
@@ -128,6 +141,10 @@ model RecipeIngredient {
 
   recipe         Recipe     @relation(fields: [recipeId], references: [id], onDelete: Cascade)
   ingredient     Ingredient @relation(fields: [ingredientId], references: [id])
+
+  // Indexes for ingredient filter join on explore page
+  @@index([recipeId])
+  @@index([ingredientId])
 }
 
 // Model Favorite untuk menyimpan resep favorit pengguna

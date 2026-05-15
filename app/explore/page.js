@@ -1,14 +1,22 @@
-// dynamic is automatically set by Next.js because this page uses searchParams
+// app/explore/page.js
+// Dynamic because searchParams change per request.
+// Auth is resolved in parallel with public data — does NOT block the recipe grid.
 
 import { Suspense } from "react";
 import SafeImage from "@/components/ui/SafeImage";
-import prisma from "@/lib/prisma";
 import Link from "next/link";
 import dynamic from "next/dynamic";
 import { auth } from "@/lib/auth";
 import FilterSidebar from "./FilterSidebar";
 import ExploreGrid from "./ExploreGrid";
 import { ArrowRight, Bell, Clock3, Globe, Star } from "lucide-react";
+import {
+  fetchFeaturedRecipe,
+  fetchPublicExploreRecipes,
+  fetchAuthenticatedExploreRecipes,
+} from "@/lib/queries/explore";
+import prisma from "@/lib/prisma";
+import { unstable_cache } from "next/cache";
 
 export const metadata = {
   title: "Explore – Recipeat",
@@ -24,71 +32,95 @@ const SmartDiscovery = dynamic(
   }
 );
 
+// Cache ingredients list for 5 minutes — changes rarely and is public data.
+const fetchIngredients = unstable_cache(
+  async () => {
+    const rows = await prisma.ingredient.findMany({
+      select: { name: true },
+      take: 200,
+      orderBy: { recipes: { _count: "desc" } },
+    });
+    return rows.map((r) => r.name);
+  },
+  ["ingredients-list"],
+  { revalidate: 300 }
+);
 
-
+// Default fallback for when no recipes exist in DB yet
+const DEFAULT_FEATURED = {
+  id: "",
+  title: "Seasonal Harvest Buddha Bowl with Miso Dressing",
+  description:
+    "Experience a symphony of textures and earthy flavors curated by Chef Julian.",
+  image:
+    "https://images.unsplash.com/photo-1547592166-23ac45744acd?auto=format&fit=crop&w=800&q=80",
+  time: "25 mins",
+  rating: "5.0",
+};
 
 export default async function ExplorePage({ searchParams: searchParamsPromise }) {
   const searchParams = await searchParamsPromise;
-  const session = await auth();
-  const userId = session?.user?.id;
 
-  const query = searchParams?.q || "";
-  const selectedMealTypes = searchParams?.mealTypes ? searchParams.mealTypes.split(",").filter(Boolean) : [];
-  const selectedServingTimes = searchParams?.servingTimes ? searchParams.servingTimes.split(",").filter(Boolean) : [];
-  const ingredientsFilter = searchParams?.ingredients ? searchParams.ingredients.split(",") : [];
+  // ── Parse filters from URL ────────────────────────────────────────────────
+  const q = searchParams?.q || "";
+  const selectedMealTypes = searchParams?.mealTypes
+    ? searchParams.mealTypes.split(",").filter(Boolean)
+    : [];
+  const selectedServingTimes = searchParams?.servingTimes
+    ? searchParams.servingTimes.split(",").filter(Boolean)
+    : [];
+  const ingredientsFilter = searchParams?.ingredients
+    ? searchParams.ingredients.split(",").filter(Boolean)
+    : [];
   const slotFilter = searchParams?.slot || "";
   const dateFilter = searchParams?.date || "";
+  const page = parseInt(searchParams?.page || "1", 10);
 
-  let availableIngredients = [];
-  let specialRecipeData = {
-    id: "",
-    title: "Seasonal Harvest Buddha Bowl with Miso Dressing",
-    description: "Experience a symphony of textures and earthy flavors curated by Chef Julian. Freshly picked root vegetables meets silky fermented dressing.",
-    image: "https://lh3.googleusercontent.com/aida-public/AB6AXuBTW3Cl9bj3m4KQymVuSqGCTkb_DiqKPFjNvng-3EOw10Ry8VXeNfQAC256wM3To0X6I9RqMZYUpVsp60bjXVlQlGcZCvGoDaJe0UKixOotAoazzHY4m6xXIdfjRI5agMytUlSCyetnVc1CxEw3-ql2pv3ZUM0rWEF2UE3gseIdsRdnpPN79o89TuOZl0GnwiCnoa2n8MSvuoMvoCuqRyExSjJySVR5QHDDUmvuqgHub2oJqxzSO1Xdl74HxWblhELbhINlMOu8h4uX",
-    time: "25 mins",
-    rating: "5.0",
+  const filters = {
+    q,
+    categoryFilter: "",
+    selectedMealTypes,
+    selectedServingTimes,
+    ingredientsFilter,
   };
 
+  // ── Fetch data in parallel — auth does NOT block recipe grid ──────────────
+  // auth() is called alongside public data fetches, not sequentially before.
+  // If session resolution fails or is slow, the recipe grid still renders.
+  const [sessionResult, featuredRecipe, ingredientsResult] = await Promise.allSettled([
+    auth(),
+    fetchFeaturedRecipe(),
+    fetchIngredients(),
+  ]);
+
+  const session = sessionResult.status === "fulfilled" ? sessionResult.value : null;
+  const userId = session?.user?.id || null;
+  const specialRecipeData =
+    (featuredRecipe.status === "fulfilled" && featuredRecipe.value) ||
+    DEFAULT_FEATURED;
+  const availableIngredients =
+    ingredientsResult.status === "fulfilled" ? ingredientsResult.value : [];
+
+  // ── Fetch initial recipe grid server-side ─────────────────────────────────
+  // This is the critical SSR change: grid data is in the initial HTML, not
+  // fetched by the client after hydration. FCP/LCP significantly improved.
+  let initialRecipes = [];
+  let initialTotal = 0;
   try {
-    const totalAllRecipesCount = await prisma.recipe.count();
-    const randomSkip = totalAllRecipesCount > 0 ? Math.floor(Math.random() * totalAllRecipesCount) : 0;
-
-    const [dbIngredients, randomRecipe] = await Promise.all([
-      prisma.ingredient.findMany({
-        select: { name: true, _count: { select: { recipes: true } } },
-        take: 200,
-        orderBy: { recipes: { _count: 'desc' } },
-      }),
-      totalAllRecipesCount > 0 ? prisma.recipe.findFirst({
-        skip: randomSkip,
-        where: { status: 'PUBLISHED' },
-        include: { category: true, ratings: true }
-      }) : null,
-    ]);
-
-    availableIngredients = dbIngredients.map((ingredient) => ingredient.name);
-
-    if (randomRecipe) {
-      const specialRating = randomRecipe.ratings && randomRecipe.ratings.length > 0
-        ? (randomRecipe.ratings.reduce((acc, curr) => acc + curr.score, 0) / randomRecipe.ratings.length).toFixed(1)
-        : "0.0";
-
-      specialRecipeData = {
-        id: randomRecipe.id,
-        title: randomRecipe.title,
-        description: randomRecipe.description || "Experience a symphony of textures and earthy flavors.",
-        image: randomRecipe.imageUrl || 'https://images.unsplash.com/photo-1547592166-23ac45744acd?auto=format&fit=crop&w=800&q=80',
-        time: `${randomRecipe.cookTime || 0} mins`,
-        rating: specialRating,
-      };
-    }
-  } catch (error) {
-    console.error("Error fetching explore data:", error);
+    const result = userId
+      ? await fetchAuthenticatedExploreRecipes(filters, page, userId)
+      : await fetchPublicExploreRecipes(filters, page);
+    initialRecipes = result.recipes;
+    initialTotal = result.total;
+  } catch (err) {
+    console.error("[explore] Failed to fetch initial recipes:", err);
   }
 
   return (
     <div className="min-h-screen bg-[#f5f6f7] text-[#2c2f30]">
       <main className="mx-auto w-full max-w-screen-2xl px-6 py-8 md:px-12">
+        {/* ── Hero / Featured Recipe ────────────────────────────────────────── */}
+        {/* LCP element: priority + accurate sizes for full-bleed hero */}
         <section className="group relative mb-12 h-[450px] md:h-[500px] w-full overflow-hidden rounded-xl shadow-[0_32px_64px_-12px_rgba(0,105,65,0.08)]">
           <SafeImage
             src={specialRecipeData.image}
@@ -96,7 +128,7 @@ export default async function ExplorePage({ searchParams: searchParamsPromise })
             fill
             className="object-cover transition-transform duration-700 group-hover:scale-105"
             priority
-            sizes="100vw"
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 100vw, 100vw"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
 
@@ -140,39 +172,31 @@ export default async function ExplorePage({ searchParams: searchParamsPromise })
           </div>
         </section>
 
-<div className="flex flex-col gap-12 lg:flex-row">
-          <FilterSidebar selectedMealTypes={selectedMealTypes} selectedServingTimes={selectedServingTimes} searchParams={searchParams} />
+        <div className="flex flex-col gap-12 lg:flex-row">
+          <FilterSidebar
+            selectedMealTypes={selectedMealTypes}
+            selectedServingTimes={selectedServingTimes}
+            searchParams={searchParams}
+          />
 
           <section className="flex-1">
-            {/* Smart Discovery - search bar */}
+            {/* Smart Discovery — search bar */}
             <SmartDiscovery
-              initialQuery={query}
+              initialQuery={q}
               initialIngredients={ingredientsFilter}
               availableIngredients={availableIngredients}
             />
 
-            {/* Client-side grid with skeleton + pagination */}
-            <Suspense fallback={
-              <div className="grid grid-cols-1 gap-8 md:grid-cols-2 xl:grid-cols-3">
-                {Array.from({ length: 12 }).map((_, i) => (
-                  <article key={i} className="flex h-full flex-col overflow-hidden rounded-xl bg-white border border-slate-100 shadow-sm animate-pulse">
-                    <div className="relative h-56 bg-slate-200" />
-                    <div className="flex flex-1 flex-col p-6">
-                      <div className="mb-2 h-5 w-3/4 rounded bg-slate-300" />
-                      <div className="mt-auto flex items-center justify-between">
-                        <div className="flex gap-4">
-                          <div className="h-4 w-16 rounded bg-slate-200" />
-                          <div className="h-4 w-20 rounded bg-slate-200" />
-                        </div>
-                        <div className="h-4 w-4 rounded bg-slate-200" />
-                      </div>
-                    </div>
-                  </article>
-                ))}
-              </div>
-            }>
-              <ExploreGrid slot={slotFilter} dateStr={dateFilter} />
-            </Suspense>
+            {/* Recipe grid — initial data is SSR; client takes over for
+                subsequent filter/page changes. No loading skeleton on first
+                paint means FCP/LCP is now served from server HTML. */}
+            <ExploreGrid
+              slot={slotFilter}
+              dateStr={dateFilter}
+              initialRecipes={initialRecipes}
+              initialTotal={initialTotal}
+              initialPage={page}
+            />
           </section>
         </div>
       </main>
@@ -206,52 +230,20 @@ export default async function ExplorePage({ searchParams: searchParamsPromise })
           <div>
             <h4 className="mb-6 text-xs font-bold uppercase tracking-widest text-[#2c2f30]">Platform</h4>
             <ul className="space-y-4 font-medium text-[#595c5d]">
-              <li>
-                <a className="transition-colors hover:text-[#006941]" href="#">
-                  Recipe Index
-                </a>
-              </li>
-              <li>
-                <a className="transition-colors hover:text-[#006941]" href="#">
-                  Meal Planner
-                </a>
-              </li>
-              <li>
-                <a className="transition-colors hover:text-[#006941]" href="#">
-                  Grocery Sync
-                </a>
-              </li>
-              <li>
-                <a className="transition-colors hover:text-[#006941]" href="#">
-                  Chef Program
-                </a>
-              </li>
+              <li><a className="transition-colors hover:text-[#006941]" href="#">Recipe Index</a></li>
+              <li><a className="transition-colors hover:text-[#006941]" href="#">Meal Planner</a></li>
+              <li><a className="transition-colors hover:text-[#006941]" href="#">Grocery Sync</a></li>
+              <li><a className="transition-colors hover:text-[#006941]" href="#">Chef Program</a></li>
             </ul>
           </div>
 
           <div>
             <h4 className="mb-6 text-xs font-bold uppercase tracking-widest text-[#2c2f30]">Resources</h4>
             <ul className="space-y-4 font-medium text-[#595c5d]">
-              <li>
-                <a className="transition-colors hover:text-[#006941]" href="#">
-                  Help Center
-                </a>
-              </li>
-              <li>
-                <a className="transition-colors hover:text-[#006941]" href="#">
-                  Privacy Policy
-                </a>
-              </li>
-              <li>
-                <a className="transition-colors hover:text-[#006941]" href="#">
-                  Terms of Service
-                </a>
-              </li>
-              <li>
-                <a className="transition-colors hover:text-[#006941]" href="#">
-                  Contact Us
-                </a>
-              </li>
+              <li><a className="transition-colors hover:text-[#006941]" href="#">Help Center</a></li>
+              <li><a className="transition-colors hover:text-[#006941]" href="#">Privacy Policy</a></li>
+              <li><a className="transition-colors hover:text-[#006941]" href="#">Terms of Service</a></li>
+              <li><a className="transition-colors hover:text-[#006941]" href="#">Contact Us</a></li>
             </ul>
           </div>
         </div>
