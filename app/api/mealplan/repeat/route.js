@@ -27,6 +27,25 @@ export async function PATCH(request) {
       data: { repeatWeekly },
     });
 
+    if (!repeatWeekly) {
+      const futureMealPlans = await prisma.mealPlan.findMany({
+        where: { userId: dbUser.id, weekStart: { gt: mealPlan.weekStart } },
+        select: { id: true },
+      });
+
+      if (futureMealPlans.length > 0) {
+        await prisma.mealPlanRecipe.deleteMany({
+          where: {
+            mealPlanId: { in: futureMealPlans.map((p) => p.id) },
+            recipeId: Number(recipeId),
+            dayOfWeek,
+            mealType,
+            repeatWeekly: true,
+          },
+        });
+      }
+    }
+
     return Response.json({ success: true, repeatWeekly }, { status: 200 });
   } catch (error) {
     console.error('PATCH /api/mealplan/repeat error:', error);
