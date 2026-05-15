@@ -10,9 +10,11 @@ import SiteFooter from "@/components/layout/SiteFooter";
 import FeaturesSection from "@/components/sections/FeaturesSection";
 import HeroSection from "@/components/sections/HeroSection";
 import RecipesSection from "@/components/sections/RecipesSection";
+import { auth } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 
 export default async function HomePage() {
+  const session = await auth();
   let dynamicRecipeCards = recipesContent.cards;
   try {
     const latestRecipes = await prisma.recipe.findMany({
@@ -46,13 +48,17 @@ export default async function HomePage() {
   } catch (error) {
     console.error("Error fetching recipes:", error);
   }
+  const heroPrimaryAction = session?.user
+    ? { label: "Explore Now", href: "/explore" }
+    : heroContent.primaryAction;
+
   return (
     <>
       <main className="bg-[#f5f6f7] text-[#2c2f30]">
         <HeroSection
           title={heroContent.title}
           description={heroContent.description}
-          primaryAction={heroContent.primaryAction}
+          primaryAction={heroPrimaryAction}
           secondaryAction={heroContent.secondaryAction}
           heroImage={heroContent.heroImage}
         />
