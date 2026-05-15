@@ -1,12 +1,13 @@
 import { footerContent } from "@/components/content/landingContent";
 import SiteFooter from "@/components/layout/SiteFooter";
-import AuthGuard from "@/components/layout/AuthGuard";
 import Image from "next/image";
 import Link from "next/link";
 import { Clock, Heart, Search } from "lucide-react";
 import prisma from "@/lib/prisma";
 import { auth } from "@/lib/auth";
 import FavoriteButton from "@/components/RecipeCard/FavoriteButton";
+import { getSafeImageSrc } from "@/lib/images";
+import { redirect } from "next/navigation";
 
 export const metadata = {
   title: "Favorites – Recipeat",
@@ -16,13 +17,18 @@ export const metadata = {
 export default async function FavoritesPage({ searchParams: searchParamsPromise }) {
   const searchParams = await searchParamsPromise;
   const session = await auth();
-  const userId = session?.user?.id;
+  if (!session?.user?.email) {
+    redirect("/login");
+  }
   
   const query = searchParams?.q || "";
 
   let favorites = [];
-  if (userId && session?.user?.email) {
-    const dbUser = await prisma.user.findUnique({ where: { email: session.user.email } });
+  if (session.user.email) {
+    const dbUser = await prisma.user.findUnique({
+      where: { email: session.user.email },
+      select: { id: true },
+    });
     
     if (dbUser) {
       favorites = await prisma.favorite.findMany({
@@ -35,10 +41,20 @@ export default async function FavoritesPage({ searchParams: searchParamsPromise 
             ]
           } : undefined
         },
-        include: {
+        select: {
           recipe: {
-            include: { category: true }
-          }
+            select: {
+              id: true,
+              title: true,
+              imageUrl: true,
+              cookTime: true,
+              category: {
+                select: {
+                  name: true,
+                },
+              },
+            },
+          },
         },
         orderBy: { savedAt: 'desc' }
       });
@@ -46,7 +62,6 @@ export default async function FavoritesPage({ searchParams: searchParamsPromise 
   }
 
   return (
-    <AuthGuard>
     <>
       <div className="min-h-screen bg-[#f5f6f7] pt-8 pb-12 font-body">
         <main className="max-w-7xl mx-auto px-6 md:px-12 space-y-10">
@@ -109,7 +124,7 @@ export default async function FavoritesPage({ searchParams: searchParamsPromise 
                 <div className="relative w-full aspect-square rounded-xl overflow-hidden bg-slate-100">
                   <Link href={`/recipes/${fav.recipe.id}`} className="block h-full">
                     <Image 
-                      src={fav.recipe.imageUrl || "/favorite4.png"} 
+                      src={getSafeImageSrc(fav.recipe.imageUrl)} 
                       alt={fav.recipe.title} 
                       fill
                       sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 25vw"
@@ -163,6 +178,5 @@ export default async function FavoritesPage({ searchParams: searchParamsPromise 
         linkGroups={footerContent.linkGroups}
       />
     </>
-    </AuthGuard>
   );
 }

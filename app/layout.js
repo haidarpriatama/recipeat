@@ -1,11 +1,8 @@
 import "./globals.css";
 import { Geist, Plus_Jakarta_Sans } from "next/font/google";
-
-// 1. Tambahkan Impor SiteHeader (dan SiteFooter jika ada) di sini
 import SiteHeader from "@/components/layout/SiteHeader";
-import { Providers } from "@/components/Providers";
 import MainContainer from "@/components/layout/MainContainer";
-import { SpeedInsights } from "@vercel/speed-insights/next";
+import SpeedInsightsProvider from "@/components/layout/SpeedInsightsProvider";
 
 const geist = Geist({
   subsets: ["latin"],
@@ -42,19 +39,11 @@ export default function RootLayout({ children }) {
         className={`${geist.variable} ${plusJakartaSans.variable} antialiased bg-[#f5f6f7]`}
         style={{ fontFamily: fontFamilyMap[DEFAULT_APP_FONT] }}
       >
-        <Providers>
-          {/* 2. Panggil SiteHeader di posisi paling atas dalam body */}
-          <SiteHeader />
+        <SiteHeader />
 
-          <MainContainer>
-            {children}
-          </MainContainer>
-        </Providers>
+        <MainContainer>{children}</MainContainer>
 
-        <SpeedInsights />
-
-        {/* 4. Letakkan Footer di sini nanti */}
-        {/* <SiteFooter /> */}
+        <SpeedInsightsProvider />
       </body>
     </html>
   );

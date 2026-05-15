@@ -10,35 +10,40 @@ import SiteFooter from "@/components/layout/SiteFooter";
 import FeaturesSection from "@/components/sections/FeaturesSection";
 import HeroSection from "@/components/sections/HeroSection";
 import RecipesSection from "@/components/sections/RecipesSection";
-import { auth } from "@/lib/auth";
+import { getSafeImageSrc } from "@/lib/images";
+import { measureServerTiming } from "@/lib/perf";
 import prisma from "@/lib/prisma";
 
 export default async function HomePage() {
-  const session = await auth();
   let dynamicRecipeCards = recipesContent.cards;
+
   try {
-    const latestRecipes = await prisma.recipe.findMany({
-      where: { status: "PUBLISHED" },
-      take: 3,
-      select: {
-        id: true,
-        title: true,
-        imageUrl: true,
-        cookTime: true,
-        category: {
+    const latestRecipes = await measureServerTiming(
+      "home:latestRecipes",
+      () =>
+        prisma.recipe.findMany({
+          where: { status: "PUBLISHED" },
+          take: 3,
           select: {
-            name: true,
+            id: true,
+            title: true,
+            imageUrl: true,
+            cookTime: true,
+            category: {
+              select: {
+                name: true,
+              },
+            },
           },
-        },
-      },
-      orderBy: { createdAt: "desc" },
-    });
+          orderBy: { createdAt: "desc" },
+        })
+    );
 
     if (latestRecipes.length > 0) {
       dynamicRecipeCards = latestRecipes.map((recipe) => ({
         id: recipe.id,
         title: recipe.title,
-        image: recipe.imageUrl || "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=800&q=80",
+        image: getSafeImageSrc(recipe.imageUrl),
         alt: recipe.title,
         label: recipe.category?.name || "Recipe",
         time: `${recipe.cookTime}m`,
@@ -48,9 +53,6 @@ export default async function HomePage() {
   } catch (error) {
     console.error("Error fetching recipes:", error);
   }
-  const heroPrimaryAction = session?.user
-    ? { label: "Explore Now", href: "/explore" }
-    : heroContent.primaryAction;
 
   return (
     <>
@@ -58,7 +60,7 @@ export default async function HomePage() {
         <HeroSection
           title={heroContent.title}
           description={heroContent.description}
-          primaryAction={heroPrimaryAction}
+          primaryAction={{ label: "Explore Now", href: "/explore" }}
           secondaryAction={heroContent.secondaryAction}
           heroImage={heroContent.heroImage}
         />

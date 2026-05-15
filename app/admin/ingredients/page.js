@@ -3,6 +3,7 @@ import { redirect } from "next/navigation";
 import prisma from "@/lib/prisma";
 import IngredientClientTable from "./IngredientClientTable";
 import AddIngredientButton from "./AddIngredientButton";
+import { measureServerTiming } from "@/lib/perf";
 
 export default async function AdminIngredientsPage({ searchParams }) {
   const session = await auth();
@@ -18,22 +19,26 @@ export default async function AdminIngredientsPage({ searchParams }) {
     ? { name: { contains: q, mode: "insensitive" } }
     : undefined;
 
-  const [ingredients, totalCount, total, active] = await Promise.all([
-    prisma.ingredient.findMany({
-      where: whereClause,
-      skip,
-      take: pageSize,
-      select: {
-        id: true,
-        name: true,
-        _count: { select: { recipes: true } },
-      },
-      orderBy: { name: "asc" },
-    }),
-    prisma.ingredient.count({ where: whereClause }),
-    prisma.ingredient.count(),
-    prisma.ingredient.count({ where: { recipes: { some: {} } } })
-  ]);
+  const [ingredients, totalCount, total, active] = await measureServerTiming(
+    "admin:ingredients",
+    () =>
+      Promise.all([
+        prisma.ingredient.findMany({
+          where: whereClause,
+          skip,
+          take: pageSize,
+          select: {
+            id: true,
+            name: true,
+            _count: { select: { recipes: true } },
+          },
+          orderBy: { name: "asc" },
+        }),
+        prisma.ingredient.count({ where: whereClause }),
+        prisma.ingredient.count(),
+        prisma.ingredient.count({ where: { recipes: { some: {} } } }),
+      ])
+  );
 
   const totalPages = Math.ceil(totalCount / pageSize);
   const unused = total - active;

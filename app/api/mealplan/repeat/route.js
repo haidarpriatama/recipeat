@@ -1,6 +1,9 @@
 import prisma from '@/lib/prisma';
 import { auth } from '@/lib/auth';
 
+export const runtime = "nodejs";
+export const preferredRegion = "sin1";
+
 export async function PATCH(request) {
   try {
     const session = await auth();

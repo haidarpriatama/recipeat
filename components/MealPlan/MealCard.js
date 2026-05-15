@@ -1,10 +1,10 @@
 "use client";
 
 import React, { useState } from 'react';
-import Image from "next/image";
 import Link from "next/link";
 import { Timer, Star, Trash2, Loader2 } from "lucide-react";
 import { useRouter } from "next/navigation";
+import SafeImage from "@/components/ui/SafeImage";
 
 export default function MealCard({ meal, compact = false, onDelete, onRepeatToggle }) {
   const router = useRouter();
@@ -87,7 +87,13 @@ export default function MealCard({ meal, compact = false, onDelete, onRepeatTogg
             <Trash2 className="h-4 w-4" />
           </button>
           <div className="relative h-48 md:h-auto md:w-1/3">
-            <Image src={meal.image} alt={meal.imageAlt} fill className="object-cover transition-transform duration-500 group-hover:scale-105" sizes="(min-width: 1024px) 25vw, (min-width: 768px) 35vw, 100vw" />
+            <SafeImage
+              src={meal.image}
+              alt={meal.imageAlt}
+              fill
+              className="object-cover transition-transform duration-500 group-hover:scale-105"
+              sizes="(min-width: 1024px) 25vw, (min-width: 768px) 35vw, 100vw"
+            />
           </div>
           <div className="flex flex-col justify-between p-6 md:w-2/3">
             <div>
@@ -156,4 +162,3 @@ export default function MealCard({ meal, compact = false, onDelete, onRepeatTogg
     </>
   );
 }
-

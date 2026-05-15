@@ -27,10 +27,8 @@ export default function RecipePickerModal({ slot, dateStr, onClose, onAdded }) {
     }
   }, [slot]);
 
-  useEffect(() => { fetchRecipes(""); }, [fetchRecipes]);
-
   useEffect(() => {
-    const timeout = setTimeout(() => fetchRecipes(q), 300);
+    const timeout = setTimeout(() => fetchRecipes(q), q ? 300 : 0);
     return () => clearTimeout(timeout);
   }, [q, fetchRecipes]);
 

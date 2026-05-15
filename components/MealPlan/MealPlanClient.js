@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { ChevronLeft, ChevronRight, PlusCircle } from "lucide-react";
 import MealCard from "./MealCard";
@@ -26,11 +26,6 @@ function Calendar({ selectedDate, onDateSelect }) {
   const [viewDate, setViewDate] = useState(
     new Date(selectedDate.getFullYear(), selectedDate.getMonth(), 1)
   );
-
-  // Sync view when selectedDate changes externally
-  useEffect(() => {
-    setViewDate(new Date(selectedDate.getFullYear(), selectedDate.getMonth(), 1));
-  }, [selectedDate]);
 
   const getCalendarDays = () => {
     const year = viewDate.getFullYear();
@@ -191,22 +186,28 @@ function TimelineItem({ slot, meals, dateStr, onMealDeleted }) {
 }
 
 // ── Main component ───────────────────────────────────────────────────────────
-export default function MealPlanClient() {
+export default function MealPlanClient({
+  initialDateStr,
+  initialMeals = [],
+}) {
   const searchParams = useSearchParams();
   const router = useRouter();
+  const isFirstRender = useRef(true);
+  const [selectedDate, setSelectedDate] = useState(() => {
+    const dateFromUrl = searchParams.get("date");
+    const source = dateFromUrl || initialDateStr;
 
-  const getInitialDate = () => {
-    const dp = searchParams.get("date");
-    if (dp) {
-      const parsed = parseDate(dp);
-      if (!isNaN(parsed)) return parsed;
+    if (source) {
+      const parsed = parseDate(source);
+      if (!isNaN(parsed)) {
+        return parsed;
+      }
     }
-    return new Date();
-  };
 
-  const [selectedDate, setSelectedDate] = useState(getInitialDate);
-  const [meals, setMeals] = useState([]);
-  const [loading, setLoading] = useState(true);
+    return new Date();
+  });
+  const [meals, setMeals] = useState(initialMeals);
+  const [loading, setLoading] = useState(false);
 
   const dateStr = formatDate(selectedDate);
   const dayName = DAYS_FULL[selectedDate.getDay()];
@@ -227,8 +228,12 @@ export default function MealPlanClient() {
     }
   }, []);
 
-  // Fetch on mount and when date changes
   useEffect(() => {
+    if (isFirstRender.current) {
+      isFirstRender.current = false;
+      return;
+    }
+
     fetchMeals(selectedDate);
   }, [selectedDate, fetchMeals]);
 
@@ -247,7 +252,11 @@ export default function MealPlanClient() {
     <div className="mx-auto grid max-w-screen-2xl grid-cols-1 gap-8 px-6 py-8 lg:grid-cols-12 lg:px-10">
       {/* Sidebar calendar */}
       <aside className="space-y-6 lg:col-span-3">
-        <Calendar selectedDate={selectedDate} onDateSelect={handleDateSelect} />
+        <Calendar
+          key={`${selectedDate.getFullYear()}-${selectedDate.getMonth()}`}
+          selectedDate={selectedDate}
+          onDateSelect={handleDateSelect}
+        />
       </aside>
 
       {/* Main timeline */}

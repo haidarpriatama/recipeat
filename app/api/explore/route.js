@@ -18,6 +18,9 @@ import {
   fetchAuthenticatedExploreRecipes,
 } from "@/lib/queries/explore";
 
+export const runtime = "nodejs";
+export const preferredRegion = "sin1";
+
 export async function GET(request) {
   const { searchParams } = new URL(request.url);
 

@@ -1,5 +1,6 @@
 import ProfileContent from "./ProfileContent";
 import { auth } from "@/lib/auth";
+import { getSafeImageSrc } from "@/lib/images";
 import prisma from "@/lib/prisma";
 import { redirect } from "next/navigation";
 
@@ -32,7 +33,7 @@ export default async function ProfilePage() {
   const favoriteRecipes = favorites.map((fav) => ({
     id: fav.recipe.id,
     title: fav.recipe.title,
-    image: fav.recipe.imageUrl || "/favorite4.png",
+    image: getSafeImageSrc(fav.recipe.imageUrl),
     alt: fav.recipe.title,
     time: `${fav.recipe.cookTime} min`,
     tags: [fav.recipe.category?.name || "Recipe"],

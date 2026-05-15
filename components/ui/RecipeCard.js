@@ -1,12 +1,12 @@
-import Image from "next/image";
 import Link from "next/link";
 import { Star, Timer } from "lucide-react";
+import SafeImage from "@/components/ui/SafeImage";
 
 export default function RecipeCard({ recipe }) {
   const cardContent = (
     <article className="h-full group overflow-hidden rounded-[2rem] bg-white shadow-sm transition-all duration-500 hover:shadow-xl">
       <div className="relative h-64 overflow-hidden">
-        <Image
+        <SafeImage
           className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
           alt={recipe.alt}
           src={recipe.image}

@@ -1,27 +1,24 @@
-// app/explore/page.js
-// Dynamic because searchParams change per request.
-// Auth is resolved in parallel with public data — does NOT block the recipe grid.
-
-import { Suspense } from "react";
 import SafeImage from "@/components/ui/SafeImage";
 import Link from "next/link";
 import dynamic from "next/dynamic";
-import { auth } from "@/lib/auth";
 import FilterSidebar from "./FilterSidebar";
 import ExploreGrid from "./ExploreGrid";
 import { ArrowRight, Bell, Clock3, Globe, Star } from "lucide-react";
 import {
   fetchFeaturedRecipe,
   fetchPublicExploreRecipes,
-  fetchAuthenticatedExploreRecipes,
 } from "@/lib/queries/explore";
 import prisma from "@/lib/prisma";
 import { unstable_cache } from "next/cache";
+import { measureServerTiming } from "@/lib/perf";
 
 export const metadata = {
   title: "Explore – Recipeat",
   description: "Discover new recipes and culinary inspiration.",
 };
+
+export const runtime = "nodejs";
+export const preferredRegion = "sin1";
 
 const SmartDiscovery = dynamic(
   () => import("@/components/SmartDiscovery/SmartDiscovery"),
@@ -34,17 +31,20 @@ const SmartDiscovery = dynamic(
 
 // Cache ingredients list for 5 minutes — changes rarely and is public data.
 const fetchIngredients = unstable_cache(
-  async () => {
-    const rows = await prisma.ingredient.findMany({
-      select: { name: true },
-      take: 200,
-      orderBy: { recipes: { _count: "desc" } },
-    });
-    return rows.map((r) => r.name);
-  },
+  async () =>
+    measureServerTiming("explore:ingredients", async () => {
+      const rows = await prisma.ingredient.findMany({
+        select: { name: true },
+        take: 200,
+        orderBy: { recipes: { _count: "desc" } },
+      });
+      return rows.map((r) => r.name);
+    }),
   ["ingredients-list"],
   { revalidate: 300 }
 );
+
+const EXPLORE_HERO_IMAGE = "/favorit3.png";
 
 // Default fallback for when no recipes exist in DB yet
 const DEFAULT_FEATURED = {
@@ -52,8 +52,7 @@ const DEFAULT_FEATURED = {
   title: "Seasonal Harvest Buddha Bowl with Miso Dressing",
   description:
     "Experience a symphony of textures and earthy flavors curated by Chef Julian.",
-  image:
-    "https://images.unsplash.com/photo-1547592166-23ac45744acd?auto=format&fit=crop&w=800&q=80",
+  image: EXPLORE_HERO_IMAGE,
   time: "25 mins",
   rating: "5.0",
 };
@@ -84,59 +83,46 @@ export default async function ExplorePage({ searchParams: searchParamsPromise })
     ingredientsFilter,
   };
 
-  // ── Fetch data in parallel — auth does NOT block recipe grid ──────────────
-  // auth() is called alongside public data fetches, not sequentially before.
-  // If session resolution fails or is slow, the recipe grid still renders.
-  const [sessionResult, featuredRecipe, ingredientsResult] = await Promise.allSettled([
-    auth(),
+  const [gridResult, featuredRecipe, ingredientsResult] = await Promise.allSettled([
+    fetchPublicExploreRecipes(filters, page),
     fetchFeaturedRecipe(),
     fetchIngredients(),
   ]);
 
-  const session = sessionResult.status === "fulfilled" ? sessionResult.value : null;
-  const userId = session?.user?.id || null;
   const specialRecipeData =
     (featuredRecipe.status === "fulfilled" && featuredRecipe.value) ||
     DEFAULT_FEATURED;
   const availableIngredients =
     ingredientsResult.status === "fulfilled" ? ingredientsResult.value : [];
 
-  // ── Fetch initial recipe grid server-side ─────────────────────────────────
-  // This is the critical SSR change: grid data is in the initial HTML, not
-  // fetched by the client after hydration. FCP/LCP significantly improved.
-  let initialRecipes = [];
-  let initialTotal = 0;
-  try {
-    const result = userId
-      ? await fetchAuthenticatedExploreRecipes(filters, page, userId)
-      : await fetchPublicExploreRecipes(filters, page);
-    initialRecipes = result.recipes;
-    initialTotal = result.total;
-  } catch (err) {
-    console.error("[explore] Failed to fetch initial recipes:", err);
+  const initialRecipes =
+    gridResult.status === "fulfilled" ? gridResult.value.recipes : [];
+  const initialTotal = gridResult.status === "fulfilled" ? gridResult.value.total : 0;
+
+  if (gridResult.status === "rejected") {
+    console.error("[explore] Failed to fetch initial recipes:", gridResult.reason);
   }
 
   return (
     <div className="min-h-screen bg-[#f5f6f7] text-[#2c2f30]">
       <main className="mx-auto w-full max-w-screen-2xl px-6 py-8 md:px-12">
-        {/* ── Hero / Featured Recipe ────────────────────────────────────────── */}
-        {/* LCP element: priority + accurate sizes for full-bleed hero */}
-        <section className="group relative mb-12 h-[450px] md:h-[500px] w-full overflow-hidden rounded-xl shadow-[0_32px_64px_-12px_rgba(0,105,65,0.08)]">
+        <section className="relative mb-12 h-[320px] w-full overflow-hidden rounded-xl shadow-[0_32px_64px_-12px_rgba(0,105,65,0.08)] md:h-[380px]">
           <SafeImage
-            src={specialRecipeData.image}
+            src={EXPLORE_HERO_IMAGE}
             alt={specialRecipeData.title}
             fill
-            className="object-cover transition-transform duration-700 group-hover:scale-105"
+            className="object-cover"
             priority
-            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 100vw, 100vw"
+            sizes="(max-width: 768px) 100vw, 1200px"
+            quality={70}
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
 
-          <div className="absolute bottom-0 left-0 max-w-2xl p-8 md:p-10 text-white">
-            <h1 className="mb-4 text-3xl md:text-4xl lg:text-5xl font-extrabold leading-tight line-clamp-2">
+          <div className="absolute bottom-0 left-0 max-w-2xl p-6 text-white md:p-8">
+            <h1 className="mb-3 line-clamp-2 text-3xl font-extrabold leading-tight md:text-4xl lg:text-5xl">
               {specialRecipeData.title}
             </h1>
-            <p className="mb-6 text-base md:text-lg text-stone-200 line-clamp-2 md:line-clamp-3">
+            <p className="mb-5 line-clamp-2 text-sm text-stone-200 md:line-clamp-3 md:text-base">
               {specialRecipeData.description}
             </p>
             <div className="flex flex-wrap items-center gap-6">
@@ -180,16 +166,12 @@ export default async function ExplorePage({ searchParams: searchParamsPromise })
           />
 
           <section className="flex-1">
-            {/* Smart Discovery — search bar */}
             <SmartDiscovery
               initialQuery={q}
               initialIngredients={ingredientsFilter}
               availableIngredients={availableIngredients}
             />
 
-            {/* Recipe grid — initial data is SSR; client takes over for
-                subsequent filter/page changes. No loading skeleton on first
-                paint means FCP/LCP is now served from server HTML. */}
             <ExploreGrid
               slot={slotFilter}
               dateStr={dateFilter}

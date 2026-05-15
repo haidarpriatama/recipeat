@@ -1,6 +1,9 @@
 import { auth } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 
+export const runtime = "nodejs";
+export const preferredRegion = "sin1";
+
 export async function GET(_request, { params }) {
   const session = await auth();
   if (!session || session.user.role !== "ADMIN") {

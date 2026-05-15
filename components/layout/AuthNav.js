@@ -1,19 +1,55 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { Bell, LogOut, User, LayoutDashboard } from "lucide-react";
-import { signOut, useSession } from "next-auth/react";
+import { LogOut, User, LayoutDashboard } from "lucide-react";
+import { getSession, signOut } from "next-auth/react";
 
 /**
- * AuthNav — rendered inside SiteHeader.
- * Shows Login + Sign Up when logged out; profile avatar + logout when logged in.
+ * AuthNav fetches session client-side after hydration so public HTML does not
+ * block on auth/session resolution.
  */
-export default function AuthNav({ initialSession }) {
-  const { data: session } = useSession();
+export default function AuthNav() {
+  const [session, setSession] = useState(null);
   const [dropdownOpen, setDropdownOpen] = useState(false);
-  const user = session?.user || initialSession?.user;
+  const [resolved, setResolved] = useState(false);
+  const user = session?.user;
+
+  useEffect(() => {
+    let cancelled = false;
+
+    const loadSession = async () => {
+      try {
+        const nextSession = await getSession();
+        if (!cancelled) {
+          setSession(nextSession);
+        }
+      } catch (error) {
+        if (!cancelled) {
+          console.error("Failed to resolve session:", error);
+        }
+      } finally {
+        if (!cancelled) {
+          setResolved(true);
+        }
+      }
+    };
+
+    if (typeof window !== "undefined" && "requestIdleCallback" in window) {
+      const id = window.requestIdleCallback(loadSession);
+      return () => {
+        cancelled = true;
+        window.cancelIdleCallback(id);
+      };
+    }
+
+    const timeoutId = window.setTimeout(loadSession, 150);
+    return () => {
+      cancelled = true;
+      window.clearTimeout(timeoutId);
+    };
+  }, []);
 
   const handleLogout = async () => {
     await signOut({ redirect: false });
@@ -21,9 +57,7 @@ export default function AuthNav({ initialSession }) {
     window.location.href = "/";
   };
 
-
-
-  if (!user) {
+  if (!resolved || !user) {
     return (
       <div className="flex items-center gap-4">
         <Link

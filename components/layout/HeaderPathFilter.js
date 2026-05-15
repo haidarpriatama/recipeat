@@ -5,7 +5,13 @@ import { usePathname } from "next/navigation";
 export default function HeaderPathFilter({ children }) {
   const pathname = usePathname();
 
-  if (pathname === "/login" || pathname === "/signup" || pathname.startsWith("/admin")) {
+  if (
+    pathname === "/login" ||
+    pathname === "/signup" ||
+    pathname === "/forgot-password" ||
+    pathname === "/reset-password" ||
+    pathname.startsWith("/admin")
+  ) {
     return null;
   }
 

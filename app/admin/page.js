@@ -15,7 +15,15 @@ export default async function AdminDashboardPage({ searchParams }) {
       prisma.recipe.findMany({
         where: { title: { contains: q, mode: "insensitive" } },
         take: 5,
-        include: { category: true },
+        select: {
+          id: true,
+          title: true,
+          category: {
+            select: {
+              name: true,
+            },
+          },
+        },
       }),
       prisma.user.findMany({
         where: {

@@ -1,23 +1,19 @@
-'use client';
+"use client";
 
-import React, { useState } from 'react';
-import Image from 'next/image';
+import Image from "next/image";
+import { DEFAULT_RECIPE_IMAGE, getSafeImageSrc } from "@/lib/images";
 
-const FALLBACK_IMAGE = "https://images.unsplash.com/photo-1547592166-23ac45744acd?auto=format&fit=crop&w=800&q=80";
-
-export default function SafeImage({ src, alt, ...props }) {
-  const [imgSrc, setImgSrc] = useState(src || FALLBACK_IMAGE);
+export default function SafeImage({ src, alt, onError, ...props }) {
+  const fallbackImage = props.fallbackSrc || DEFAULT_RECIPE_IMAGE;
+  const safeSrc = getSafeImageSrc(src, fallbackImage);
 
   return (
     <Image
       {...props}
-      src={imgSrc}
+      src={safeSrc}
       alt={alt || "Recipe Image"}
-      onError={() => {
-        if (imgSrc !== FALLBACK_IMAGE) {
-          setImgSrc(FALLBACK_IMAGE);
-        }
-      }}
+      quality={props.quality ?? 70}
+      onError={onError}
     />
   );
 }

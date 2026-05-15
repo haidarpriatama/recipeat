@@ -5,6 +5,9 @@ import { Home, CircleUserRound } from "lucide-react";
 import AdminSearchBar from "@/components/admin/AdminSearchBar";
 import AdminSidebarNav from "@/components/admin/AdminSidebarNav";
 
+export const runtime = "nodejs";
+export const preferredRegion = "sin1";
+
 export default async function AdminLayout({ children }) {
   const session = await auth();
 

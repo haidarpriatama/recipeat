@@ -3,9 +3,9 @@
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import Image from "next/image";
 import { Pencil, Trash2, ExternalLink, X } from "lucide-react";
 import { deleteRecipeAction } from "./actions";
+import SafeImage from "@/components/ui/SafeImage";
 
 function TableSkeleton() {
   return (
@@ -94,8 +94,8 @@ export default function RecipesTableClient({ recipes, page, totalPages, q }) {
                       <tr key={recipe.id} className="transition-colors hover:bg-[#f5f6f7]">
                         <td className="px-6 py-4">
                           <div className="relative h-12 w-16 overflow-hidden rounded-lg bg-[#eff1f2]">
-                            <Image
-                              src={recipe.imageUrl || "https://images.unsplash.com/photo-1547592166-23ac45744acd?auto=format&fit=crop&w=800&q=80"}
+                            <SafeImage
+                              src={recipe.imageUrl}
                               alt={recipe.title}
                               fill
                               className="object-cover"

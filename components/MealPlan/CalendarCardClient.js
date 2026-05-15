@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
@@ -10,33 +10,19 @@ export default function CalendarCardClient() {
   
   // Read date from URL or use today
   const dateParam = searchParams.get("date");
-  const today = new Date();
-  
-  const [selectedDate, setSelectedDate] = useState(() => {
+
+  const selectedDate = useMemo(() => {
     if (dateParam) {
       const parsed = new Date(dateParam);
       if (!isNaN(parsed)) return parsed;
     }
-    return today;
-  });
+    return new Date();
+  }, [dateParam]);
 
   // Keep internal state for the month being viewed
-  const [viewDate, setViewDate] = useState(new Date(selectedDate.getFullYear(), selectedDate.getMonth(), 1));
-
-  // Sync state if URL changes externally
-  useEffect(() => {
-    if (dateParam) {
-      const parsed = new Date(dateParam);
-      if (!isNaN(parsed)) {
-        setSelectedDate(parsed);
-        setViewDate(new Date(parsed.getFullYear(), parsed.getMonth(), 1));
-      }
-    } else {
-      setSelectedDate(today);
-      setViewDate(new Date(today.getFullYear(), today.getMonth(), 1));
-    }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [dateParam]);
+  const [viewDate, setViewDate] = useState(
+    () => new Date(selectedDate.getFullYear(), selectedDate.getMonth(), 1)
+  );
 
   const handlePrevMonth = () => {
     setViewDate(new Date(viewDate.getFullYear(), viewDate.getMonth() - 1, 1));

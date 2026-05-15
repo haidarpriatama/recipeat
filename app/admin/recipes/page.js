@@ -1,4 +1,5 @@
 import { auth } from "@/lib/auth";
+import { getSafeImageSrc } from "@/lib/images";
 import { redirect } from "next/navigation";
 import prisma from "@/lib/prisma";
 import Link from "next/link";
@@ -28,8 +29,18 @@ export default async function AdminRecipesPage({ searchParams }) {
       where: whereClause,
       skip,
       take: pageSize,
-      include: {
-        category: true,
+      select: {
+        id: true,
+        title: true,
+        imageUrl: true,
+        cookTime: true,
+        status: true,
+        createdAt: true,
+        category: {
+          select: {
+            name: true,
+          },
+        },
         _count: { select: { favorites: true, ingredients: true } },
       },
       orderBy: { createdAt: "desc" },
@@ -47,7 +58,7 @@ export default async function AdminRecipesPage({ searchParams }) {
   const serializedRecipes = recipes.map((r) => ({
     id: r.id,
     title: r.title,
-    imageUrl: r.imageUrl,
+    imageUrl: getSafeImageSrc(r.imageUrl),
     cookTime: r.cookTime,
     status: r.status,
     categoryName: r.category?.name || null,

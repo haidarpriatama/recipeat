@@ -41,7 +41,8 @@ export default function HeroSection({
               src={heroImage.src}
               fill
               priority
-              sizes="(min-width: 1024px) 40vw, 90vw"
+              quality={70}
+              sizes="(max-width: 1024px) 92vw, 40vw"
             />
           </div>
 
