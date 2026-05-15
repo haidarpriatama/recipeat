@@ -23,12 +23,9 @@ export default async function AdminIngredientsPage({ searchParams }) {
       where: whereClause,
       skip,
       take: pageSize,
-      include: {
-        recipes: {
-          include: {
-            recipe: { select: { title: true } }
-          }
-        },
+      select: {
+        id: true,
+        name: true,
         _count: { select: { recipes: true } },
       },
       orderBy: { name: "asc" },

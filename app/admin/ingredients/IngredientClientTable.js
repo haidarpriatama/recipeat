@@ -43,6 +43,9 @@ export default function IngredientClientTable({ ingredients, page = 1, totalPage
   const [editItem, setEditItem] = useState(null);
   const [deleteItem, setDeleteItem] = useState(null);
   const [showRecipesItem, setShowRecipesItem] = useState(null);
+  const [recipes, setRecipes] = useState([]);
+  const [recipesLoading, setRecipesLoading] = useState(false);
+  const [recipesError, setRecipesError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const navigate = (p) => {
@@ -70,6 +73,38 @@ export default function IngredientClientTable({ ingredients, page = 1, totalPage
     await deleteIngredientAction(deleteItem.id);
     setDeleteItem(null);
     setIsSubmitting(false);
+  };
+
+  const handleShowRecipes = async (ingredient) => {
+    setShowRecipesItem(ingredient);
+    setRecipes([]);
+    setRecipesError("");
+    setRecipesLoading(true);
+
+    try {
+      const response = await fetch(`/admin/ingredients/${ingredient.id}/recipes`, {
+        method: "GET",
+        cache: "no-store",
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to load recipes");
+      }
+
+      const data = await response.json();
+      setRecipes(data.recipes || []);
+    } catch {
+      setRecipesError("Failed to load recipes.");
+    } finally {
+      setRecipesLoading(false);
+    }
+  };
+
+  const handleCloseRecipesModal = () => {
+    setShowRecipesItem(null);
+    setRecipes([]);
+    setRecipesError("");
+    setRecipesLoading(false);
   };
 
   return (
@@ -104,7 +139,7 @@ export default function IngredientClientTable({ ingredients, page = 1, totalPage
                     <div className="flex items-center justify-end gap-2">
                       {ingredient._count.recipes > 0 && (
                         <button
-                          onClick={() => setShowRecipesItem(ingredient)}
+                          onClick={() => handleShowRecipes(ingredient)}
                           className="inline-flex h-9 w-9 items-center justify-center rounded-lg text-[#006941] transition-colors hover:bg-[#f3fcf3]"
                           title="View recipes"
                         >
@@ -246,26 +281,32 @@ export default function IngredientClientTable({ ingredients, page = 1, totalPage
            <div className="w-full max-w-md overflow-hidden rounded-3xl bg-white shadow-2xl">
              <div className="flex items-center justify-between border-b border-[#eff1f2] px-6 py-4">
                <h3 className="text-lg font-extrabold text-[#2c2f30]">Used In Recipes</h3>
-               <button onClick={() => setShowRecipesItem(null)} className="text-[#595c5d] hover:text-[#2c2f30]">
+               <button onClick={handleCloseRecipesModal} className="text-[#595c5d] hover:text-[#2c2f30]">
                  <X className="h-5 w-5" />
                </button>
              </div>
              <div className="p-6 max-h-96 overflow-y-auto">
-               <ul className="space-y-2">
-                 {showRecipesItem.recipes.map((r, i) => (
-                   <li key={i} className="text-sm font-semibold text-[#2c2f30] bg-[#f5f6f7] p-3 rounded-xl border border-[#eff1f2]">
-                     {r.recipe.title}
-                   </li>
-                 ))}
-                 {showRecipesItem.recipes.length === 0 && (
-                   <li className="text-sm text-[#595c5d]">Not used in any recipes yet.</li>
-                 )}
-               </ul>
+               {recipesLoading ? (
+                 <p className="text-sm text-[#595c5d]">Loading recipes...</p>
+               ) : recipesError ? (
+                 <p className="text-sm text-[#b31b25]">{recipesError}</p>
+               ) : (
+                 <ul className="space-y-2">
+                   {recipes.map((recipe) => (
+                     <li key={recipe.id} className="text-sm font-semibold text-[#2c2f30] bg-[#f5f6f7] p-3 rounded-xl border border-[#eff1f2]">
+                       {recipe.title}
+                     </li>
+                   ))}
+                   {recipes.length === 0 && (
+                     <li className="text-sm text-[#595c5d]">Not used in any recipes yet.</li>
+                   )}
+                 </ul>
+               )}
              </div>
              <div className="bg-[#eff1f2]/50 px-6 py-4 flex justify-end">
                 <button
                   type="button"
-                  onClick={() => setShowRecipesItem(null)}
+                   onClick={handleCloseRecipesModal}
                   className="rounded-xl bg-[#006941] px-5 py-2.5 text-sm font-bold text-white shadow-md hover:bg-[#005c38]"
                 >
                   Close

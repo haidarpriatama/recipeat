@@ -145,6 +145,7 @@ model RecipeIngredient {
   // Indexes for ingredient filter join on explore page
   @@index([recipeId])
   @@index([ingredientId])
+  @@unique([recipeId, ingredientId])
 }
 
 // Model Favorite untuk menyimpan resep favorit pengguna
