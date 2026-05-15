@@ -35,16 +35,19 @@ export default function AddToMealPlanButton({ recipeId, mealType }) {
       const currentDay = DAYS[today.getDay()];
       
       // Normalize to Monday 00:00:00 for the week start
-      const weekStart = new Date(today);
-      weekStart.setDate(today.getDate() - (today.getDay() === 0 ? 6 : today.getDay() - 1));
-      weekStart.setHours(0, 0, 0, 0);
+      const weekStartDate = new Date(today);
+      weekStartDate.setDate(today.getDate() - (today.getDay() === 0 ? 6 : today.getDay() - 1));
+      weekStartDate.setHours(0, 0, 0, 0);
+
+      const pad = (n) => String(n).padStart(2, '0');
+      const weekStartStr = `${weekStartDate.getFullYear()}-${pad(weekStartDate.getMonth() + 1)}-${pad(weekStartDate.getDate())}`;
 
       const res = await fetch('/api/mealplan', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
           recipeId, 
-          weekStart: weekStart.toISOString(),
+          weekStart: weekStartStr,
           dayOfWeek: currentDay,
           mealType: intendedSlot
         }),

@@ -73,8 +73,8 @@ export async function POST(request) {
     const body = await request.json();
     const { recipeId, dayOfWeek, mealType, weekStart } = body;
 
-    const weekStartDate = new Date(weekStart);
-    weekStartDate.setHours(0, 0, 0, 0);
+    const [wy, wm, wd] = weekStart.split('-').map(Number);
+    const weekStartDate = new Date(wy, wm - 1, wd, 0, 0, 0, 0);
 
     // Pastikan user ada di DB dan ambil ID-nya
     const dbUser = await prisma.user.upsert({
