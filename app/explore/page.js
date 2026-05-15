@@ -1,27 +1,14 @@
 // dynamic is automatically set by Next.js because this page uses searchParams
 
-import Image from "next/image";
+import { Suspense } from "react";
 import SafeImage from "@/components/ui/SafeImage";
 import prisma from "@/lib/prisma";
 import Link from "next/link";
 import dynamic from "next/dynamic";
 import { auth } from "@/lib/auth";
-import FavoriteButton from "@/components/RecipeCard/FavoriteButton";
 import FilterSidebar from "./FilterSidebar";
-import {
-  ArrowRight,
-  Bell,
-  CheckCircle2,
-  ChevronLeft,
-  ChevronRight,
-  Clock3,
-  Flame,
-  Globe,
-  Heart,
-  PlusCircle,
-  Search,
-  Star,
-} from "lucide-react";
+import ExploreGrid from "./ExploreGrid";
+import { ArrowRight, Bell, Clock3, Globe, Star } from "lucide-react";
 
 export const metadata = {
   title: "Explore – Recipeat",
@@ -37,128 +24,8 @@ const SmartDiscovery = dynamic(
   }
 );
 
-const RECIPES = [
-  {
-    title: "Honey Glazed Salmon with Wild Asparagus",
-    image:
-      "https://lh3.googleusercontent.com/aida-public/AB6AXuBaqVMxGkC0J2mMGTLfPuHneMbwXl55gvYVI9y7VFC9mLP7bH38-Wh37yzYSmGVfFlZJiye9_XeDVZr1sB2MNnmDX8z2z2b_yAiLgKfx-Bc6Omrd5bwDFgaz07F7Vi22mFTW9RDS1bVFmMggx2B3rqqiSoHTcT8ZrOOTr1rAKql1IfAPTVgBsN6FzA2h8KlS65S0zQqPhP-nX7kYL4TXPjLTacWEdXFca8bCd6FCwxxDNb4zln8tGJbBMIuVfmP7EXBT0mMIiQEdNHb",
-    alt: "Pan-seared salmon with asparagus",
-    time: "20m",
-    rating: 5,
-    label: "Dinner",
-    favorite: true,
-  },
-  {
-    title: "Crispy Chickpea & Kale Power Salad",
-    image:
-      "https://lh3.googleusercontent.com/aida-public/AB6AXuDBkBXJj6V96CEHMlp-1HUE2bxX0skyARsVwVphmo2K8ISdGnQjrQ7weSbo6x4193qtGX_JpOcbpH9XBirr6ewndl_StgWH9QljvLhcLbgTeORdSUV6oQhwFFFOvD2wZAeP6YsndOwQcqYK95cG53gVCqAv6u1Vw7k45Rg36lxTytzPnF3nwfkgGbCYHB9HzFdgc686tffbqrINN2SnUkiTTcV5KPRBJ-aXJGBKjyWu6WEGw_HBHLGE74n34huLrKzf6OAAYM8bUW3G",
-    alt: "Kale and chickpea salad bowl",
-    time: "15m",
-    rating: 4,
-    label: "Vegan",
-  },
-  {
-    title: "Artisan Sourdough Margherita Pizza",
-    image:
-      "https://lh3.googleusercontent.com/aida-public/AB6AXuANYdMcxH-k1Q9iqnxguwllBhZ__yqv7d8xOzulcXOx5Hn-Z2VUXQDLKdgvxVeW71UazftYmiK7M54HOgZSVAj7ExUA_53ZYAUJpL6_nbJPlANsvq4Ph8U803QLC4TM75H3tHa8BO3U0Qi6Y5sS4rbDUSFuKZiJ7RaWTJwRDSvAgmhVgUv-yq3ZI_Wiro6meyQ-Son_sFkXll9XQ8Fb0PSrkmZjdk5WsWj7f1vVoM4WVPxL9clV-v62cEFeAZSho_QBjhBMZ7A-bHhv",
-    alt: "Margherita pizza with basil",
-    time: "45m",
-    rating: 5,
-    label: "Italian",
-  },
-  {
-    title: "Rainbow Fusion Bowl with Ginger Soy",
-    image:
-      "https://lh3.googleusercontent.com/aida-public/AB6AXuBfj2KjEGeI4Wi4nSWKkKKc78boclluhCKxNsXguJDHuizDAeN0xK0TIj5ehYcRgx0RYRgCeiDGMXi_1lFDju3u36xzwekfqHOM5AKJuVkmmzRMjDteZwbSxon2d1-Ye1DL-Jmm06UocYWvw32OWFGbuqxdMiBvLMLZUue4D_MAYZiPR3Y_LFPjYhA6Q67xHcpyiMN5C203c65enGmIsubEqpKHQCQDGAnVa8YDS9muxBKiYPeV0m10Ys26OIBW5bXnCsBi8IHXMhyj",
-    alt: "Colorful tofu and vegetable fusion bowl",
-    time: "10m",
-    rating: 0,
-    label: "Lunch",
-  },
-  {
-    title: "Herb-Roasted Poultry with Root Veloute",
-    image:
-      "https://lh3.googleusercontent.com/aida-public/AB6AXuB9OB9DnbxggOSs4TxSOV_-SKhrVNKA-KRrYxLTs8t0aH7bvB6bR2vtAUANnOKO4rQtiItfLpJ7nWhqQoU9IxdY4-0B2tBqqWAmKBMQ-fAa36YkDg3A72DcN9E3O7EwK2HCiF_mgJo4aZslMgOy5dyHnVboWLdyoOILtmuMe5AFkUe5RK4CvzIbEp5fJVdBIafGoCMYEv9DkF5VqWpjgDBAtZvDZ9YL6xikEB3GFRqVEAf4WSTo9U8ksmnKz5uviIUfGdQxKlepUYvp",
-    alt: "Roasted chicken with vegetables",
-    time: "50m",
-    rating: 5,
-    label: "Dinner",
-    favorite: true,
-  },
-  {
-    title: "Garden Medley hors d'oeuvres",
-    image:
-      "https://lh3.googleusercontent.com/aida-public/AB6AXuBzQndvPz-Q0UhK6-mEb7xKuz3XmROc6OK_W6PM9J010EbtOGI28cU20QwPG5mpwh2yGWwIq5PAR5Nbe5mWn9VfqWpQGBKmXq2bQMrW9paTKXKmDhMJhEjgKA-f_I49953dbNsAcP2TmXMSeLxjEr4ALzAWmaJXM7I6ifLHfm9uznwbsAfPQ3CQArzazEmIZzQob29aUtly4MaeDdMZOLKMZq0jks171DkkgGh1XVthsuKyO5FggHdUfNxgA8OFw_tzyANdFDrGgpeK",
-    alt: "Vegetable appetizers assortment",
-    time: "35m",
-    rating: 0,
-    label: "Snack",
-  },
-];
 
 
-function RecipeCard({ recipe, slot, dateStr }) {
-  const params = new URLSearchParams();
-  if (slot) params.set('slot', slot);
-  if (dateStr) params.set('date', dateStr);
-  const qs = params.toString();
-  const destination = qs ? `/recipes/${recipe.id}?${qs}` : `/recipes/${recipe.id}`;
-  const cardContent = (
-    <article className="h-full group flex cursor-pointer flex-col overflow-hidden rounded-xl border border-transparent bg-white shadow-[0_32px_64px_-12px_rgba(0,105,65,0.08)] transition-all hover:border-[#006941]/10">
-      <div className="relative h-56">
-        <SafeImage
-          src={recipe.image}
-          alt={recipe.title}
-          fill
-          className="object-cover transition-transform duration-500 group-hover:scale-110"
-          sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-        />
-
-        <FavoriteButton 
-          recipeId={recipe.id} 
-          initialFavorited={recipe.favorite} 
-          className="absolute right-4 top-4"
-        />
-
-        <div className="absolute bottom-4 left-4">
-          <span className="rounded-full bg-black/50 px-3 py-1 text-[10px] font-bold uppercase text-white backdrop-blur-sm">
-            {recipe.label}
-          </span>
-        </div>
-      </div>
-
-      <div className="flex flex-1 flex-col p-6">
-        <h3 className="mb-3 text-xl font-bold text-[#2c2f30] transition-colors group-hover:text-[#006941]">
-          {recipe.title}
-        </h3>
-
-        <div className="mt-auto flex items-center justify-between text-[#595c5d]">
-          <div className="flex items-center gap-4 text-xs font-semibold">
-            <span className="inline-flex items-center gap-1">
-              <Clock3 className="h-3.5 w-3.5" />
-              {recipe.time}
-            </span>
-            <span className="inline-flex items-center gap-0.5">
-              {Array.from({ length: 5 }).map((_, i) => (
-                <Star
-                  key={i}
-                  className={`h-3.5 w-3.5 ${i < (recipe.rating || 0) ? "fill-[#ffb800] text-[#ffb800]" : "text-[#abadae]"}`}
-                />
-              ))}
-            </span>
-          </div>
-
-          <ArrowRight className="h-4 w-4 text-[#006941] transition-transform group-hover:translate-x-1" />
-        </div>
-      </div>
-    </article>
-  );
-
-  if (recipe.id) {
-    return <Link href={destination} className="block h-full">{cardContent}</Link>;
-  }
-  return cardContent;
-}
 
 export default async function ExplorePage({ searchParams: searchParamsPromise }) {
   const searchParams = await searchParamsPromise;
@@ -166,20 +33,13 @@ export default async function ExplorePage({ searchParams: searchParamsPromise })
   const userId = session?.user?.id;
 
   const query = searchParams?.q || "";
-  const categoryFilter = searchParams?.category || "";
-  const slotFilter = searchParams?.slot || "";
-  const dateFilter = searchParams?.date || "";
   const selectedMealTypes = searchParams?.mealTypes ? searchParams.mealTypes.split(",").filter(Boolean) : [];
   const selectedServingTimes = searchParams?.servingTimes ? searchParams.servingTimes.split(",").filter(Boolean) : [];
   const ingredientsFilter = searchParams?.ingredients ? searchParams.ingredients.split(",") : [];
-  
-  const page = parseInt(searchParams?.page || "1", 10);
-  const pageSize = 12;
-  const skip = (page - 1) * pageSize;
+  const slotFilter = searchParams?.slot || "";
+  const dateFilter = searchParams?.date || "";
 
-  let displayRecipes = [];
   let availableIngredients = [];
-  let totalRecipesCount = 0;
   let specialRecipeData = {
     id: "",
     title: "Seasonal Harvest Buddha Bowl with Miso Dressing",
@@ -193,71 +53,18 @@ export default async function ExplorePage({ searchParams: searchParamsPromise })
     const totalAllRecipesCount = await prisma.recipe.count();
     const randomSkip = totalAllRecipesCount > 0 ? Math.floor(Math.random() * totalAllRecipesCount) : 0;
 
-    // Build the Prisma query filter
-    const where = {
-      status: 'PUBLISHED',
-      AND: [
-        query ? {
-          OR: [
-            { title: { contains: query, mode: 'insensitive' } },
-            { description: { contains: query, mode: 'insensitive' } }
-          ]
-        } : {},
-        categoryFilter ? {
-          category: { name: { equals: categoryFilter, mode: 'insensitive' } }
-        } : {},
-        selectedMealTypes.length > 0 ? {
-          category: {
-            name: { in: selectedMealTypes, mode: 'insensitive' }
-          }
-        } : {},
-        selectedServingTimes.length > 0 ? {
-          OR: selectedServingTimes.map((time) => {
-            if (time === "under_15") return { cookTime: { lt: 15 } };
-            if (time === "under_30") return { cookTime: { lt: 30 } };
-            if (time === "under_60") return { cookTime: { lt: 60 } };
-            if (time === "over_90") return { cookTime: { gt: 90 } };
-            return {};
-          })
-        } : {},
-        ingredientsFilter.length > 0 ? {
-          ingredients: {
-            some: {
-              ingredient: {
-                OR: ingredientsFilter.map(ing => ({
-                  name: { contains: ing, mode: 'insensitive' }
-                }))
-              }
-            }
-          }
-        } : {}
-      ]
-    };
-
-    const [dbRecipes, dbIngredients, count, randomRecipe] = await Promise.all([
-      prisma.recipe.findMany({
-        where,
-        skip,
-        take: pageSize,
-        include: { 
-          category: true,
-          favorites: userId ? { where: { userId } } : false,
-          ratings: userId ? { where: { userId } } : false
-        },
-        orderBy: { createdAt: 'desc' }
-      }),
+    const [dbIngredients, randomRecipe] = await Promise.all([
       prisma.ingredient.findMany({
         select: { name: true, _count: { select: { recipes: true } } },
         take: 200,
         orderBy: { recipes: { _count: 'desc' } },
       }),
-      prisma.recipe.count({ where }),
       totalAllRecipesCount > 0 ? prisma.recipe.findFirst({
         skip: randomSkip,
+        where: { status: 'PUBLISHED' },
         include: { category: true, ratings: true }
-      }) : null
+      }) : null,
     ]);
-    totalRecipesCount = count;
 
     availableIngredients = dbIngredients.map((ingredient) => ingredient.name);
 
@@ -275,31 +82,8 @@ export default async function ExplorePage({ searchParams: searchParamsPromise })
         rating: specialRating,
       };
     }
-
-    if (dbRecipes.length > 0) {
-      displayRecipes = dbRecipes.map((recipe) => {
-        const userRating = recipe.ratings && recipe.ratings.length > 0
-          ? recipe.ratings[0].score
-          : 0;
-          
-        return {
-          id: recipe.id,
-          title: recipe.title,
-          image: recipe.imageUrl || 'https://images.unsplash.com/photo-1547592166-23ac45744acd?auto=format&fit=crop&w=800&q=80',
-          alt: recipe.title,
-          time: `${recipe.cookTime}m`,
-          rating: userRating,
-          label: recipe.category?.name || "Recipe",
-          favorite: recipe.favorites?.length > 0,
-        };
-      });
-    } else if (!query && !categoryFilter && selectedMealTypes.length === 0 && ingredientsFilter.length === 0) {
-      // Fallback to static data only if no search/filter is applied and DB is empty
-      displayRecipes = RECIPES;
-    }
   } catch (error) {
-    console.error("Error fetching recipes:", error);
-    displayRecipes = RECIPES;
+    console.error("Error fetching explore data:", error);
   }
 
   return (
@@ -360,60 +144,35 @@ export default async function ExplorePage({ searchParams: searchParamsPromise })
           <FilterSidebar selectedMealTypes={selectedMealTypes} selectedServingTimes={selectedServingTimes} searchParams={searchParams} />
 
           <section className="flex-1">
-            
-            {/* INI DIA KOMPONEN SMART DISCOVERY YANG BARU */}
+            {/* Smart Discovery - search bar */}
             <SmartDiscovery
               initialQuery={query}
               initialIngredients={ingredientsFilter}
               availableIngredients={availableIngredients}
             />
 
-            {/* --- BAGIAN BAWAH (DISCOVER FLAVORS & RESEP) TETAP SAMA --- */}
-            <div className="mb-8 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
-              <div>
-                <h2 className="mb-1 text-3xl font-extrabold tracking-tight">
-                  {query || ingredientsFilter.length > 0 ? "Search Results" : "Discover Flavors"}
-                </h2>
-                <p className="text-[#595c5d]">{totalRecipesCount || displayRecipes.length} recipes found for your current selection</p>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 gap-8 md:grid-cols-2 xl:grid-cols-3">
-              {displayRecipes.map((recipe) => (
-                <RecipeCard key={recipe.title} recipe={recipe} slot={slotFilter} dateStr={dateFilter} />
-              ))}
-            </div>
-
-            {totalRecipesCount > pageSize && (
-              <div className="mt-16 flex flex-wrap items-center justify-center gap-2">
-                <Link
-                  href={`/explore?${new URLSearchParams({...searchParams, page: Math.max(1, page - 1)}).toString()}`}
-                  className={`flex h-10 w-10 items-center justify-center rounded-full border border-[#abadae]/20 text-[#595c5d] transition-colors hover:bg-[#006941]/10 ${page <= 1 ? "pointer-events-none opacity-50" : ""}`}
-                >
-                  <ChevronLeft className="h-4 w-4" />
-                </Link>
-
-                {Array.from({ length: Math.ceil(totalRecipesCount / pageSize) }).map((_, i) => (
-                  <Link
-                    key={i + 1}
-                    href={`/explore?${new URLSearchParams({...searchParams, page: i + 1}).toString()}`}
-                    style={page === i + 1 ? { color: "white" } : {}}
-                    className={`flex h-10 w-10 items-center justify-center rounded-full font-bold transition-colors ${
-                      page === i + 1 ? "bg-[#006941]" : "text-[#595c5d] hover:bg-[#006941]/10"
-                    }`}
-                  >
-                    {i + 1}
-                  </Link>
+            {/* Client-side grid with skeleton + pagination */}
+            <Suspense fallback={
+              <div className="grid grid-cols-1 gap-8 md:grid-cols-2 xl:grid-cols-3">
+                {Array.from({ length: 12 }).map((_, i) => (
+                  <article key={i} className="flex h-full flex-col overflow-hidden rounded-xl bg-white border border-slate-100 shadow-sm animate-pulse">
+                    <div className="relative h-56 bg-slate-200" />
+                    <div className="flex flex-1 flex-col p-6">
+                      <div className="mb-2 h-5 w-3/4 rounded bg-slate-300" />
+                      <div className="mt-auto flex items-center justify-between">
+                        <div className="flex gap-4">
+                          <div className="h-4 w-16 rounded bg-slate-200" />
+                          <div className="h-4 w-20 rounded bg-slate-200" />
+                        </div>
+                        <div className="h-4 w-4 rounded bg-slate-200" />
+                      </div>
+                    </div>
+                  </article>
                 ))}
-
-                <Link
-                  href={`/explore?${new URLSearchParams({...searchParams, page: Math.min(Math.ceil(totalRecipesCount / pageSize), page + 1)}).toString()}`}
-                  className={`flex h-10 w-10 items-center justify-center rounded-full border border-[#abadae]/20 text-[#595c5d] transition-colors hover:bg-[#006941]/10 ${page >= Math.ceil(totalRecipesCount / pageSize) ? "pointer-events-none opacity-50" : ""}`}
-                >
-                  <ChevronRight className="h-4 w-4" />
-                </Link>
               </div>
-            )}
+            }>
+              <ExploreGrid slot={slotFilter} dateStr={dateFilter} />
+            </Suspense>
           </section>
         </div>
       </main>
