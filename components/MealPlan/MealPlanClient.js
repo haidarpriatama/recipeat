@@ -2,8 +2,9 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
-import { ChevronLeft, ChevronRight, PlusCircle, Clock3 } from "lucide-react";
+import { ChevronLeft, ChevronRight, PlusCircle } from "lucide-react";
 import MealCard from "./MealCard";
+import RecipePickerModal from "./RecipePickerModal";
 import Link from "next/link";
 
 const DAYS_FULL = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
@@ -143,6 +144,7 @@ const SLOTS = ["Breakfast", "Lunch", "Dinner"];
 function TimelineItem({ slot, meals, dateStr, onMealDeleted }) {
   const slotMeals = meals.filter((m) => m.mealType === slot);
   const remaining = 3 - slotMeals.length;
+  const [pickerOpen, setPickerOpen] = useState(false);
 
   return (
     <article className="group relative pl-16">
@@ -160,8 +162,9 @@ function TimelineItem({ slot, meals, dateStr, onMealDeleted }) {
         ))}
 
         {remaining > 0 && (
-          <Link
-            href={`/explore?slot=${slot}&date=${dateStr}`}
+          <button
+            type="button"
+            onClick={() => setPickerOpen(true)}
             className="flex w-full flex-col items-center justify-center rounded-2xl border-2 border-dashed border-[#abadae] bg-white/60 p-8 text-center transition-all hover:border-[#006941] hover:bg-[#f3fcf3]"
           >
             <PlusCircle className="mb-2 h-9 w-9 text-[#757778] transition-colors group-hover:text-[#006941]" />
@@ -171,9 +174,18 @@ function TimelineItem({ slot, meals, dateStr, onMealDeleted }) {
             <span className="mt-1 text-xs font-medium text-[#959798]">
               {remaining} slot{remaining === 1 ? "" : "s"} left
             </span>
-          </Link>
+          </button>
         )}
       </div>
+
+      {pickerOpen && (
+        <RecipePickerModal
+          slot={slot}
+          dateStr={dateStr}
+          onClose={() => setPickerOpen(false)}
+          onAdded={onMealDeleted}
+        />
+      )}
     </article>
   );
 }

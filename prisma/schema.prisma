@@ -174,10 +174,11 @@ model MealPlan {
 
 // Model MealPlanRecipe untuk menyimpan resep dalam rencana makan pada hari tertentu
 model MealPlanRecipe {
-  mealPlanId Int
-  recipeId   Int
-  dayOfWeek  String  // Menyimpan hari dalam minggu (Monday, Tuesday, dll.)
-  mealType   String  @default("Lunch") // Breakfast, Lunch, Dinner
+  mealPlanId   Int
+  recipeId     Int
+  dayOfWeek    String  // Menyimpan hari dalam minggu (Monday, Tuesday, dll.)
+  mealType     String  @default("Lunch") // Breakfast, Lunch, Dinner
+  repeatWeekly Boolean @default(false)
 
   mealPlan MealPlan @relation(fields: [mealPlanId], references: [id]) // Relasi ke MealPlan
   recipe   Recipe   @relation(fields: [recipeId], references: [id])   // Relasi ke Recipe

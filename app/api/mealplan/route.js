@@ -25,7 +25,10 @@ export async function GET(request) {
       weekStart.setDate(dateObj.getDate() - (dateObj.getDay() === 0 ? 6 : dateObj.getDay() - 1));
       weekStart.setHours(0, 0, 0, 0);
 
-      const mealPlan = await prisma.mealPlan.findFirst({
+      const prevWeekStart = new Date(weekStart);
+      prevWeekStart.setDate(weekStart.getDate() - 7);
+
+      let mealPlan = await prisma.mealPlan.findFirst({
         where: { userId: dbUser.id, weekStart },
         include: {
           recipes: {
@@ -34,6 +37,61 @@ export async function GET(request) {
           }
         }
       });
+
+      const prevMealPlan = await prisma.mealPlan.findFirst({
+        where: { userId: dbUser.id, weekStart: prevWeekStart },
+        include: {
+          recipes: {
+            where: { dayOfWeek: dayName, repeatWeekly: true },
+            include: { recipe: { include: { category: true, ratings: true } } }
+          }
+        }
+      });
+
+      if (prevMealPlan && prevMealPlan.recipes.length > 0) {
+        if (!mealPlan) {
+          mealPlan = await prisma.mealPlan.create({
+            data: { userId: dbUser.id, weekStart },
+            include: {
+              recipes: {
+                where: { dayOfWeek: dayName },
+                include: { recipe: { include: { category: true, ratings: true } } }
+              }
+            }
+          });
+        }
+
+        const existingKeys = new Set(
+          mealPlan.recipes.map((r) => `${r.recipeId}-${r.dayOfWeek}-${r.mealType}`)
+        );
+
+        const toCreate = prevMealPlan.recipes.filter(
+          (r) => !existingKeys.has(`${r.recipeId}-${r.dayOfWeek}-${r.mealType}`)
+        );
+
+        if (toCreate.length > 0) {
+          await prisma.mealPlanRecipe.createMany({
+            data: toCreate.map((r) => ({
+              mealPlanId: mealPlan.id,
+              recipeId: r.recipeId,
+              dayOfWeek: r.dayOfWeek,
+              mealType: r.mealType,
+              repeatWeekly: true,
+            })),
+            skipDuplicates: true,
+          });
+
+          mealPlan = await prisma.mealPlan.findFirst({
+            where: { id: mealPlan.id },
+            include: {
+              recipes: {
+                where: { dayOfWeek: dayName },
+                include: { recipe: { include: { category: true, ratings: true } } }
+              }
+            }
+          });
+        }
+      }
 
       if (!mealPlan) return Response.json({ meals: [], mealPlanId: null, dayName }, { status: 200 });
 
@@ -47,6 +105,7 @@ export async function GET(request) {
         mealType: r.mealType,
         dayOfWeek: r.dayOfWeek,
         mealPlanId: mealPlan.id,
+        repeatWeekly: r.repeatWeekly,
         rating: r.recipe.ratings?.length > 0
           ? (r.recipe.ratings.reduce((a, b) => a + b.score, 0) / r.recipe.ratings.length).toFixed(1)
           : '0.0',
