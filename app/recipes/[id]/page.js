@@ -85,7 +85,7 @@ export default async function RecipeDetailPage({ params }) {
             {/* Image Section */}
             <div className="relative h-[400px] w-full lg:h-[600px]">
               <SafeImage
-                src={recipe.imageUrl || "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?auto=format&fit=crop&w=800&q=80"}
+                src={recipe.imageUrl || ""}
                 alt={recipe.title}
                 fill
                 className="object-cover"
