@@ -41,7 +41,7 @@ const fetchIngredients = unstable_cache(
       return rows.map((r) => r.name);
     }),
   ["ingredients-list"],
-  { revalidate: 300 }
+  { revalidate: 300, tags: ["ingredients-list"] }
 );
 
 const EXPLORE_HERO_IMAGE = "";

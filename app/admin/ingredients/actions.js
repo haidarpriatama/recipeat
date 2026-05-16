@@ -1,7 +1,7 @@
 "use server";
 import { auth } from "@/lib/auth";
 import prisma from "@/lib/prisma";
-import { revalidatePath } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
 
 function formatIngredientName(name) {
   const trimmed = name.trim().toLowerCase();
@@ -18,6 +18,7 @@ export async function deleteIngredientAction(id) {
   await prisma.ingredient.delete({ where: { id } });
 
   revalidatePath("/admin/ingredients");
+  revalidateTag("ingredients-list");
 }
 
 export async function updateIngredientAction(id, name) {
@@ -38,6 +39,7 @@ export async function updateIngredientAction(id, name) {
   });
 
   revalidatePath("/admin/ingredients");
+  revalidateTag("ingredients-list");
   return { success: true };
 }
 
@@ -53,6 +55,7 @@ export async function createIngredientAction(name) {
       data: { name: normalizedName },
     });
     revalidatePath("/admin/ingredients");
+    revalidateTag("ingredients-list");
     return { success: true };
   } else {
     return { error: "Ingredient already exists" };
