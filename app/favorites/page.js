@@ -1,12 +1,11 @@
 import { footerContent } from "@/components/content/landingContent";
 import SiteFooter from "@/components/layout/SiteFooter";
-import Image from "next/image";
+import SafeImage from "@/components/ui/SafeImage";
 import Link from "next/link";
 import { Clock, Heart, Search } from "lucide-react";
 import prisma from "@/lib/prisma";
 import { auth } from "@/lib/auth";
 import FavoriteButton from "@/components/RecipeCard/FavoriteButton";
-import { getSafeImageSrc } from "@/lib/images";
 import { redirect } from "next/navigation";
 
 export const metadata = {
@@ -123,8 +122,8 @@ export default async function FavoritesPage({ searchParams: searchParamsPromise 
               <article key={fav.recipe.id} className="bg-white rounded-[1.5rem] p-4 shadow-sm hover:shadow-xl flex flex-col gap-5 group cursor-pointer transition-all duration-300 hover:-translate-y-2 border border-slate-100">
                 <div className="relative w-full aspect-square rounded-xl overflow-hidden bg-slate-100">
                   <Link href={`/recipes/${fav.recipe.id}`} className="block h-full">
-                    <Image 
-                      src={getSafeImageSrc(fav.recipe.imageUrl)} 
+                    <SafeImage 
+                      src={fav.recipe.imageUrl} 
                       alt={fav.recipe.title} 
                       fill
                       sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 25vw"
