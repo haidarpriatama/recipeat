@@ -134,11 +134,9 @@ export default function ProfilePage() {
             {/* Kartu Resep 1 */}
             <div className="group cursor-pointer">
               <div className="relative h-64 rounded-xl overflow-hidden mb-4 shadow-[0_32px_64px_rgba(44,47,48,0.04)]">
-                <img 
-                  src="/favorit2.png" // Sesuaikan dengan nama gambarmu
-                  alt="Avocado Toast" 
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" 
-                />
+                  <div className="w-full h-full bg-gray-200 animate-pulse group-hover:scale-105 transition-transform duration-500 flex items-center justify-center">
+                    <span className="text-gray-400 font-body">Image placeholder</span>
+                  </div>
                 <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm p-2 rounded-full text-[#8c4a00] shadow-sm">
                   <Heart size={20} fill="currentColor" />
                 </div>
@@ -162,11 +160,9 @@ export default function ProfilePage() {
             {/* Kartu Resep 2 */}
             <div className="group cursor-pointer">
               <div className="relative h-64 rounded-xl overflow-hidden mb-4 shadow-[0_32px_64px_rgba(44,47,48,0.04)]">
-                <img 
-                  src="/favorite4.png" // Sesuaikan dengan nama gambarmu
-                  alt="Buddha Bowl" 
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" 
-                />
+                  <div className="w-full h-full bg-gray-200 animate-pulse group-hover:scale-105 transition-transform duration-500 flex items-center justify-center">
+                    <span className="text-gray-400 font-body">Image placeholder</span>
+                  </div>
                 <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm p-2 rounded-full text-[#8c4a00] shadow-sm">
                   <Heart size={20} fill="currentColor" />
                 </div>
@@ -190,11 +186,9 @@ export default function ProfilePage() {
             {/* Kartu Resep 3 */}
             <div className="group cursor-pointer hidden lg:block">
               <div className="relative h-64 rounded-xl overflow-hidden mb-4 shadow-[0_32px_64px_rgba(44,47,48,0.04)]">
-                <img 
-                  src="/favorit1.png" // Sesuaikan dengan nama gambarmu
-                  alt="Pesto Pasta" 
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" 
-                />
+                  <div className="w-full h-full bg-gray-200 animate-pulse group-hover:scale-105 transition-transform duration-500 flex items-center justify-center">
+                    <span className="text-gray-400 font-body">Image placeholder</span>
+                  </div>
                 <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm p-2 rounded-full text-[#8c4a00] shadow-sm">
                   <Heart size={20} fill="currentColor" />
                 </div>

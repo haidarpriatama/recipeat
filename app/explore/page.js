@@ -44,7 +44,7 @@ const fetchIngredients = unstable_cache(
   { revalidate: 300 }
 );
 
-const EXPLORE_HERO_IMAGE = "/favorit3.png";
+const EXPLORE_HERO_IMAGE = "";
 
 // Default fallback for when no recipes exist in DB yet
 const DEFAULT_FEATURED = {
@@ -108,7 +108,7 @@ export default async function ExplorePage({ searchParams: searchParamsPromise })
       <main className="mx-auto w-full max-w-screen-2xl px-6 py-8 md:px-12">
         <section className="relative mb-12 h-[320px] w-full overflow-hidden rounded-xl shadow-[0_32px_64px_-12px_rgba(0,105,65,0.08)] md:h-[380px]">
           <SafeImage
-            src={EXPLORE_HERO_IMAGE}
+            src={specialRecipeData.image}
             alt={specialRecipeData.title}
             fill
             className="object-cover"
