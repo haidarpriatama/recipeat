@@ -3,6 +3,12 @@ import { auth } from "@/lib/auth";
 import prisma from "@/lib/prisma";
 import { revalidatePath } from "next/cache";
 
+function formatIngredientName(name) {
+  const trimmed = name.trim().toLowerCase();
+  if (!trimmed) return "";
+  return trimmed.charAt(0).toUpperCase() + trimmed.slice(1);
+}
+
 export async function deleteIngredientAction(id) {
   const currentSession = await auth();
   if (!currentSession || currentSession.user.role !== "ADMIN") throw new Error("Unauthorized");
@@ -19,7 +25,7 @@ export async function updateIngredientAction(id, name) {
   if (!currentSession || currentSession.user.role !== "ADMIN") throw new Error("Unauthorized");
   if (!id || !name) return { error: "ID and name required" };
 
-  const normalizedName = name.trim().toLowerCase();
+  const normalizedName = formatIngredientName(name);
 
   const existing = await prisma.ingredient.findUnique({ where: { name: normalizedName } });
   if (existing && existing.id !== id) {
@@ -40,12 +46,15 @@ export async function createIngredientAction(name) {
   if (!currentSession || currentSession.user.role !== "ADMIN") throw new Error("Unauthorized");
   if (!name) throw new Error("Name required");
 
-  const normalizedName = name.trim().toLowerCase();
+  const normalizedName = formatIngredientName(name);
   const existing = await prisma.ingredient.findUnique({ where: { name: normalizedName } });
   if (!existing) {
     await prisma.ingredient.create({
       data: { name: normalizedName },
     });
     revalidatePath("/admin/ingredients");
+    return { success: true };
+  } else {
+    return { error: "Ingredient already exists" };
   }
 }

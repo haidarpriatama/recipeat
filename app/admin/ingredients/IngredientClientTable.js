@@ -4,6 +4,12 @@ import { useRouter } from "next/navigation";
 import { Pencil, Trash2, X, Eye } from "lucide-react";
 import { deleteIngredientAction, updateIngredientAction } from "./actions";
 
+function capitalizeFirst(str) {
+  if (!str) return "";
+  const trimmed = str.trim();
+  return trimmed.charAt(0).toUpperCase() + trimmed.slice(1);
+}
+
 function TableSkeleton() {
   return (
     <div className="space-y-6 animate-pulse">
@@ -138,7 +144,7 @@ export default function IngredientClientTable({ ingredients, page = 1, totalPage
               {ingredients.map((ingredient) => (
                 <tr key={ingredient.id} className="transition-colors hover:bg-[#f5f6f7]">
                   <td className="px-6 py-4 text-sm font-semibold text-[#595c5d]">ING-{String(ingredient.id).padStart(5, "0")}</td>
-                  <td className="px-6 py-4 font-semibold text-[#2c2f30]">{ingredient.name}</td>
+                  <td className="px-6 py-4 font-semibold text-[#2c2f30]">{capitalizeFirst(ingredient.name)}</td>
                   <td className="px-6 py-4 text-sm text-[#595c5d]">
                     {ingredient._count.recipes} recipes
                   </td>
@@ -229,7 +235,7 @@ export default function IngredientClientTable({ ingredients, page = 1, totalPage
                   id="name"
                   name="name"
                   required
-                  defaultValue={editItem.name}
+                  defaultValue={capitalizeFirst(editItem.name)}
                   className="w-full rounded-xl border border-[#eff1f2] bg-white px-4 py-3 outline-none focus:border-[#006941] focus:ring-1 focus:ring-[#006941]"
                 />
               </div>
@@ -262,7 +268,7 @@ export default function IngredientClientTable({ ingredients, page = 1, totalPage
             <div className="p-6">
               <h3 className="mb-2 text-xl font-extrabold text-[#2c2f30]">Delete Ingredient?</h3>
               <p className="text-sm text-[#595c5d]">
-                Are you sure you want to delete <span className="font-bold text-[#2c2f30]">{deleteItem.name}</span>? This will remove it from all recipes and cannot be undone.
+                Are you sure you want to delete <span className="font-bold text-[#2c2f30]">{capitalizeFirst(deleteItem.name)}</span>? This will remove it from all recipes and cannot be undone.
               </p>
             </div>
             <div className="flex justify-end gap-3 bg-[#eff1f2]/50 px-6 py-4">
