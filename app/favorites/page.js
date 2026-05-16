@@ -16,49 +16,40 @@ export const metadata = {
 export default async function FavoritesPage({ searchParams: searchParamsPromise }) {
   const searchParams = await searchParamsPromise;
   const session = await auth();
-  if (!session?.user?.email) {
+  if (!session?.user?.id) {
     redirect("/login");
   }
   
   const query = searchParams?.q || "";
+  const userId = session.user.id;
 
-  let favorites = [];
-  if (session.user.email) {
-    const dbUser = await prisma.user.findUnique({
-      where: { email: session.user.email },
-      select: { id: true },
-    });
-    
-    if (dbUser) {
-      favorites = await prisma.favorite.findMany({
-        where: { 
-          userId: dbUser.id,
-          recipe: query ? {
-            OR: [
-              { title: { contains: query, mode: 'insensitive' } },
-              { description: { contains: query, mode: 'insensitive' } }
-            ]
-          } : undefined
-        },
+  let favorites = await prisma.favorite.findMany({
+    where: { 
+      userId,
+      recipe: query ? {
+        OR: [
+          { title: { contains: query, mode: 'insensitive' } },
+          { description: { contains: query, mode: 'insensitive' } }
+        ]
+      } : undefined
+    },
+    select: {
+      recipe: {
         select: {
-          recipe: {
+          id: true,
+          title: true,
+          imageUrl: true,
+          cookTime: true,
+          category: {
             select: {
-              id: true,
-              title: true,
-              imageUrl: true,
-              cookTime: true,
-              category: {
-                select: {
-                  name: true,
-                },
-              },
+              name: true,
             },
           },
         },
-        orderBy: { savedAt: 'desc' }
-      });
-    }
-  }
+      },
+    },
+    orderBy: { savedAt: 'desc' }
+  });
 
   return (
     <>

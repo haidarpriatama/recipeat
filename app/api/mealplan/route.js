@@ -22,9 +22,7 @@ export async function GET(request) {
     }
 
     // Fallback: return all meal plans for user
-    const dbUser = await prisma.user.findUnique({ where: { email: session.user.email } });
-    if (!dbUser) return Response.json({ meals: [], mealPlanId: null }, { status: 200 });
-    const mealPlans = await prisma.mealPlan.findMany({ where: { userId: dbUser.id } });
+    const mealPlans = await prisma.mealPlan.findMany({ where: { userId: session.user.id } });
     return Response.json(mealPlans, { status: 200 });
   } catch (error) {
     console.error('GET /api/mealplan error:', error);
@@ -44,18 +42,7 @@ export async function POST(request) {
     const [wy, wm, wd] = weekStart.split('-').map(Number);
     const weekStartDate = new Date(wy, wm - 1, wd, 0, 0, 0, 0);
 
-    // Pastikan user ada di DB dan ambil ID-nya
-    const dbUser = await prisma.user.upsert({
-      where: { email: session.user.email },
-      update: { name: session.user.name || session.user.email },
-      create: {
-        id: session.user.id,
-        email: session.user.email,
-        name: session.user.name || session.user.email,
-      },
-    });
-
-    const userId = dbUser.id;
+    const userId = session.user.id;
 
     // Cari atau buat MealPlan untuk minggu tersebut
     let mealPlan = await prisma.mealPlan.findFirst({
@@ -123,15 +110,7 @@ export async function DELETE(request) {
     const session = await auth();
     if (!session?.user) return Response.json({ message: 'Unauthorized' }, { status: 401 });
 
-    const dbUser = await prisma.user.upsert({
-      where: { email: session.user.email },
-      update: {},
-      create: {
-        id: session.user.id,
-        email: session.user.email,
-        name: session.user.name || session.user.email,
-      },
-    });
+    const userId = session.user.id;
 
     const { id, mealPlanId, recipeId, dayOfWeek, mealType } = await request.json();
 
@@ -142,14 +121,14 @@ export async function DELETE(request) {
           recipeId: Number(recipeId),
           dayOfWeek,
           mealType,
-          mealPlan: { userId: dbUser.id },
+          mealPlan: { userId: userId },
         },
       });
       return Response.json(deleted, { status: 200 });
     }
 
     const deletedMealPlan = await prisma.mealPlan.deleteMany({
-      where: { id: Number(id), userId: dbUser.id },
+      where: { id: Number(id), userId: userId },
     });
 
     return Response.json(deletedMealPlan, { status: 200 });

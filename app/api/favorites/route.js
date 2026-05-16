@@ -3,18 +3,13 @@ import { auth } from '@/lib/auth';
 
 export async function GET() {
   const session = await auth();
-  if (!session?.user) {
+  if (!session?.user?.id) {
     return Response.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
   try {
-    let dbUser = await prisma.user.findUnique({ where: { email: session.user.email } });
-    if (!dbUser) {
-      return Response.json([]);
-    }
-
     const favorites = await prisma.favorite.findMany({
-      where: { userId: dbUser.id },
+      where: { userId: session.user.id },
       include: { recipe: { include: { category: true } } },
     });
     return Response.json(favorites);
@@ -25,24 +20,12 @@ export async function GET() {
 
 export async function POST(request) {
   const session = await auth();
-  if (!session?.user) {
+  if (!session?.user?.id) {
     return Response.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
   try {
-    // Ensure user exists in our DB (Fail-safe)
-    let dbUser = await prisma.user.findUnique({ where: { email: session.user.email } });
-    if (!dbUser) {
-      dbUser = await prisma.user.create({
-        data: {
-          id: session.user.id,
-          email: session.user.email,
-          name: session.user.name || session.user.email
-        }
-      });
-    }
-    const realUserId = dbUser.id;
-
+    const realUserId = session.user.id;
     const { recipeId } = await request.json();
     
     // Check if already favorited

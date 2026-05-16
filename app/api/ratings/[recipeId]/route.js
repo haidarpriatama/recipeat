@@ -19,16 +19,11 @@ export async function GET(request, { params }) {
       );
     }
 
-    let dbUser = await prisma.user.findUnique({ where: { email: session.user.email } });
-    if (!dbUser) {
-      return Response.json({ rating: null }, { status: 200 });
-    }
-
     // Cari rating user untuk resep ini
     const rating = await prisma.rating.findUnique({
       where: {
         userId_recipeId: {
-          userId: dbUser.id,
+          userId: session.user.id,
           recipeId: recipeIdNum,
         },
       },
@@ -91,28 +86,17 @@ export async function POST(request, { params }) {
     }
 
     // Pastikan user ada di DB
-    let dbUser = await prisma.user.findUnique({ where: { email: session.user.email } });
-    if (!dbUser) {
-      dbUser = await prisma.user.create({
-        data: {
-          id: session.user.id,
-          email: session.user.email,
-          name: session.user.name || session.user.email
-        }
-      });
-    }
-
     // Upsert rating
     const rating = await prisma.rating.upsert({
       where: {
         userId_recipeId: {
-          userId: dbUser.id,
+          userId: session.user.id,
           recipeId: recipeIdNum,
         },
       },
       update: { score },
       create: {
-        userId: dbUser.id,
+        userId: session.user.id,
         recipeId: recipeIdNum,
         score,
       },

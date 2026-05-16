@@ -11,11 +11,11 @@ export async function PATCH(request) {
 
     const { mealPlanId, recipeId, dayOfWeek, mealType, repeatWeekly } = await request.json();
 
-    const dbUser = await prisma.user.findUnique({ where: { email: session.user.email } });
-    if (!dbUser) return Response.json({ message: 'User not found' }, { status: 404 });
+    const userId = session.user.id;
+    if (!userId) return Response.json({ message: 'User not found' }, { status: 404 });
 
     const mealPlan = await prisma.mealPlan.findFirst({
-      where: { id: Number(mealPlanId), userId: dbUser.id },
+      where: { id: Number(mealPlanId), userId: userId },
     });
     if (!mealPlan) return Response.json({ message: 'Meal plan not found' }, { status: 404 });
 
@@ -32,7 +32,7 @@ export async function PATCH(request) {
 
     if (!repeatWeekly) {
       const futureMealPlans = await prisma.mealPlan.findMany({
-        where: { userId: dbUser.id, weekStart: { gt: mealPlan.weekStart } },
+        where: { userId: userId, weekStart: { gt: mealPlan.weekStart } },
         select: { id: true },
       });
 

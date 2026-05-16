@@ -1,5 +1,3 @@
-export const dynamic = "force-dynamic";
-
 import prisma from "@/lib/prisma";
 import Image from "next/image";
 import SafeImage from "@/components/ui/SafeImage";
@@ -48,12 +46,8 @@ export default async function RecipeDetailPage({ params }) {
   }
 
   const session = await auth();
-  let realUserId = null;
   const isAdmin = session?.user?.role === "ADMIN";
-  if (session?.user?.email) {
-    const dbUser = await prisma.user.findUnique({ where: { email: session.user.email } });
-    if (dbUser) realUserId = dbUser.id;
-  }
+  const realUserId = session?.user?.id || null;
 
   const recipe = await prisma.recipe.findUnique({
     where: { id: recipeId },
