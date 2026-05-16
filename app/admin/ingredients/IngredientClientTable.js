@@ -47,6 +47,7 @@ export default function IngredientClientTable({ ingredients, page = 1, totalPage
   const [recipesLoading, setRecipesLoading] = useState(false);
   const [recipesError, setRecipesError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [editError, setEditError] = useState("");
 
   const navigate = (p) => {
     const params = new URLSearchParams();
@@ -61,8 +62,14 @@ export default function IngredientClientTable({ ingredients, page = 1, totalPage
     e.preventDefault();
     if (isSubmitting) return;
     setIsSubmitting(true);
+    setEditError("");
     const formData = new FormData(e.target);
-    await updateIngredientAction(editItem.id, formData.get("name"));
+    const res = await updateIngredientAction(editItem.id, formData.get("name"));
+    if (res?.error) {
+      setEditError(res.error);
+      setIsSubmitting(false);
+      return;
+    }
     setEditItem(null);
     setIsSubmitting(false);
   };
@@ -205,11 +212,16 @@ export default function IngredientClientTable({ ingredients, page = 1, totalPage
           <div className="w-full max-w-md overflow-hidden rounded-3xl bg-white shadow-2xl">
             <div className="flex items-center justify-between border-b border-[#eff1f2] px-6 py-4">
               <h3 className="text-lg font-extrabold text-[#2c2f30]">Edit Ingredient</h3>
-              <button onClick={() => setEditItem(null)} className="text-[#595c5d] hover:text-[#2c2f30]">
+              <button onClick={() => { setEditItem(null); setEditError(""); }} className="text-[#595c5d] hover:text-[#2c2f30]">
                 <X className="h-5 w-5" />
               </button>
             </div>
             <form onSubmit={handleEditSubmit} className="p-6">
+              {editError && (
+                <div className="mb-4 rounded-xl bg-[#ffefee] p-3 text-sm font-semibold text-[#b31b25]">
+                  {editError}
+                </div>
+              )}
               <div className="space-y-2 mb-6">
                 <label htmlFor="name" className="text-sm font-bold text-[#2c2f30]">Name</label>
                 <input
@@ -224,7 +236,7 @@ export default function IngredientClientTable({ ingredients, page = 1, totalPage
               <div className="flex justify-end gap-3">
                 <button
                   type="button"
-                  onClick={() => setEditItem(null)}
+                  onClick={() => { setEditItem(null); setEditError(""); }}
                   className="rounded-xl px-5 py-2.5 text-sm font-bold text-[#595c5d] hover:bg-[#eff1f2]"
                 >
                   Cancel

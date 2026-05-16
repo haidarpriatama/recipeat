@@ -17,14 +17,22 @@ export async function deleteIngredientAction(id) {
 export async function updateIngredientAction(id, name) {
   const currentSession = await auth();
   if (!currentSession || currentSession.user.role !== "ADMIN") throw new Error("Unauthorized");
-  if (!id || !name) throw new Error("ID and name required");
+  if (!id || !name) return { error: "ID and name required" };
+
+  const normalizedName = name.trim().toLowerCase();
+
+  const existing = await prisma.ingredient.findUnique({ where: { name: normalizedName } });
+  if (existing && existing.id !== id) {
+    return { error: "Ingredient with this name already exists." };
+  }
 
   await prisma.ingredient.update({
     where: { id },
-    data: { name },
+    data: { name: normalizedName },
   });
 
   revalidatePath("/admin/ingredients");
+  return { success: true };
 }
 
 export async function createIngredientAction(name) {
