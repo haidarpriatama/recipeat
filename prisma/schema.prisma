@@ -67,7 +67,7 @@ model Account {
 model Session {
   id           Int      @id @default(autoincrement())
   sessionToken String   @unique
-  userId           String
+  userId       String
   expires      DateTime
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -84,38 +84,34 @@ model VerificationToken {
 
 // Model Recipe untuk menyimpan data resep
 model Recipe {
-  id          Int      @id @default(autoincrement())
-  title       String
-  description String?
+  id           Int      @id @default(autoincrement())
+  title        String
+  description  String?
   instructions String?  // Cara pembuatan resep
-  imageUrl    String?
-  cookTime    Int      // Waktu memasak dalam menit
-  categoryId  Int
-  protein     Int      @default(0)
-  carbs       Int      @default(0)
-  fats        Int      @default(0)
-  status      RecipeStatus @default(PUBLISHED)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  imageUrl     String?
+  cookTime     Int      // Waktu memasak dalam menit
+  
+  // --- BAGIAN YANG DIUBAH: DITAMBAH TANDA TANYA AGAR OPSIONAL ---
+  categoryId   Int?     
+  // --------------------------------------------------------------
+  
+  status       RecipeStatus @default(PUBLISHED)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
 
-  category    Category   @relation(fields: [categoryId], references: [id]) // Relasi ke kategori
-  ingredients RecipeIngredient[] // Relasi ke RecipeIngredient
-  favorites   Favorite[]         // Relasi ke Favorite
-  mealPlans   MealPlanRecipe[]   // Relasi ke MealPlanRecipe
-  ratings     Rating[]           // Relasi ke Rating
+  // --- BAGIAN YANG DIUBAH: DITAMBAH TANDA TANYA AGAR OPSIONAL ---
+  category     Category?  @relation(fields: [categoryId], references: [id]) 
+  // --------------------------------------------------------------
+  
+  ingredients  RecipeIngredient[] 
+  favorites    Favorite[]         
+  mealPlans    MealPlanRecipe[]   
+  ratings      Rating[]           
 
   // Indexes for explore page filter/sort performance
-  // status+createdAt: covers default listing (PUBLISHED, order by newest)
   @@index([status, createdAt(sort: Desc)])
-  // categoryId+status: covers category filter queries
   @@index([categoryId, status])
-  // cookTime: covers serving-time range filter (<15, <30, <60, >90)
   @@index([cookTime])
-  // TODO: For title/description full-text search, add a GIN trigram index
-  // via a raw SQL migration (not expressible in Prisma schema):
-  //   CREATE EXTENSION IF NOT EXISTS pg_trgm;
-  //   CREATE INDEX CONCURRENTLY idx_recipe_title_trgm
-  //     ON "Recipe" USING GIN (title gin_trgm_ops);
 }
 
 // Model Category untuk menyimpan kategori resep
@@ -134,13 +130,13 @@ model Ingredient {
 
 // Model RecipeIngredient untuk detail bahan resep
 model RecipeIngredient {
-  id             Int      @id @default(autoincrement())
-  recipeId       Int
-  ingredientId   Int
-  quantity       String
+  id           Int      @id @default(autoincrement())
+  recipeId     Int
+  ingredientId Int
+  quantity     String
 
-  recipe         Recipe     @relation(fields: [recipeId], references: [id], onDelete: Cascade)
-  ingredient     Ingredient @relation(fields: [ingredientId], references: [id])
+  recipe       Recipe     @relation(fields: [recipeId], references: [id], onDelete: Cascade)
+  ingredient   Ingredient @relation(fields: [ingredientId], references: [id])
 
   // Indexes for ingredient filter join on explore page
   @@index([recipeId])
