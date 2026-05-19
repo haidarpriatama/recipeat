@@ -2,7 +2,7 @@ import { footerContent } from "@/components/content/landingContent";
 import SiteFooter from "@/components/layout/SiteFooter";
 import SafeImage from "@/components/ui/SafeImage";
 import Link from "next/link";
-import { Clock, Heart, Search } from "lucide-react";
+import { Clock, Heart, Search, Star } from "lucide-react";
 import prisma from "@/lib/prisma";
 import { auth } from "@/lib/auth";
 import FavoriteButton from "@/components/RecipeCard/FavoriteButton";
@@ -44,6 +44,10 @@ export default async function FavoritesPage({ searchParams: searchParamsPromise 
             select: {
               name: true,
             },
+          },
+          ratings: {
+            where: { userId },
+            select: { score: true },
           },
         },
       },
@@ -138,10 +142,16 @@ export default async function FavoritesPage({ searchParams: searchParamsPromise 
                       {fav.recipe.title}
                     </h3>
                   </Link>
-                  <div className="mt-auto flex items-center justify-end text-slate-500 text-sm pt-2">
-                    <div className="flex items-center gap-1 font-medium">
-                      <Clock size={16} />
-                      <span>{fav.recipe.cookTime} min</span>
+                  <div className="mt-auto flex items-center justify-between text-slate-500 text-sm pt-2">
+                    <div className="flex items-center gap-4 text-xs font-semibold">
+                      <span className="inline-flex items-center gap-1.5">
+                        <Clock size={16} />
+                        {fav.recipe.cookTime} min
+                      </span>
+                      <span className="inline-flex items-center gap-1.5">
+                        <Star size={14} className="fill-[#ffb800] text-[#ffb800]" />
+                        {fav.recipe.ratings?.[0]?.score ? fav.recipe.ratings[0].score.toFixed(1) : "0.0"}
+                      </span>
                     </div>
                   </div>
                 </div>

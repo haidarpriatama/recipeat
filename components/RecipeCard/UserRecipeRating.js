@@ -2,8 +2,10 @@
 
 import { useEffect, useState } from "react";
 import { Star } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 export default function UserRecipeRating({ recipeId }) {
+  const router = useRouter();
   const [rating, setRating] = useState(null);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
@@ -45,6 +47,8 @@ export default function UserRecipeRating({ recipeId }) {
       if (!res.ok) {
         throw new Error("Failed to submit rating");
       }
+      
+      router.refresh();
     } catch (error) {
       console.error("Error submitting rating:", error);
       // Revert if failed

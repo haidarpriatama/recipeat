@@ -93,17 +93,9 @@ function RecipeCard({ recipe, slot, dateStr }) {
                 <Clock3 className="h-3.5 w-3.5" />
                 {recipe.time}
               </span>
-              <span className="inline-flex items-center gap-0.5">
-                {Array.from({ length: 5 }).map((_, i) => (
-                  <Star
-                    key={i}
-                    className={`h-3.5 w-3.5 ${
-                      i < (recipe.rating || 0)
-                        ? "fill-[#ffb800] text-[#ffb800]"
-                        : "text-[#abadae]"
-                    }`}
-                  />
-                ))}
+              <span className="inline-flex items-center gap-1.5">
+                <Star className="h-3.5 w-3.5 fill-[#ffb800] text-[#ffb800]" />
+                {recipe.rating || "0.0"}
               </span>
             </div>
             <ArrowRight className="h-4 w-4 text-[#006941] transition-transform group-hover:translate-x-1" />

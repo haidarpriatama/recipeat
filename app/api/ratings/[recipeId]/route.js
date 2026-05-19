@@ -85,7 +85,6 @@ export async function POST(request, { params }) {
       );
     }
 
-    // Pastikan user ada di DB
     // Upsert rating
     const rating = await prisma.rating.upsert({
       where: {
@@ -101,6 +100,13 @@ export async function POST(request, { params }) {
         score,
       },
     });
+
+    // Revalidate relevant pages so rating updates show instantly across the app
+    const { revalidatePath } = await import("next/cache");
+    revalidatePath("/explore");
+    revalidatePath("/favorites");
+    revalidatePath("/meal-plans");
+    revalidatePath(`/recipes/${recipeIdNum}`);
 
     return Response.json({ success: true, rating: rating.score });
   } catch (error) {
