@@ -18,7 +18,7 @@ export default async function AdminDashboardPage({ searchParams }) {
         select: {
           id: true,
           title: true,
-          category: {
+          categories: {
             select: {
               name: true,
             },
@@ -77,7 +77,7 @@ export default async function AdminDashboardPage({ searchParams }) {
                    <li key={r.id} className="flex items-center justify-between py-3">
                      <div>
                        <p className="font-semibold text-[#2c2f30]">{r.title}</p>
-                       <p className="text-xs text-[#595c5d]">{r.category?.name || "Uncategorized"}</p>
+                       <p className="text-xs text-[#595c5d]">{r.categories && r.categories.length > 0 ? r.categories.map(c => c.name).join(", ") : "Uncategorized"}</p>
                      </div>
                      <Link href={`/admin/recipes/${r.id}/edit`} className="text-xs font-bold text-[#006941] hover:underline">Edit</Link>
                    </li>

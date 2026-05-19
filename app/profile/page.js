@@ -21,7 +21,7 @@ export default async function ProfilePage() {
       where: { userId },
       include: {
         recipe: {
-          include: { category: true },
+          include: { categories: true },
         },
       },
       orderBy: { savedAt: "desc" },
@@ -36,7 +36,7 @@ export default async function ProfilePage() {
     image: getSafeImageSrc(fav.recipe.imageUrl),
     alt: fav.recipe.title,
     time: `${fav.recipe.cookTime} min`,
-    tags: [fav.recipe.category?.name || "Recipe"],
+    tags: fav.recipe.categories && fav.recipe.categories.length > 0 ? fav.recipe.categories.map(c => c.name) : ["Recipe"],
   }));
 
   return (

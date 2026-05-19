@@ -52,7 +52,7 @@ export default async function RecipeDetailPage({ params }) {
   const recipe = await prisma.recipe.findUnique({
     where: { id: recipeId },
     include: {
-      category: true,
+      categories: true,
       ingredients: { include: { ingredient: true } },
       favorites: realUserId ? { where: { userId: realUserId } } : false,
     },
@@ -87,7 +87,7 @@ export default async function RecipeDetailPage({ params }) {
                 priority
               />
               <div className="absolute top-6 left-6 rounded-full bg-white/90 px-4 py-1.5 text-xs font-bold uppercase tracking-widest text-[#006941] backdrop-blur">
-                {recipe.category?.name || "Recipe"}
+                {recipe.categories && recipe.categories.length > 0 ? recipe.categories.map(c => c.name).join(", ") : "Recipe"}
               </div>
             </div>
 
@@ -116,7 +116,7 @@ export default async function RecipeDetailPage({ params }) {
               </div>
 
               <div className="mt-8 flex items-center gap-4">
-                <AddToMealPlanButton recipeId={recipe.id} mealType={recipe.category?.name || "Lunch"} />
+                <AddToMealPlanButton recipeId={recipe.id} mealType={recipe.categories?.[0]?.name || "Lunch"} />
                 <FavoriteButton recipeId={recipe.id} initialFavorited={recipe.favorites?.length > 0} className="relative !top-auto !right-auto h-[56px] w-[56px] bg-white border border-slate-200 shadow-sm hover:border-[#006941]" />
               </div>
 

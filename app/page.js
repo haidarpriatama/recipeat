@@ -29,7 +29,7 @@ export default async function HomePage() {
             title: true,
             imageUrl: true,
             cookTime: true,
-            category: {
+            categories: {
               select: {
                 name: true,
               },
@@ -45,7 +45,7 @@ export default async function HomePage() {
         title: recipe.title,
         image: getSafeImageSrc(recipe.imageUrl),
         alt: recipe.title,
-        label: recipe.category?.name || "Recipe",
+        label: recipe.categories && recipe.categories.length > 0 ? recipe.categories.map(c => c.name).join(", ") : "Recipe",
         time: `${recipe.cookTime}m`,
         tags: ["Featured", "Delicious"],
       }));

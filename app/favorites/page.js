@@ -40,7 +40,7 @@ export default async function FavoritesPage({ searchParams: searchParamsPromise 
           title: true,
           imageUrl: true,
           cookTime: true,
-          category: {
+          categories: {
             select: {
               name: true,
             },
@@ -130,7 +130,7 @@ export default async function FavoritesPage({ searchParams: searchParamsPromise 
                 <div className="flex flex-col flex-grow space-y-3 px-2">
                   <div className="flex flex-wrap gap-2">
                     <span className="px-3 py-1 bg-[#f3fcf3] text-[#006941] text-xs font-semibold rounded-lg">
-                      {fav.recipe.category?.name || "Recipe"}
+                      {fav.recipe.categories && fav.recipe.categories.length > 0 ? fav.recipe.categories.map(c => c.name).join(", ") : "Recipe"}
                     </span>
                   </div>
                   <Link href={`/recipes/${fav.recipe.id}`}>

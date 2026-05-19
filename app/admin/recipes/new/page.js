@@ -30,7 +30,7 @@ export default async function AdminNewRecipePage() {
     const instructions = String(formData.get("instructions") || "").trim();
     const imageUrl = String(formData.get("imageUrl") || "").trim();
     const cookTime = Number(formData.get("cookTime"));
-    const categoryId = Number(formData.get("categoryId"));
+    const categoryIds = formData.getAll("categoryIds").map(Number).filter(Boolean);
 
     const ingredientsData = formData.get("ingredientsData");
     let parsedIngredients = [];
@@ -41,7 +41,7 @@ export default async function AdminNewRecipePage() {
       } catch (e) {}
     }
 
-    if (!title || !cookTime || !categoryId) {
+    if (!title || !cookTime || categoryIds.length === 0) {
       return;
     }
 
@@ -73,8 +73,10 @@ export default async function AdminNewRecipePage() {
         instructions: instructions || null,
         imageUrl: imageUrl || null,
         cookTime,
-        categoryId,
         status,
+        categories: {
+          connect: categoryIds.map(id => ({ id }))
+        },
         ingredients: {
           create: recipeIngredientsToCreate
         }
@@ -141,19 +143,20 @@ export default async function AdminNewRecipePage() {
 
         <section className="space-y-6 rounded-2xl bg-white p-6 shadow-sm">
           <div>
-            <label className="mb-2 block text-sm font-bold text-[#595c5d]">Category</label>
-            <select
-              name="categoryId"
-              required
-              className="w-full rounded-xl bg-[#eff1f2] px-4 py-3 outline-none ring-[#006941] transition focus:ring-2"
-            >
-              <option value="">Select category</option>
+            <label className="mb-2 block text-sm font-bold text-[#595c5d]">Categories</label>
+            <div className="flex flex-wrap gap-4 rounded-xl bg-[#eff1f2] px-4 py-3 ring-[#006941] focus-within:ring-2">
               {categories.map((category) => (
-                <option key={category.id} value={category.id}>
+                <label key={category.id} className="flex cursor-pointer items-center gap-2 text-sm font-medium text-[#595c5d] transition-colors hover:text-[#006941]">
+                  <input
+                    type="checkbox"
+                    name="categoryIds"
+                    value={category.id}
+                    className="h-4 w-4 rounded border-gray-300 text-[#006941] focus:ring-[#006941]"
+                  />
                   {category.name}
-                </option>
+                </label>
               ))}
-            </select>
+            </div>
           </div>
 
           <div>

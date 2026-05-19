@@ -36,7 +36,7 @@ export default async function AdminRecipesPage({ searchParams }) {
         cookTime: true,
         status: true,
         createdAt: true,
-        category: {
+        categories: {
           select: {
             name: true,
           },
@@ -61,7 +61,7 @@ export default async function AdminRecipesPage({ searchParams }) {
     imageUrl: getSafeImageSrc(r.imageUrl),
     cookTime: r.cookTime,
     status: r.status,
-    categoryName: r.category?.name || null,
+    categoryName: r.categories && r.categories.length > 0 ? r.categories.map(c => c.name).join(", ") : null,
     createdAt: r.createdAt.toISOString(),
     _count: r._count,
   }));

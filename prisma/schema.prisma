@@ -91,16 +91,13 @@ model Recipe {
   imageUrl     String?
   cookTime     Int      // Waktu memasak dalam menit
   
-  // --- BAGIAN YANG DIUBAH: DITAMBAH TANDA TANYA AGAR OPSIONAL ---
-  categoryId   Int?     
+  // --- BAGIAN YANG DIUBAH: MENJADI MANY-TO-MANY ---
+  categories   Category[]
   // --------------------------------------------------------------
   
   status       RecipeStatus @default(PUBLISHED)
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
-
-  // --- BAGIAN YANG DIUBAH: DITAMBAH TANDA TANYA AGAR OPSIONAL ---
-  category     Category?  @relation(fields: [categoryId], references: [id]) 
   // --------------------------------------------------------------
   
   ingredients  RecipeIngredient[] 
@@ -110,7 +107,6 @@ model Recipe {
 
   // Indexes for explore page filter/sort performance
   @@index([status, createdAt(sort: Desc)])
-  @@index([categoryId, status])
   @@index([cookTime])
 }
 
