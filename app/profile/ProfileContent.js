@@ -13,7 +13,6 @@ import { updateProfileAction } from "./actions";
 export default function ProfileContent({ favorites = [], favoriteCount = 0, ratingCount = 0, user }) {
   const router = useRouter();
   const displayName = user?.name || user?.email || "Guest";
-  const username = user?.username || displayName.split(" ")[0]?.toLowerCase() || "guest";
   const avatarUrl = user?.image || null;
   const initials = displayName
     .split(" ")
@@ -24,7 +23,6 @@ export default function ProfileContent({ favorites = [], favoriteCount = 0, rati
     .toUpperCase();
 
   const [formData, setFormData] = useState({
-    username,
     fullName: displayName,
     email: user?.email || "",
   });
@@ -45,7 +43,6 @@ export default function ProfileContent({ favorites = [], favoriteCount = 0, rati
 
     try {
       await updateProfileAction({
-        username: formData.username,
         fullName: formData.fullName,
       });
       setSaved(true);
@@ -85,12 +82,9 @@ export default function ProfileContent({ favorites = [], favoriteCount = 0, rati
                 )}
               </div>
 
-              <h1 className="font-headline text-2xl font-bold text-[#2c2f30] mb-1 z-10">
+              <h1 className="font-headline text-2xl font-bold text-[#2c2f30] mb-6 z-10">
                 {formData.fullName}
               </h1>
-              <p className="text-slate-500 mb-6 z-10 font-medium">
-                @{formData.username}
-              </p>
 
               {/* Stats */}
               <div className="flex gap-4 w-full z-10 mt-auto">
@@ -119,18 +113,18 @@ export default function ProfileContent({ favorites = [], favoriteCount = 0, rati
                 className="space-y-6 flex flex-col flex-1"
                 onSubmit={handleSave}
               >
-                {/* Username + Full Name row */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {/* Full Name and Email stack */}
+                <div className="flex flex-col space-y-6">
                   <div className="space-y-2">
-                    <label className="text-sm font-semibold text-[#2c2f30]" htmlFor="username">
-                      Username
+                    <label className="text-sm font-semibold text-[#2c2f30]" htmlFor="fullName">
+                      Full Name
                     </label>
                     <div className="relative">
                       <User size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
                       <input
-                        id="username"
+                        id="fullName"
                         type="text"
-                        value={formData.username}
+                        value={formData.fullName}
                         onChange={handleChange}
                         className="w-full bg-white rounded-xl border-none py-3 pl-11 pr-4 text-[#2c2f30] shadow-[inset_0_2px_4px_rgba(0,0,0,0.02)] focus:ring-2 focus:ring-[#7bfeb8] outline-none font-body text-sm transition-all"
                       />
@@ -138,33 +132,19 @@ export default function ProfileContent({ favorites = [], favoriteCount = 0, rati
                   </div>
 
                   <div className="space-y-2">
-                    <label className="text-sm font-semibold text-[#2c2f30]" htmlFor="fullName">
-                      Full Name
+                    <label className="text-sm font-semibold text-[#2c2f30]" htmlFor="email">
+                      Email Address
                     </label>
-                    <input
-                      id="fullName"
-                      type="text"
-                      value={formData.fullName}
-                      onChange={handleChange}
-                      className="w-full bg-white rounded-xl border-none py-3 px-4 text-[#2c2f30] shadow-[inset_0_2px_4px_rgba(0,0,0,0.02)] focus:ring-2 focus:ring-[#7bfeb8] outline-none font-body text-sm transition-all"
-                    />
-                  </div>
-                </div>
-
-                {/* Email */}
-                <div className="space-y-2">
-                  <label className="text-sm font-semibold text-[#2c2f30]" htmlFor="email">
-                    Email Address
-                  </label>
-                  <div className="relative">
-                    <Mail size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
-                    <input
-                      id="email"
-                      type="email"
-                      value={formData.email}
-                      readOnly
-                      className="w-full bg-white rounded-xl border-none py-3 pl-11 pr-4 text-[#2c2f30] shadow-[inset_0_2px_4px_rgba(0,0,0,0.02)] focus:ring-2 focus:ring-[#7bfeb8] outline-none font-body text-sm transition-all"
-                    />
+                    <div className="relative">
+                      <Mail size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
+                      <input
+                        id="email"
+                        type="email"
+                        value={formData.email}
+                        readOnly
+                        className="w-full bg-white rounded-xl border-none py-3 pl-11 pr-4 text-[#2c2f30] shadow-[inset_0_2px_4px_rgba(0,0,0,0.02)] focus:ring-2 focus:ring-[#7bfeb8] outline-none font-body text-sm transition-all"
+                      />
+                    </div>
                   </div>
                 </div>
 
