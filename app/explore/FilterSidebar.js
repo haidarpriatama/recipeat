@@ -15,7 +15,7 @@ const SERVING_TIMES = [
   { label: "<15 min", value: "under_15" },
   { label: "<30 min", value: "under_30" },
   { label: "<60 min", value: "under_60" },
-  { label: ">90 min", value: "over_90" },
+  { label: ">60 min", value: "over_60" },
 ];
 
 export default function FilterSidebar({ selectedMealTypes = [], selectedServingTimes = [], searchParams = {} }) {

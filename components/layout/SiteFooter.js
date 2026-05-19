@@ -14,19 +14,6 @@ export default function SiteFooter({
           <p className="max-w-sm text-xs font-medium uppercase tracking-widest text-slate-500">
             {legalText}
           </p>
-
-          <div className="flex gap-4">
-            {socialItems.map((item) => (
-              <a
-                key={item.icon}
-                className="flex h-8 w-8 items-center justify-center rounded-full bg-[#e6e8ea] transition-colors hover:text-[#006941]"
-                href={item.href}
-                aria-label={item.label}
-              >
-                <LucideIcon className="h-4 w-4" name={item.icon} strokeWidth={2.25} />
-              </a>
-            ))}
-          </div>
         </div>
 
         <div className="grid grid-cols-2 gap-6 md:grid-cols-3">

@@ -191,22 +191,6 @@ export default async function ExplorePage({ searchParams: searchParamsPromise })
               Redefining home cooking through seasonal inspiration and editorial-grade nutrition. Join our
               community of culinary curators.
             </p>
-            <div className="flex gap-4">
-              <a
-                href="#"
-                className="flex h-10 w-10 items-center justify-center rounded-full bg-white text-[#006941] shadow-sm"
-                aria-label="Website"
-              >
-                <Globe className="h-4 w-4" />
-              </a>
-              <a
-                href="#"
-                className="flex h-10 w-10 items-center justify-center rounded-full bg-white text-[#006941] shadow-sm"
-                aria-label="Contact"
-              >
-                <Bell className="h-4 w-4" />
-              </a>
-            </div>
           </div>
 
           <div>

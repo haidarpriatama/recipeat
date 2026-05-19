@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useTransition, useEffect } from 'react';
-import { Search, X, History } from 'lucide-react';
+import { Search, X, History, Plus } from 'lucide-react';
 import { useRouter, useSearchParams } from 'next/navigation';
 
 export default function SmartDiscovery({ initialQuery = "", initialIngredients = [], availableIngredients = [] }) {
@@ -12,8 +12,12 @@ export default function SmartDiscovery({ initialQuery = "", initialIngredients =
   // availableIngredients are already sorted by most-used from the server
   const ingredientOptions = availableIngredients.length > 0 ? availableIngredients : [];
 
-  // Quick Add: first 8 most-used ingredients
-  const quickAddIngredients = ingredientOptions.slice(0, 8);
+  const [hiddenQuickAdds, setHiddenQuickAdds] = useState([]);
+
+  // Quick Add: first 8 most-used ingredients that are not hidden
+  const quickAddIngredients = ingredientOptions
+    .filter(item => !hiddenQuickAdds.includes(item))
+    .slice(0, 8);
 
   const [selectedIngredients, setSelectedIngredients] = useState(initialIngredients);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -27,7 +31,19 @@ export default function SmartDiscovery({ initialQuery = "", initialIngredients =
       const history = JSON.parse(localStorage.getItem('recipeSearchHistory')) || [];
       setSearchHistory(history);
     } catch (e) {}
+    try {
+      const hidden = JSON.parse(localStorage.getItem('hiddenQuickAdds')) || [];
+      setHiddenQuickAdds(hidden);
+    } catch (e) {}
   }, []);
+
+  const hideQuickAdd = (item) => {
+    try {
+      const next = [...hiddenQuickAdds, item];
+      setHiddenQuickAdds(next);
+      localStorage.setItem('hiddenQuickAdds', JSON.stringify(next));
+    } catch(e) {}
+  };
 
   const saveToHistory = (query) => {
     if (!query.trim()) return;
@@ -46,6 +62,7 @@ export default function SmartDiscovery({ initialQuery = "", initialIngredients =
   const customSelectedIngredients = selectedIngredients.filter(
     (ingredient) => !quickAddIngredients.includes(ingredient)
   );
+
   const filteredIngredientOptions = ingredientOptions.filter((ingredient) =>
     ingredient.toLowerCase().includes(ingredientSearchQuery.toLowerCase())
   );
@@ -160,12 +177,6 @@ export default function SmartDiscovery({ initialQuery = "", initialIngredients =
             <span className="text-xs font-bold uppercase tracking-[0.15em] text-[#006941]">
               Quick Add
             </span>
-            <button 
-              onClick={() => setIsModalOpen(true)}
-              className="rounded-full border border-[#006941] bg-[#006941] px-4 py-2 text-sm font-medium text-white shadow-md transition-all hover:bg-[#005535]"
-            >
-              Add More
-            </button>
           </div>
 
           <div className="flex flex-wrap gap-3 mb-5">
@@ -183,10 +194,33 @@ export default function SmartDiscovery({ initialQuery = "", initialIngredients =
                   }`}
                 >
                   <span>{item}</span>
-                  {isSelected && <X size={14} className="hidden group-hover:block" />}
+                  <span 
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      if (isSelected) {
+                        removeIngredient(item);
+                      } else {
+                        hideQuickAdd(item);
+                      }
+                    }}
+                    className={`ml-0.5 rounded-full p-0.5 transition-colors hidden group-hover:flex items-center justify-center ${
+                      isSelected ? 'hover:bg-red-700' : 'hover:bg-red-500 hover:text-white'
+                    }`}
+                  >
+                    <X size={14} />
+                  </span>
                 </button>
               );
             })}
+            <button
+              onClick={() => setIsModalOpen(true)}
+              disabled={isPending}
+              className="flex items-center gap-1 px-4 py-2 rounded-full text-sm font-medium transition-all border border-[#006941] bg-[#006941] text-white shadow-md hover:bg-[#005535] disabled:opacity-60"
+            >
+              <Plus size={16} />
+              <span>Add More</span>
+            </button>
           </div>
         </div>
       )}
@@ -230,7 +264,18 @@ export default function SmartDiscovery({ initialQuery = "", initialIngredients =
                       }`}
                     >
                       <span>{item}</span>
-                      {isSelected && <X size={14} className="hidden group-hover:block" />}
+                      {isSelected && (
+                        <span 
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            removeIngredient(item);
+                          }}
+                          className="ml-0.5 rounded-full p-0.5 hover:bg-red-700 transition-colors hidden group-hover:flex items-center justify-center"
+                        >
+                          <X size={14} />
+                        </span>
+                      )}
                     </button>
                   );
                 })}
