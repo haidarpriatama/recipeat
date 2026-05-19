@@ -4,6 +4,8 @@ import dynamic from "next/dynamic";
 import FilterSidebar from "./FilterSidebar";
 import ExploreGrid from "./ExploreGrid";
 import { ArrowRight, Bell, Clock3, Globe, Star } from "lucide-react";
+import SiteFooter from "@/components/layout/SiteFooter";
+import { footerContent } from "@/components/content/landingContent";
 import {
   fetchFeaturedRecipe,
   fetchPublicExploreRecipes,
@@ -183,42 +185,12 @@ export default async function ExplorePage({ searchParams: searchParamsPromise })
         </div>
       </main>
 
-      <footer className="mt-24 border-t border-[#abadae]/20 bg-[#eff1f2] px-6 py-12 md:px-12">
-        <div className="mx-auto grid max-w-screen-2xl grid-cols-1 gap-12 md:grid-cols-4">
-          <div className="col-span-1 md:col-span-2">
-            <span className="mb-6 block text-2xl font-bold tracking-tight text-[#006941]">Recipeat</span>
-            <p className="mb-6 max-w-sm text-[#595c5d]">
-              Redefining home cooking through seasonal inspiration and editorial-grade nutrition. Join our
-              community of culinary curators.
-            </p>
-          </div>
-
-          <div>
-            <h4 className="mb-6 text-xs font-bold uppercase tracking-widest text-[#2c2f30]">Platform</h4>
-            <ul className="space-y-4 font-medium text-[#595c5d]">
-              <li><a className="transition-colors hover:text-[#006941]" href="#">Recipe Index</a></li>
-              <li><a className="transition-colors hover:text-[#006941]" href="#">Meal Planner</a></li>
-              <li><a className="transition-colors hover:text-[#006941]" href="#">Grocery Sync</a></li>
-              <li><a className="transition-colors hover:text-[#006941]" href="#">Chef Program</a></li>
-            </ul>
-          </div>
-
-          <div>
-            <h4 className="mb-6 text-xs font-bold uppercase tracking-widest text-[#2c2f30]">Resources</h4>
-            <ul className="space-y-4 font-medium text-[#595c5d]">
-              <li><a className="transition-colors hover:text-[#006941]" href="#">Help Center</a></li>
-              <li><a className="transition-colors hover:text-[#006941]" href="#">Privacy Policy</a></li>
-              <li><a className="transition-colors hover:text-[#006941]" href="#">Terms of Service</a></li>
-              <li><a className="transition-colors hover:text-[#006941]" href="#">Contact Us</a></li>
-            </ul>
-          </div>
-        </div>
-
-        <div className="mx-auto mt-12 flex max-w-screen-2xl flex-col justify-between gap-3 border-t border-[#abadae]/20 pt-8 text-xs font-bold uppercase tracking-widest text-[#595c5d] md:flex-row">
-          <span>© 2025 Recipeat UI. All rights reserved.</span>
-          <span>Designed for the Modern Kitchen</span>
-        </div>
-      </footer>
+      <SiteFooter
+        brand={footerContent.brand}
+        legalText={footerContent.legalText}
+        socialItems={footerContent.socialItems}
+        linkGroups={footerContent.linkGroups}
+      />
     </div>
   );
 }

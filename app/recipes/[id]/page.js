@@ -8,6 +8,8 @@ import AddToMealPlanButton from "@/components/MealPlan/AddToMealPlanButton";
 import FavoriteButton from "@/components/RecipeCard/FavoriteButton";
 import UserRecipeRating from "@/components/RecipeCard/UserRecipeRating";
 import { auth } from "@/lib/auth";
+import SiteFooter from "@/components/layout/SiteFooter";
+import { footerContent } from "@/components/content/landingContent";
 
 
 const SERVING_TIPS = {
@@ -171,6 +173,13 @@ export default async function RecipeDetailPage({ params }) {
           </div>
         </div>
       </main>
+
+      <SiteFooter
+        brand={footerContent.brand}
+        legalText={footerContent.legalText}
+        socialItems={footerContent.socialItems}
+        linkGroups={footerContent.linkGroups}
+      />
     </div>
   );
 }
