@@ -9,10 +9,12 @@ import { footerContent } from "@/components/content/landingContent";
 import {
   fetchFeaturedRecipe,
   fetchPublicExploreRecipes,
+  fetchAuthenticatedExploreRecipes,
 } from "@/lib/queries/explore";
 import prisma from "@/lib/prisma";
 import { unstable_cache } from "next/cache";
 import { measureServerTiming } from "@/lib/perf";
+import { auth } from "@/lib/auth";
 
 export const metadata = {
   title: "Explore – Recipeat",
@@ -85,8 +87,15 @@ export default async function ExplorePage({ searchParams: searchParamsPromise })
     ingredientsFilter,
   };
 
+  const session = await auth();
+  const userId = session?.user?.id;
+
+  const gridPromise = userId
+    ? fetchAuthenticatedExploreRecipes(filters, page, userId)
+    : fetchPublicExploreRecipes(filters, page);
+
   const [gridResult, featuredRecipe, ingredientsResult] = await Promise.allSettled([
-    fetchPublicExploreRecipes(filters, page),
+    gridPromise,
     fetchFeaturedRecipe(),
     fetchIngredients(),
   ]);
