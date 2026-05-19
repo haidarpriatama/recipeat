@@ -1,7 +1,7 @@
 "use client";
 
-import React, { useState, useTransition } from 'react';
-import { Search, X } from 'lucide-react';
+import React, { useState, useTransition, useEffect } from 'react';
+import { Search, X, History } from 'lucide-react';
 import { useRouter, useSearchParams } from 'next/navigation';
 
 export default function SmartDiscovery({ initialQuery = "", initialIngredients = [], availableIngredients = [] }) {
@@ -19,6 +19,29 @@ export default function SmartDiscovery({ initialQuery = "", initialIngredients =
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState(initialQuery);
   const [ingredientSearchQuery, setIngredientSearchQuery] = useState("");
+  const [searchHistory, setSearchHistory] = useState([]);
+  const [showHistory, setShowHistory] = useState(false);
+
+  useEffect(() => {
+    try {
+      const history = JSON.parse(localStorage.getItem('recipeSearchHistory')) || [];
+      setSearchHistory(history);
+    } catch (e) {}
+  }, []);
+
+  const saveToHistory = (query) => {
+    if (!query.trim()) return;
+    try {
+      let history = JSON.parse(localStorage.getItem('recipeSearchHistory')) || [];
+      history = history.filter(item => item !== query.trim());
+      history.unshift(query.trim());
+      if (history.length > 3) {
+        history = history.slice(0, 3);
+      }
+      localStorage.setItem('recipeSearchHistory', JSON.stringify(history));
+      setSearchHistory(history);
+    } catch (e) {}
+  };
 
   const customSelectedIngredients = selectedIngredients.filter(
     (ingredient) => !quickAddIngredients.includes(ingredient)
@@ -46,6 +69,8 @@ export default function SmartDiscovery({ initialQuery = "", initialIngredients =
   };
 
   const handleSearch = () => {
+    saveToHistory(searchQuery);
+    setShowHistory(false);
     buildAndNavigate(searchQuery, selectedIngredients);
   };
 
@@ -81,10 +106,44 @@ export default function SmartDiscovery({ initialQuery = "", initialIngredients =
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') {
+                e.preventDefault();
+                handleSearch();
+              }
+            }}
+            onFocus={() => setShowHistory(true)}
+            onBlur={() => setTimeout(() => setShowHistory(false), 200)}
             placeholder="Search for recipes or ingredients (e.g. Salmon, Pasta...)"
             className="w-full bg-white rounded-xl py-4 pl-12 pr-4 border-none shadow-[0_2px_8px_rgba(0,0,0,0.04)] focus:ring-2 focus:ring-[#006941] outline-none transition-shadow"
           />
+          {showHistory && searchHistory.length > 0 && (
+            <div className="absolute top-full left-0 w-full mt-2 bg-white rounded-xl shadow-[0_8px_24px_-4px_rgba(0,0,0,0.1)] border border-[#eff1f2] overflow-hidden z-20">
+              <div className="px-4 py-2 bg-[#f5f6f7] text-[10px] font-bold uppercase tracking-widest text-[#959798]">
+                Recent Searches
+              </div>
+              <ul>
+                {searchHistory.map((item, index) => (
+                  <li key={index} className="border-b border-[#eff1f2] last:border-0">
+                    <button
+                      type="button"
+                      onMouseDown={(e) => e.preventDefault()} // Prevent blur before click
+                      onClick={() => {
+                        setSearchQuery(item);
+                        saveToHistory(item);
+                        buildAndNavigate(item, selectedIngredients);
+                        setShowHistory(false);
+                      }}
+                      className="group w-full text-left px-4 py-3 text-sm text-[#595c5d] hover:bg-[#f3fcf3] hover:text-[#006941] transition-colors flex items-center gap-3"
+                    >
+                      <History size={16} className="text-[#abadae] flex-shrink-0 transition-colors group-hover:text-[#006941]" />
+                      <span className="truncate font-medium">{item}</span>
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
         </div>
         <button 
           onClick={handleSearch}
