@@ -24,7 +24,7 @@ export default function FilterSidebar({ selectedMealTypes = [], selectedServingT
 
   const navigate = (params) => {
     startTransition(() => {
-      router.push(`/explore?${params.toString()}`);
+      router.push(`/explore?${params.toString()}`, { scroll: false });
     });
   };
 

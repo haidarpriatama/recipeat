@@ -13,11 +13,12 @@ export default function SmartDiscovery({ initialQuery = "", initialIngredients =
   const ingredientOptions = availableIngredients.length > 0 ? availableIngredients : [];
 
   const [hiddenQuickAdds, setHiddenQuickAdds] = useState([]);
+  const [addedToQuickAdd, setAddedToQuickAdd] = useState([]);
 
-  // Quick Add: first 8 most-used ingredients that are not hidden
+  // Quick Add: first 8 most-used ingredients, then filter out hidden ones
   const quickAddIngredients = ingredientOptions
-    .filter(item => !hiddenQuickAdds.includes(item))
-    .slice(0, 8);
+    .slice(0, 8)
+    .filter(item => !hiddenQuickAdds.includes(item));
 
   const [selectedIngredients, setSelectedIngredients] = useState(initialIngredients);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -35,14 +36,54 @@ export default function SmartDiscovery({ initialQuery = "", initialIngredients =
       const hidden = JSON.parse(localStorage.getItem('hiddenQuickAdds')) || [];
       setHiddenQuickAdds(hidden);
     } catch (e) {}
+    try {
+      const added = JSON.parse(localStorage.getItem('addedToQuickAdd')) || [];
+      setAddedToQuickAdd(added);
+    } catch (e) {}
   }, []);
 
   const hideQuickAdd = (item) => {
-    try {
-      const next = [...hiddenQuickAdds, item];
-      setHiddenQuickAdds(next);
-      localStorage.setItem('hiddenQuickAdds', JSON.stringify(next));
-    } catch(e) {}
+    if (!hiddenQuickAdds.includes(item)) {
+      try {
+        const next = [...hiddenQuickAdds, item];
+        setHiddenQuickAdds(next);
+        localStorage.setItem('hiddenQuickAdds', JSON.stringify(next));
+      } catch(e) {}
+    }
+  };
+
+  const removeVisualElement = (item) => {
+    if (selectedIngredients.includes(item)) {
+      const next = selectedIngredients.filter(i => i !== item);
+      setSelectedIngredients(next);
+      buildAndNavigate(searchQuery, next);
+    }
+    if (ingredientOptions.slice(0, 8).includes(item)) {
+      hideQuickAdd(item);
+    }
+    if (addedToQuickAdd.includes(item)) {
+      const next = addedToQuickAdd.filter(i => i !== item);
+      setAddedToQuickAdd(next);
+      localStorage.setItem('addedToQuickAdd', JSON.stringify(next));
+    }
+  };
+
+  const toggleAddedToQuickAdd = (item) => {
+    const isDisplayed = quickAddIngredients.includes(item) || addedToQuickAdd.includes(item) || selectedIngredients.includes(item);
+    
+    if (isDisplayed) {
+      removeVisualElement(item);
+    } else {
+      if (hiddenQuickAdds.includes(item) && ingredientOptions.slice(0, 8).includes(item)) {
+        const nextHidden = hiddenQuickAdds.filter(i => i !== item);
+        setHiddenQuickAdds(nextHidden);
+        localStorage.setItem('hiddenQuickAdds', JSON.stringify(nextHidden));
+      } else {
+        const next = [...addedToQuickAdd, item];
+        setAddedToQuickAdd(next);
+        localStorage.setItem('addedToQuickAdd', JSON.stringify(next));
+      }
+    }
   };
 
   const saveToHistory = (query) => {
@@ -59,9 +100,7 @@ export default function SmartDiscovery({ initialQuery = "", initialIngredients =
     } catch (e) {}
   };
 
-  const customSelectedIngredients = selectedIngredients.filter(
-    (ingredient) => !quickAddIngredients.includes(ingredient)
-  );
+  const allQuickAdds = Array.from(new Set([...quickAddIngredients, ...addedToQuickAdd, ...selectedIngredients]));
 
   const filteredIngredientOptions = ingredientOptions.filter((ingredient) =>
     ingredient.toLowerCase().includes(ingredientSearchQuery.toLowerCase())
@@ -81,7 +120,7 @@ export default function SmartDiscovery({ initialQuery = "", initialIngredients =
     }
     params.delete('page');
     startTransition(() => {
-      router.push(`/explore?${params.toString()}`);
+      router.push(`/explore?${params.toString()}`, { scroll: false });
     });
   };
 
@@ -180,7 +219,7 @@ export default function SmartDiscovery({ initialQuery = "", initialIngredients =
           </div>
 
           <div className="flex flex-wrap gap-3 mb-5">
-            {[...quickAddIngredients, ...customSelectedIngredients].map((item) => {
+            {allQuickAdds.map((item) => {
               const isSelected = selectedIngredients.includes(item);
               return (
                 <button
@@ -198,11 +237,7 @@ export default function SmartDiscovery({ initialQuery = "", initialIngredients =
                     onClick={(e) => {
                       e.preventDefault();
                       e.stopPropagation();
-                      if (isSelected) {
-                        removeIngredient(item);
-                      } else {
-                        hideQuickAdd(item);
-                      }
+                      removeVisualElement(item);
                     }}
                     className={`ml-0.5 rounded-full p-0.5 transition-colors hidden group-hover:flex items-center justify-center ${
                       isSelected ? 'hover:bg-red-700' : 'hover:bg-red-500 hover:text-white'
@@ -252,24 +287,24 @@ export default function SmartDiscovery({ initialQuery = "", initialIngredients =
               </div>
               <div className="flex flex-wrap gap-3">
                 {filteredIngredientOptions.map((item) => {
-                  const isSelected = selectedIngredients.includes(item);
+                  const isDisplayed = allQuickAdds.includes(item);
                   return (
                     <button
                       key={item}
-                      onClick={() => toggleIngredient(item)}
+                      onClick={() => toggleAddedToQuickAdd(item)}
                       className={`group flex items-center gap-1 px-4 py-2 rounded-full text-sm font-medium transition-all border ${
-                        isSelected 
+                        isDisplayed 
                           ? "bg-[#006941] border-[#006941] text-white shadow-md hover:bg-red-500 hover:border-red-500" 
                           : "bg-transparent border-dashed border-slate-300 text-slate-600 hover:border-solid hover:border-[#006941]/50 hover:bg-slate-50"
                       }`}
                     >
                       <span>{item}</span>
-                      {isSelected && (
+                      {isDisplayed && (
                         <span 
                           onClick={(e) => {
                             e.preventDefault();
                             e.stopPropagation();
-                            removeIngredient(item);
+                            removeVisualElement(item);
                           }}
                           className="ml-0.5 rounded-full p-0.5 hover:bg-red-700 transition-colors hidden group-hover:flex items-center justify-center"
                         >
